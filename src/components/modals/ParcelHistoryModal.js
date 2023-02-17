@@ -62,7 +62,7 @@ function ParcelHistoryModal({ tracking, status, colors }) {
       };
 
       const response = await axios({
-        url: `http://localhost:3000/histories`,
+        url: `https://ecom-api-5wlr.onrender.com/histories`,
         method: 'post',
         headers: { 'Content-Type': 'application/json' },
         data,

@@ -85,7 +85,7 @@ function CreateOrderForm() {
         price: productPrice + shippingPrice,
       });
       const response = await axios({
-        url: `http://localhost:3000/create/`,
+        url: `https://ecom-api-5wlr.onrender.com/create/`,
         method: 'post',
         headers: { 'Content-Type': 'application/json' },
         data: {

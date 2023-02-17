@@ -287,28 +287,28 @@ export default function LeadPage() {
     fetchLeads();
   }, [rowsPerPage, page, triggerFetch]);
 
-  useEffect(() => {
-    const init = async () => {
-      try {
-        const response = await axios({
-          url: `http://localhost:3000`,
-          method: 'post',
-          headers: { 'Content-Type': 'application/json' },
-          data: {
-            extension: '',
-          },
-        });
-        console.log('the response: ', response.data);
-        console.log('--', process.env.REACT_APP_API_ID);
-        console.log('--', process.env.REACT_APP_API_TOKEN);
-      } catch (error) {
-        console.log(error);
-        console.log('--', process.env.REACT_APP_API_ID);
-        console.log('--', process.env.REACT_APP_API_TOKEN);
-      }
-    };
-    init();
-  }, []);
+  // useEffect(() => {
+  //   const init = async () => {
+  //     try {
+  //       const response = await axios({
+  //         url: `https://ecom-api-5wlr.onrender.com/`,
+  //         method: 'post',
+  //         headers: { 'Content-Type': 'application/json' },
+  //         data: {
+  //           extension: '',
+  //         },
+  //       });
+  //       console.log('the response: ', response.data);
+  //       console.log('--', process.env.REACT_APP_API_ID);
+  //       console.log('--', process.env.REACT_APP_API_TOKEN);
+  //     } catch (error) {
+  //       console.log(error);
+  //       console.log('--', process.env.REACT_APP_API_ID);
+  //       console.log('--', process.env.REACT_APP_API_TOKEN);
+  //     }
+  //   };
+  //   init();
+  // }, []);
   const handleSearchInDb = async (e) => {
     if (e.key === 'Enter') {
       try {

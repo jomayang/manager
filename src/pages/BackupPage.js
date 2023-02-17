@@ -108,7 +108,7 @@ export default function BackupPage() {
           extension: `?payment_status=not-ready&order_by=date_last_status&page_size=500`,
         };
         const response = await axios({
-          url: `http://localhost:3000/`,
+          url: `https://ecom-api-5wlr.onrender.com/`,
           method: 'post',
           headers: { 'Content-Type': 'application/json' },
           data,

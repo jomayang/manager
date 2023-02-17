@@ -290,7 +290,7 @@ export default function TrackingPage() {
       // if (page && rowsPerPage) {
       try {
         const response = await axios({
-          url: `http://localhost:3000/`,
+          url: `https://ecom-api-5wlr.onrender.com/`,
           method: 'post',
           headers: { 'Content-Type': 'application/json' },
           data,
