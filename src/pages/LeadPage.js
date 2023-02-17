@@ -1,7 +1,7 @@
 import { Helmet } from 'react-helmet-async';
 import { filter } from 'lodash';
 import { sentenceCase } from 'change-case';
-import { useEffect, useState } from 'react';
+import { forwardRef, useEffect, useState } from 'react';
 // @mui
 import {
   Card,
@@ -9,7 +9,6 @@ import {
   Stack,
   Paper,
   Avatar,
-  Button,
   Popover,
   Checkbox,
   TableRow,
@@ -27,7 +26,9 @@ import {
   OutlinedInput,
   Toolbar,
   alpha,
+  Snackbar,
 } from '@mui/material';
+import MuiAlert from '@mui/material/Alert';
 // components
 import axios from 'axios';
 import Label from '../components/label';
@@ -37,11 +38,14 @@ import supabase from '../config/SupabaseClient';
 // sections
 // mock
 import USERLIST from '../_mock/user';
-import { LeadListHead, LeadListToolbar } from '../sections/@dashboard/lead';
+import { LeadListHead } from '../sections/@dashboard/lead';
 import CreateLeadModal from '../components/modals/CreateLeadModal';
 import EditLeadStatus from '../components/modals/EditLeadStatus';
+import ImportLeadsModal from '../components/modals/ImportLeadsModal';
 
 // ----------------------------------------------------------------------
+
+const Alert = forwardRef((props, ref) => <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />);
 
 const TABLE_HEAD = [
   { id: 'name', label: 'Name', alignRight: false },
@@ -52,6 +56,17 @@ const TABLE_HEAD = [
   { id: '', alignRight: false },
   { id: '' },
 ];
+
+const statusColors = {
+  initial: 'info',
+  canceled: 'danger',
+  confirmed: 'success',
+  'not-responding': 'warning',
+  unreachable: 'warning',
+  busy: 'warning',
+  reported: 'secondary',
+  other: 'secondary',
+};
 
 // ----------------------------------------------------------------------
 
@@ -115,22 +130,27 @@ export default function LeadPage() {
   const [order, setOrder] = useState('asc');
 
   const [selected, setSelected] = useState([]);
-
+  const [triggerFetch, setTriggerFetch] = useState();
   const [orderBy, setOrderBy] = useState('name');
 
   const [filterName, setFilterName] = useState('');
-
+  const [isError, setIsError] = useState(false);
+  const [feedback, setFeedback] = useState('');
   const [rowsPerPage, setRowsPerPage] = useState(2);
   const [leads, setLeads] = useState([]);
   const [searchInput, setSearchInput] = useState('');
   const [rowsCount, setRowsCount] = useState(0);
 
-  const handleOpenMenu = (event) => {
-    setOpen(event.currentTarget);
-  };
+  useEffect(() => {
+    console.log(selected);
+  }, [selected]);
 
-  const handleCloseMenu = () => {
-    setOpen(null);
+  const handleClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    setOpen(false);
   };
 
   const handleRequestSort = (event, property) => {
@@ -141,7 +161,7 @@ export default function LeadPage() {
 
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
-      const newSelecteds = USERLIST.map((n) => n.name);
+      const newSelecteds = leads.map((n) => n.name);
       setSelected(newSelecteds);
       return;
     }
@@ -186,11 +206,61 @@ export default function LeadPage() {
   useEffect(() => {
     const fetchLeads = async () => {
       try {
-        const { count, data, error } = await supabase
-          .from('leads')
-          .select('id, first_name, last_name, phone, wilaya, commune', { count: 'exact' })
-          .order('created_at', { ascending: false })
-          .range(page * rowsPerPage, page * rowsPerPage + rowsPerPage - 1);
+        const { data: dataAuth, error: errorAuth } = await supabase.auth.getSession();
+        const { email } = dataAuth.session.user;
+        const { data: dataUser, error: errorUser } = await supabase.from('users').select().eq('email', email).single();
+
+        if (dataUser) {
+          console.log('data user: ', dataUser);
+        }
+
+        if (errorUser) {
+          console.log('error user: ', errorUser);
+        }
+
+        let count;
+        let data;
+        let error;
+        if (dataUser.role === 'agent') {
+          const {
+            count: countLeads,
+            data: dataLeads,
+            error: errorLeads,
+          } = await supabase
+            .from('leads')
+            .select('id, first_name, last_name, phone, wilaya, commune, status', { count: 'exact' })
+            .eq('agent_id', dataUser.id)
+            .order('created_at', { ascending: false })
+            .range(page * rowsPerPage, page * rowsPerPage + rowsPerPage - 1);
+
+          count = countLeads;
+          data = dataLeads;
+          error = errorLeads;
+        } else {
+          const {
+            count: countLeads,
+            data: dataLeads,
+            error: errorLeads,
+          } = await supabase
+            .from('leads')
+            .select('id, first_name, last_name, phone, wilaya, commune, status', { count: 'exact' })
+            .order('created_at', { ascending: false })
+            .range(page * rowsPerPage, page * rowsPerPage + rowsPerPage - 1);
+
+          count = countLeads;
+          data = dataLeads;
+          error = errorLeads;
+        }
+
+        // if (dataAuth) {
+
+        //   const relevantEmail = data.filter((item) => item.email === email);
+        //   if (relevantEmail.length !== 0) {
+        //     setCurrentAgentId(relevantEmail[0].id);
+        //   } else {
+        //     setCurrentAgentId(null);
+        //   }
+        // }
         console.log([page * rowsPerPage, page * rowsPerPage + rowsPerPage - 1]);
         if (data) {
           const fetchedLeads = data.map((lead) => ({
@@ -201,6 +271,7 @@ export default function LeadPage() {
             phone: lead.phone,
             commune: lead.commune,
             wilaya: lead.wilaya,
+            status: lead.status,
           }));
           setRowsCount(count);
           setLeads(fetchedLeads);
@@ -214,18 +285,20 @@ export default function LeadPage() {
       }
     };
     fetchLeads();
-  }, [rowsPerPage, page]);
+  }, [rowsPerPage, page, triggerFetch]);
 
   useEffect(() => {
     const init = async () => {
       try {
-        const response = await axios.get('https://api.yalidine.app/v1/wilayas/', {
-          headers: {
-            'X-API-ID': '73837800271119345844',
-            'X-API-TOKEN': 'W1CdymI0FqqBVDfGN1YfvWlK75v4oilX63ahP9TxFHh3rYTxGK8AAckdnnQHrBjb',
+        const response = await axios({
+          url: `http://localhost:3000`,
+          method: 'post',
+          headers: { 'Content-Type': 'application/json' },
+          data: {
+            extension: '',
           },
         });
-        console.log('the response: ', response);
+        console.log('the response: ', response.data);
         console.log('--', process.env.REACT_APP_API_ID);
         console.log('--', process.env.REACT_APP_API_TOKEN);
       } catch (error) {
@@ -260,11 +333,36 @@ export default function LeadPage() {
           setRowsCount(count);
           setLeads(fetchedLeads);
         }
+        if (error) {
+          console.log(error);
+        }
       } catch (error) {
         console.log('something went wrong', error);
       }
     }
   };
+
+  const handleDeleteLead = async (id) => {
+    try {
+      const { error } = await supabase.from('leads').delete().eq('id', id);
+
+      if (error) {
+        setFeedback('a Problem accured when removing the lead');
+        setIsError(true);
+      } else {
+        setFeedback('Lead removed successfully!');
+        setIsError(false);
+        setTriggerFetch(Math.random());
+      }
+      setOpen(true);
+    } catch (error) {
+      console.log(error);
+      setFeedback('a Problem accured!');
+      setIsError(true);
+      setOpen(true);
+    }
+  };
+
   return (
     <>
       <Helmet>
@@ -276,7 +374,10 @@ export default function LeadPage() {
           <Typography variant="h4" gutterBottom>
             Leads
           </Typography>
-          <CreateLeadModal />
+          <Stack direction="row">
+            <CreateLeadModal />
+            <ImportLeadsModal />
+          </Stack>
         </Stack>
 
         <Card>
@@ -331,18 +432,18 @@ export default function LeadPage() {
                   order={order}
                   orderBy={orderBy}
                   headLabel={TABLE_HEAD}
-                  rowCount={USERLIST.length}
+                  rowCount={leads.length}
                   numSelected={selected.length}
                   onRequestSort={handleRequestSort}
                   onSelectAllClick={handleSelectAllClick}
                 />
                 <TableBody>
                   {filteredLeads.map((row) => {
-                    const { id, fullName, phone, wilaya, commune } = row;
+                    const { id, fullName, status, phone, wilaya, commune } = row;
                     const selectedLead = selected.indexOf(id) !== -1;
 
                     return (
-                      <TableRow hover key={id} tabIndex={-1} role="checkbox" selected={selectedLead}>
+                      <TableRow hover key={id + page} tabIndex={-1} role="checkbox" selected={selectedLead}>
                         <TableCell padding="checkbox">
                           <Checkbox checked={selectedLead} onChange={(event) => handleClick(event, id)} />
                         </TableCell>
@@ -351,7 +452,7 @@ export default function LeadPage() {
                           <Stack direction="row" alignItems="center" spacing={2}>
                             <Avatar
                               alt={fullName}
-                              src={`https://api.dicebear.com/5.x/bottts-neutral/svg?seed=${fullName}`}
+                              src={`https://api.dicebear.com/5.x/fun-emoji/svg?seed=${fullName}`}
                             />
                             <Typography variant="subtitle2" noWrap>
                               {fullName}
@@ -366,14 +467,13 @@ export default function LeadPage() {
                         <TableCell align="left">{commune}</TableCell>
 
                         <TableCell align="left">
-                          <Label color={'success'}>{sentenceCase('delivered')}</Label>
+                          <Label color={statusColors[status]}>{sentenceCase(status)}</Label>
                         </TableCell>
+                        <TableCell align="right">{status !== 'confirmed' && <EditLeadStatus id={id} />}</TableCell>
+
                         <TableCell align="right">
-                          <EditLeadStatus id={id} />
-                        </TableCell>
-                        <TableCell align="right">
-                          <IconButton size="large" color="inherit" onClick={handleOpenMenu}>
-                            <Iconify icon={'eva:more-vertical-fill'} />
+                          <IconButton size="large" color="inherit" onClick={() => handleDeleteLead(id)}>
+                            <Iconify icon={'eva:trash-2-outline'} />
                           </IconButton>
                         </TableCell>
                       </TableRow>
@@ -425,34 +525,16 @@ export default function LeadPage() {
         </Card>
       </Container>
 
-      <Popover
-        open={Boolean(open)}
-        anchorEl={open}
-        onClose={handleCloseMenu}
-        anchorOrigin={{ vertical: 'top', horizontal: 'left' }}
-        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-        PaperProps={{
-          sx: {
-            p: 1,
-            width: 140,
-            '& .MuiMenuItem-root': {
-              px: 1,
-              typography: 'body2',
-              borderRadius: 0.75,
-            },
-          },
-        }}
+      <Snackbar
+        open={open}
+        autoHideDuration={6000}
+        onClose={handleClose}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
       >
-        <MenuItem>
-          <Iconify icon={'eva:edit-fill'} sx={{ mr: 2 }} />
-          Edit
-        </MenuItem>
-
-        <MenuItem sx={{ color: 'error.main' }}>
-          <Iconify icon={'eva:trash-2-outline'} sx={{ mr: 2 }} />
-          Delete
-        </MenuItem>
-      </Popover>
+        <Alert onClose={handleClose} severity={isError ? 'error' : 'success'} sx={{ width: '100%' }}>
+          {feedback}
+        </Alert>
+      </Snackbar>
     </>
   );
 }

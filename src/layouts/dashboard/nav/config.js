@@ -5,7 +5,25 @@ import SvgColor from '../../../components/svg-color';
 
 const icon = (name) => <SvgColor src={`/assets/icons/navbar/${name}.svg`} sx={{ width: 1, height: 1 }} />;
 
-const navConfig = [
+export const navAgentConfig = [
+  // {
+  //   title: 'dashboard',
+  //   path: '/dashboard/home',
+  //   icon: icon('ic_analytics'),
+  // },
+  {
+    title: 'lead',
+    path: '/dashboard/leads',
+    icon: icon('ic_user'),
+  },
+  {
+    title: 'order',
+    path: '/dashboard/orders',
+    icon: icon('ic_cart'),
+  },
+];
+
+export const navAdminConfig = [
   {
     title: 'dashboard',
     path: '/dashboard/app',
@@ -22,20 +40,31 @@ const navConfig = [
     icon: icon('ic_cart'),
   },
   {
-    title: 'blog',
-    path: '/dashboard/blog',
-    icon: icon('ic_blog'),
+    title: 'Tracking',
+    path: '/dashboard/tracking',
+    icon: icon('ic_cart'),
   },
   {
-    title: 'login',
-    path: '/login',
-    icon: icon('ic_lock'),
-  },
-  {
-    title: 'Not found',
-    path: '/404',
-    icon: icon('ic_disabled'),
+    title: 'Users',
+    path: '/dashboard/users',
+    icon: icon('ic_cart'),
   },
 ];
 
-export default navConfig;
+export const navTrackerConfig = [
+  // {
+  //   title: 'dashboard',
+  //   path: '/dashboard/home',
+  //   icon: icon('ic_analytics'),
+  // },
+  {
+    title: 'order',
+    path: '/dashboard/orders',
+    icon: icon('ic_cart'),
+  },
+  {
+    title: 'Tracking',
+    path: '/dashboard/tracking',
+    icon: icon('ic_cart'),
+  },
+];

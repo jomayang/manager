@@ -182,7 +182,7 @@ export default function OrderPage() {
       try {
         const { count, data, error } = await supabase
           .from('orders')
-          .select('id, first_name, last_name, phone, wilaya, commune', { count: 'exact' })
+          .select('id, first_name, last_name, phone, wilaya, commune, status', { count: 'exact' })
           .order('created_at', { ascending: false })
           .range(page * rowsPerPage, page * rowsPerPage + rowsPerPage - 1);
         console.log([page * rowsPerPage, page * rowsPerPage + rowsPerPage - 1]);
@@ -195,6 +195,7 @@ export default function OrderPage() {
             phone: order.phone,
             commune: order.commune,
             wilaya: order.wilaya,
+            status: order.status,
           }));
           setRowsCount(count);
           setOrders(fetchedOrders);
@@ -215,7 +216,7 @@ export default function OrderPage() {
       try {
         const { count, data, error } = await supabase
           .from('orders')
-          .select('id, first_name, last_name, phone, wilaya, commune', { count: 'exact' })
+          .select('id, first_name, last_name, phone, wilaya, commune, status', { count: 'exact' })
           .like('phone', `%${searchInput}%`)
           .order('created_at', { ascending: false })
           .range(page * rowsPerPage, page * rowsPerPage + rowsPerPage - 1);
@@ -228,6 +229,7 @@ export default function OrderPage() {
             phone: order.phone,
             commune: order.commune,
             wilaya: order.wilaya,
+            status: order.status,
           }));
           setRowsCount(count);
           setOrders(fetchedOrders);
@@ -310,7 +312,7 @@ export default function OrderPage() {
                 />
                 <TableBody>
                   {filteredOrders.map((row) => {
-                    const { id, fullName, phone, wilaya, commune } = row;
+                    const { id, fullName, phone, wilaya, commune, status } = row;
                     const selectedOrder = selected.indexOf(id) !== -1;
 
                     return (
@@ -323,7 +325,7 @@ export default function OrderPage() {
                           <Stack direction="row" alignItems="center" spacing={2}>
                             <Avatar
                               alt={fullName}
-                              src={`https://api.dicebear.com/5.x/bottts-neutral/svg?seed=${fullName}`}
+                              src={`https://api.dicebear.com/5.x/fun-emoji/svg?seed=${fullName}`}
                             />
                             <Typography variant="subtitle2" noWrap>
                               {fullName}
@@ -338,13 +340,13 @@ export default function OrderPage() {
                         <TableCell align="left">{commune}</TableCell>
 
                         <TableCell align="left">
-                          <Label color={'success'}>{sentenceCase('delivered')}</Label>
+                          <Label color={'success'}>{status}</Label>
                         </TableCell>
 
                         <TableCell align="right">
-                          <IconButton size="large" color="inherit" onClick={handleOpenMenu}>
+                          {/* <IconButton size="large" color="inherit" onClick={handleOpenMenu}>
                             <Iconify icon={'eva:more-vertical-fill'} />
-                          </IconButton>
+                          </IconButton> */}
                         </TableCell>
                       </TableRow>
                     );

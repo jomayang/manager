@@ -15,16 +15,17 @@ import {
   Typography,
 } from '@mui/material';
 import React, { forwardRef, useEffect, useState } from 'react';
-import MuiAlert, { AlertProps } from '@mui/material/Alert';
+import MuiAlert from '@mui/material/Alert';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
-import { agencies } from './agencies';
+import { agencies } from '../../data/agencies';
 import supabase from '../../config/SupabaseClient';
-import { wilayas } from './wilayas';
+import { wilayas } from '../../data/wilayas';
+import { communesList } from '../../data/communes';
+import { communesStopdesk } from '../../data/communesStopdesk';
+import { fees } from '../../data/fees';
 
-const Alert = forwardRef((props, ref) => {
-  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
-});
+const Alert = forwardRef((props, ref) => <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />);
 
 function EditLeadForm({ id }) {
   const [open, setOpen] = useState(false);
@@ -41,6 +42,14 @@ function EditLeadForm({ id }) {
   const [commune, setCommune] = useState('');
   const [address, setAddress] = useState('');
   const [wilaya, setWilaya] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [product, setProduct] = useState('');
+  const [deliveryFee, setDeliveryFee] = useState(null);
+  const [trackers, setTrackers] = useState([]);
+  const [trackersCount, setTrackersCount] = useState(0);
+
   const handleClose = (event, reason) => {
     if (reason === 'clickaway') {
       return;
@@ -50,6 +59,28 @@ function EditLeadForm({ id }) {
   };
 
   useEffect(() => {
+    const fetchTrackers = async () => {
+      try {
+        const { data, error } = await supabase.from('users').select('*').eq('role', 'tracker');
+
+        if (data) {
+          console.log('the data tracker: ', data);
+          setTrackers(data);
+          setTrackersCount(data.length);
+        }
+
+        if (error) {
+          console.log('something went wrong ', error);
+        }
+      } catch (error) {
+        console.log('catched an error ', error);
+      }
+    };
+
+    fetchTrackers();
+  }, []);
+
+  useEffect(() => {
     const fetchLead = async () => {
       try {
         const { data, error } = await supabase.from('leads').select().eq('id', id).single();
@@ -57,6 +88,9 @@ function EditLeadForm({ id }) {
         if (data) {
           console.log('the data is: ', data.wilaya);
           setCurrentLead(data);
+          setAddress(data.address);
+          setFirstName(data.first_name);
+          setPhone(data.phone);
           console.log('some: ', agencies[data.wilaya]);
         }
 
@@ -68,25 +102,24 @@ function EditLeadForm({ id }) {
       }
     };
     fetchLead();
-  }, []);
+  }, [id]);
 
   useEffect(() => {
-    const fetch = async () => {
-      if (wilaya !== '') {
-        const getCommunes = await axios({
-          url: `https://province-api.onrender.com/`,
-          method: 'post',
-          headers: { 'Content-Type': 'application/json' },
-          data: {
-            wilaya,
-          },
-        });
-        setCommunes(getCommunes.data.communes);
-        console.log('the new communes: ', getCommunes.data);
+    if (wilaya !== '') {
+      console.log('wilaya', wilayas);
+      console.log('communes', communesStopdesk[wilaya]);
+      console.log('communes', communesList[wilaya]);
+      if (isStopDesk) {
+        setCommunes(communesStopdesk[wilaya]);
+        console.log('fee: ', fees[wilaya].deskFee);
+        setDeliveryFee(fees[wilaya].deskFee);
+      } else {
+        setCommunes(communesList[wilaya]);
+        console.log('fee: ', fees[wilaya].homeFee);
+        setDeliveryFee(fees[wilaya].homeFee);
       }
-    };
-    fetch();
-  }, [wilaya]);
+    }
+  }, [wilaya, isStopDesk]);
 
   const updateStatus = async (e) => {
     e.preventDefault();
@@ -99,6 +132,7 @@ function EditLeadForm({ id }) {
 
       if (dataUpdate) {
         console.log('--->', dataUpdate);
+
         setFeedback('lead status updated successfully!');
         setIsError(false);
       }
@@ -110,21 +144,67 @@ function EditLeadForm({ id }) {
       }
 
       if (status === 'confirmed') {
+        let trackerId;
+        if (trackersCount !== 0) {
+          trackerId = trackers[Math.floor(Math.random() * trackersCount)].id;
+        } else {
+          trackerId = null;
+        }
+        const response = await axios({
+          url: `http://localhost:3000/create/`,
+          method: 'post',
+          headers: { 'Content-Type': 'application/json' },
+          data: {
+            firstName,
+            lastName,
+            address,
+            phone,
+            wilaya,
+            commune,
+            product,
+            isStopDesk,
+            isFreeShipping: true,
+            stopdesk: agency,
+            orderId: trackerId,
+            price: productPrice + shippingPrice,
+          },
+        });
+        console.log('added to yal ', response.data);
+        const { data: dataTracker, error: errorTracker } = await supabase
+          .from('followups')
+          .insert({
+            tracking: response.data[`order_${trackerId}`].tracking,
+            is_handled_out: false,
+            is_handled_missed: false,
+            is_handled_center: false,
+            is_handled_received: false,
+            tracker_id: trackerId,
+          })
+          .select();
+        if (dataTracker) {
+          console.log('created data tracker', dataTracker);
+        }
+        if (errorTracker) {
+          console.log('something went wrog creating tracekr', errorTracker);
+        }
         const { data: dataInsert, error: errorInsert } = await supabase
           .from('orders')
           .insert({
-            first_name: currentLead.first_name,
-            last_name: currentLead.last_name,
+            first_name: firstName,
+            last_name: lastName,
             address,
-            phone: currentLead.phone,
+            phone,
             wilaya,
             commune,
-            product: currentLead.product,
+            product,
             is_stopdesk: isStopDesk,
             is_free_shipping: true,
             stopdesk: agency,
             product_price: productPrice,
             shipping_price: shippingPrice,
+            tracking_id: response.data[`order_${trackerId}`].tracking,
+            delivery_fees: deliveryFee,
+            tracker_id: trackerId,
           })
           .select();
 
@@ -152,7 +232,7 @@ function EditLeadForm({ id }) {
   };
   return (
     <form onSubmit={updateStatus}>
-      <Stack spacing={3} style={{ marginTop: 30 }}>
+      <Stack spacing={3} style={{ marginTop: 30, maxHeight: '70vh', overflowY: 'scroll', padding: '1rem' }}>
         <Stack spacing={3}>
           <Stack spacing={3}>
             <FormControl>
@@ -176,10 +256,48 @@ function EditLeadForm({ id }) {
             <Stack spacing={3}>
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
                 <FormControl fullWidth>
+                  <TextField
+                    name="firstName"
+                    label="first name"
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                  />
+                </FormControl>
+                <FormControl fullWidth>
+                  <TextField
+                    name="lastname"
+                    label="Last name"
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                  />
+                </FormControl>
+              </Stack>
+
+              <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+                <FormControl fullWidth>
+                  <TextField
+                    name="phone"
+                    label="Phone Number"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                  />
+                </FormControl>
+                <FormControl fullWidth>
+                  <InputLabel>Product</InputLabel>
+                  <Select value={product} label="product" onChange={(e) => setProduct(e.target.value)}>
+                    <MenuItem value={'prod-1'}>Product 1</MenuItem>
+                    <MenuItem value={'prod-2'}>Product 2</MenuItem>
+                  </Select>
+                </FormControl>
+              </Stack>
+              <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+                <FormControl fullWidth>
                   <InputLabel>Wilaya</InputLabel>
                   <Select value={wilaya} label="Wilaya" onChange={(e) => setWilaya(e.target.value)}>
-                    {wilayas.map((wil) => (
-                      <MenuItem value={wil.value}>{wil.label}</MenuItem>
+                    {wilayas.map((wil, i) => (
+                      <MenuItem key={i} value={wil.value}>
+                        {wil.label}
+                      </MenuItem>
                     ))}
                   </Select>
                   <FormHelperText>{currentLead.wilaya}</FormHelperText>
@@ -187,8 +305,10 @@ function EditLeadForm({ id }) {
                 <FormControl fullWidth>
                   <InputLabel>Commune</InputLabel>
                   <Select value={commune} label="Commune" onChange={(e) => setCommune(e.target.value)}>
-                    {communes.map((com) => (
-                      <MenuItem value={com.value}>{com.label}</MenuItem>
+                    {communes.map((com, i) => (
+                      <MenuItem key={i} value={com.value} disabled={!com.isDeliverable}>
+                        {com.label} {!com.isDeliverable && '(Undeliverable)'}
+                      </MenuItem>
                     ))}
                   </Select>
                   <FormHelperText>{currentLead.commune}</FormHelperText>
@@ -207,15 +327,17 @@ function EditLeadForm({ id }) {
                     label="Stop desk"
                   />
                 </FormGroup>
-                {isStopDesk && (
+                {isStopDesk && commune ? (
                   <FormControl>
                     <InputLabel>Agency</InputLabel>
                     <Select value={agency} label="Agency" onChange={(e) => setAgency(e.target.value)}>
-                      {agencies[wilaya].map((wil) => (
-                        <MenuItem value={wil.value}>{wil.label}</MenuItem>
-                      ))}
+                      {agencies[commune] && (
+                        <MenuItem value={agencies[commune].value}>{agencies[commune].label}</MenuItem>
+                      )}
                     </Select>
                   </FormControl>
+                ) : (
+                  <></>
                 )}
               </Stack>
               <Stack>
@@ -223,7 +345,7 @@ function EditLeadForm({ id }) {
                   <TextField
                     name="address"
                     label="Address"
-                    value={address}
+                    value={address || currentLead.address}
                     onChange={(e) => {
                       setAddress(e.target.value);
                     }}
@@ -257,10 +379,11 @@ function EditLeadForm({ id }) {
                     onChange={(e) => setShippingPrice(+e.target.value)}
                   />
                 </FormControl>
-                {/* <Stack> */}
-                {/* </Stack> */}
               </Stack>
               <Stack>
+                <Typography variant="p" component="p" style={{ fontSize: '13px', marginBottom: 8, color: '#666' }}>
+                  {deliveryFee && <span>Delivery Fees: {deliveryFee} DA</span>}
+                </Typography>
                 <Typography variant="p" component="p" style={{ fontSize: '13px' }}>
                   Total: {(productPrice + shippingPrice).toFixed(2)} DA
                 </Typography>

@@ -1,7 +1,7 @@
 import { Helmet } from 'react-helmet-async';
 import { filter } from 'lodash';
 import { sentenceCase } from 'change-case';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 // @mui
 import {
   Card,
@@ -9,7 +9,6 @@ import {
   Stack,
   Paper,
   Avatar,
-  Button,
   Popover,
   Checkbox,
   TableRow,
@@ -21,29 +20,52 @@ import {
   IconButton,
   TableContainer,
   TablePagination,
+  Tooltip,
+  InputAdornment,
+  styled,
+  OutlinedInput,
+  Toolbar,
+  alpha,
 } from '@mui/material';
 // components
+import axios from 'axios';
 import Label from '../components/label';
 import Iconify from '../components/iconify';
 import Scrollbar from '../components/scrollbar';
-// sections
-import { UserListHead, UserListToolbar } from '../sections/@dashboard/user';
-// mock
+import supabase from '../config/SupabaseClient';
 import USERLIST from '../_mock/user';
+import { LeadListHead } from '../sections/@dashboard/lead';
+import CreateLeadModal from '../components/modals/CreateLeadModal';
+import EditLeadStatus from '../components/modals/EditLeadStatus';
+import EditRoleModal from '../components/modals/EditRoleModal';
+import UserListHead from '../sections/@dashboard/user/UserListHead';
 
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
   { id: 'name', label: 'Name', alignRight: false },
-  { id: 'company', label: 'Company', alignRight: false },
+  { id: 'email', label: 'Email', alignRight: false },
   { id: 'role', label: 'Role', alignRight: false },
-  { id: 'isVerified', label: 'Verified', alignRight: false },
-  { id: 'status', label: 'Status', alignRight: false },
   { id: '' },
 ];
 
-// ----------------------------------------------------------------------
+const statusColors = {
+  initial: 'info',
+  canceled: 'danger',
+  confirmed: 'success',
+  'not-responding': 'warning',
+  unreachable: 'warning',
+  busy: 'warning',
+  reported: 'secondary',
+  other: 'secondary',
+};
 
+// ----------------------------------------------------------------------
+const roleColors = {
+  admin: 'error',
+  tracker: 'info',
+  agent: 'success',
+};
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
     return -1;
@@ -73,6 +95,29 @@ function applySortFilter(array, comparator, query) {
   return stabilizedThis.map((el) => el[0]);
 }
 
+const StyledRoot = styled(Toolbar)(({ theme }) => ({
+  height: 96,
+  display: 'flex',
+  justifyContent: 'space-between',
+  padding: theme.spacing(0, 1, 0, 3),
+}));
+
+const StyledSearch = styled(OutlinedInput)(({ theme }) => ({
+  width: 240,
+  transition: theme.transitions.create(['box-shadow', 'width'], {
+    easing: theme.transitions.easing.easeInOut,
+    duration: theme.transitions.duration.shorter,
+  }),
+  '&.Mui-focused': {
+    width: 320,
+    boxShadow: theme.customShadows.z8,
+  },
+  '& fieldset': {
+    borderWidth: `1px !important`,
+    borderColor: `${alpha(theme.palette.grey[500], 0.32)} !important`,
+  },
+}));
+
 export default function UserPage() {
   const [open, setOpen] = useState(null);
 
@@ -86,7 +131,10 @@ export default function UserPage() {
 
   const [filterName, setFilterName] = useState('');
 
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [rowsPerPage, setRowsPerPage] = useState(2);
+  const [users, setUsers] = useState([]);
+  const [searchInput, setSearchInput] = useState('');
+  const [rowsCount, setRowsCount] = useState(0);
 
   const handleOpenMenu = (event) => {
     setOpen(event.currentTarget);
@@ -142,28 +190,130 @@ export default function UserPage() {
 
   const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - USERLIST.length) : 0;
 
-  const filteredUsers = applySortFilter(USERLIST, getComparator(order, orderBy), filterName);
+  const filteredUsers = applySortFilter(users, getComparator(order, orderBy), filterName);
 
   const isNotFound = !filteredUsers.length && !!filterName;
 
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const { count, data, error } = await supabase
+          .from('users')
+          .select('*', { count: 'exact' })
+          .order('created_at', { ascending: false })
+          .range(page * rowsPerPage, page * rowsPerPage + rowsPerPage - 1);
+        console.log([page * rowsPerPage, page * rowsPerPage + rowsPerPage - 1]);
+        if (data) {
+          const fetchedUsers = data.map((user) => ({
+            id: user.id,
+            fullName: user.name,
+            email: user.email,
+            role: user.role,
+            avatarUrl: user.avatar_url,
+          }));
+          console.log('users are', data);
+          setRowsCount(count);
+          setUsers(fetchedUsers);
+        }
+
+        if (error) {
+          console.log('something went wrong', error);
+        }
+      } catch (error) {
+        console.log('something was wrong', error);
+      }
+    };
+    fetchUsers();
+  }, [rowsPerPage, page]);
+
+  const handleSearchInDb = async (e) => {
+    if (e.key === 'Enter') {
+      try {
+        const { count, data, error } = await supabase
+          .from('users')
+          .select('*', { count: 'exact' })
+          .like('email', `%${searchInput}%`)
+          .order('created_at', { ascending: false })
+          .range(page * rowsPerPage, page * rowsPerPage + rowsPerPage - 1);
+
+        if (data) {
+          const fetchedUsers = data.map((user) => ({
+            id: user.id,
+            fullName: user.name,
+            email: user.email,
+            role: user.role,
+            avatarUrl: user.avatar_url,
+          }));
+
+          setRowsCount(count);
+          setUsers(fetchedUsers);
+        }
+        if (error) {
+          console.log(error);
+        }
+      } catch (error) {
+        console.log('something went wrong', error);
+      }
+    }
+  };
   return (
     <>
       <Helmet>
-        <title> User | Minimal UI </title>
+        <title> Users </title>
       </Helmet>
 
       <Container>
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
           <Typography variant="h4" gutterBottom>
-            User
+            Users
           </Typography>
-          <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />}>
-            New User
-          </Button>
+          <CreateLeadModal />
         </Stack>
 
         <Card>
-          <UserListToolbar numSelected={selected.length} filterName={filterName} onFilterName={handleFilterByName} />
+          <StyledRoot
+            sx={{
+              ...(selected.length > 0 && {
+                color: 'primary.main',
+                bgcolor: 'primary.lighter',
+              }),
+            }}
+          >
+            {selected.length > 0 ? (
+              <Typography component="div" variant="subtitle1">
+                {selected.length} selected
+              </Typography>
+            ) : (
+              // <form onSubmit={handleSearchInDb}>
+              <StyledSearch
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+                onKeyDown={handleSearchInDb}
+                placeholder="Search user..."
+                startAdornment={
+                  <InputAdornment position="start">
+                    <Iconify icon="eva:search-fill" sx={{ color: 'text.disabled', width: 20, height: 20 }} />
+                  </InputAdornment>
+                }
+              />
+              // <button
+              // </form>
+            )}
+
+            {selected.length > 0 ? (
+              <Tooltip title="Delete">
+                <IconButton>
+                  <Iconify icon="eva:trash-2-fill" />
+                </IconButton>
+              </Tooltip>
+            ) : (
+              <Tooltip title="Filter list">
+                <IconButton>
+                  <Iconify icon="ic:round-filter-list" />
+                </IconButton>
+              </Tooltip>
+            )}
+          </StyledRoot>
 
           <Scrollbar>
             <TableContainer sx={{ minWidth: 800 }}>
@@ -172,45 +322,48 @@ export default function UserPage() {
                   order={order}
                   orderBy={orderBy}
                   headLabel={TABLE_HEAD}
-                  rowCount={USERLIST.length}
+                  rowCount={users.length}
                   numSelected={selected.length}
                   onRequestSort={handleRequestSort}
                   onSelectAllClick={handleSelectAllClick}
                 />
                 <TableBody>
-                  {filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
-                    const { id, name, role, status, company, avatarUrl, isVerified } = row;
-                    const selectedUser = selected.indexOf(name) !== -1;
+                  {filteredUsers.map((row) => {
+                    const { id, fullName, email, avatarUrl, role } = row;
+                    const selectedUser = selected.indexOf(id) !== -1;
 
                     return (
-                      <TableRow hover key={id} tabIndex={-1} role="checkbox" selected={selectedUser}>
+                      <TableRow hover key={id + page} tabIndex={-1} role="checkbox" selected={selectedUser}>
                         <TableCell padding="checkbox">
-                          <Checkbox checked={selectedUser} onChange={(event) => handleClick(event, name)} />
+                          <Checkbox checked={selectedUser} onChange={(event) => handleClick(event, id)} />
                         </TableCell>
 
                         <TableCell component="th" scope="row" padding="none">
                           <Stack direction="row" alignItems="center" spacing={2}>
-                            <Avatar alt={name} src={avatarUrl} />
+                            <Avatar alt={fullName} src={avatarUrl} />
                             <Typography variant="subtitle2" noWrap>
-                              {name}
+                              {fullName}
                             </Typography>
                           </Stack>
                         </TableCell>
 
-                        <TableCell align="left">{company}</TableCell>
-
-                        <TableCell align="left">{role}</TableCell>
-
-                        <TableCell align="left">{isVerified ? 'Yes' : 'No'}</TableCell>
+                        <TableCell align="left">{email}</TableCell>
 
                         <TableCell align="left">
-                          <Label color={(status === 'banned' && 'error') || 'success'}>{sentenceCase(status)}</Label>
+                          {<Label color={roleColors[role]}>{sentenceCase(role)}</Label>}
                         </TableCell>
 
+                        {/* <TableCell align="right">
+                          
+                        </TableCell> */}
+
                         <TableCell align="right">
-                          <IconButton size="large" color="inherit" onClick={handleOpenMenu}>
-                            <Iconify icon={'eva:more-vertical-fill'} />
-                          </IconButton>
+                          <Stack direction="row" justifyContent="right">
+                            <EditRoleModal id={id} role={role} />
+                            <IconButton size="large" color="inherit" onClick={handleOpenMenu}>
+                              <Iconify icon={'eva:more-vertical-fill'} />
+                            </IconButton>
+                          </Stack>
                         </TableCell>
                       </TableRow>
                     );
@@ -252,7 +405,7 @@ export default function UserPage() {
           <TablePagination
             rowsPerPageOptions={[5, 10, 25]}
             component="div"
-            count={USERLIST.length}
+            count={rowsCount}
             rowsPerPage={rowsPerPage}
             page={page}
             onPageChange={handleChangePage}

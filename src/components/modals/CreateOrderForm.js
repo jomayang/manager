@@ -4,6 +4,7 @@ import {
   FormControl,
   FormControlLabel,
   FormGroup,
+  FormHelperText,
   InputAdornment,
   InputLabel,
   MenuItem,
@@ -20,8 +21,11 @@ import MuiAlert, { AlertProps } from '@mui/material/Alert';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import supabase from '../../config/SupabaseClient';
-import { wilayas } from './wilayas';
-import { agencies } from './agencies';
+import { wilayas } from '../../data/wilayas';
+import { agencies } from '../../data/agencies';
+import { fees } from '../../data/fees';
+import { communesList } from '../../data/communes';
+import { communesStopdesk } from '../../data/communesStopdesk';
 
 const Alert = forwardRef((props, ref) => {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -42,8 +46,12 @@ function CreateOrderForm() {
   const [isFreeShipping, setIsFreeShipping] = useState(true);
   const [productPrice, setProductPrice] = useState(0);
   const [shippingPrice, setShippingPrice] = useState(0);
+  const [deliveryFee, setDeliveryFee] = useState(null);
   const [phone, setPhone] = useState('');
   const [product, setProduct] = useState('');
+
+  const [trackers, setTrackers] = useState([]);
+  const [trackersCount, setTrackersCount] = useState(0);
 
   const handleClose = (event, reason) => {
     if (reason === 'clickaway') {
@@ -53,10 +61,59 @@ function CreateOrderForm() {
     setOpen(false);
   };
 
-  const createLead = async (e) => {
+  const createOrder = async (e) => {
     e.preventDefault();
     try {
-      console.log({ first_name: firstName, last_name: lastName, address, phone, wilaya, commune, product });
+      let trackerId;
+      if (trackersCount !== 0) {
+        trackerId = trackers[Math.floor(Math.random() * trackersCount)].id;
+      } else {
+        trackerId = null;
+      }
+      console.log('choosen tracker is: ', trackerId, 'count:', trackersCount);
+      console.log({
+        firstName,
+        lastName,
+        address,
+        phone,
+        wilaya,
+        commune,
+        product,
+        isStopDesk,
+        isFreeShipping: true,
+        stopdesk: agency,
+        price: productPrice + shippingPrice,
+      });
+      const response = await axios({
+        url: `http://localhost:3000/create/`,
+        method: 'post',
+        headers: { 'Content-Type': 'application/json' },
+        data: {
+          firstName,
+          lastName,
+          address,
+          phone,
+          wilaya,
+          commune,
+          product,
+          isStopDesk,
+          isFreeShipping: true,
+          stopdesk: agency,
+          orderId: trackerId,
+          price: productPrice + shippingPrice,
+        },
+      });
+      const { data: dataTracker, error: errorTracker } = await supabase.from('followups').insert({
+        tracking: response.data[`order_${trackerId}`].tracking,
+        is_handled_out: false,
+        is_handled_missed: false,
+        is_handled_center: false,
+        is_handled_received: false,
+        tracker_id: trackerId,
+      });
+      if (errorTracker) {
+        console.log('error tracker: ', errorTracker);
+      }
       const { data, error } = await supabase
         .from('orders')
         .insert([
@@ -72,6 +129,10 @@ function CreateOrderForm() {
             is_free_shipping: true,
             product_price: productPrice,
             shipping_price: shippingPrice,
+            stopdesk: agency,
+            tracking_id: response.data[`order_${trackerId}`].tracking,
+            delivery_fees: deliveryFee,
+            tracker_id: trackerId,
           },
         ])
         .select();
@@ -85,7 +146,8 @@ function CreateOrderForm() {
       if (data) {
         console.log('added successfully', data);
         // setIdentifier(id);
-        setFeedback('A new lead added!');
+        setIsError(false);
+        setFeedback('A new order added!');
       }
       setOpen(true);
     } catch (error) {
@@ -97,25 +159,46 @@ function CreateOrderForm() {
   };
 
   useEffect(() => {
-    const fetch = async () => {
-      if (wilaya !== '') {
-        const getCommunes = await axios({
-          url: `https://province-api.onrender.com/`,
-          method: 'post',
-          headers: { 'Content-Type': 'application/json' },
-          data: {
-            wilaya,
-          },
-        });
-        setCommunes(getCommunes.data.communes);
-        console.log('the new communes: ', getCommunes.data);
+    if (wilaya !== '') {
+      console.log('wilaya', wilayas);
+      console.log('communes', communesStopdesk[wilaya]);
+      console.log('communes', communesList[wilaya]);
+      if (isStopDesk) {
+        setCommunes(communesStopdesk[wilaya]);
+        console.log('fee: ', fees[wilaya].deskFee);
+        setDeliveryFee(fees[wilaya].deskFee);
+      } else {
+        setCommunes(communesList[wilaya]);
+        console.log('fee: ', fees[wilaya].homeFee);
+        setDeliveryFee(fees[wilaya].homeFee);
+      }
+    }
+  }, [wilaya, isStopDesk]);
+
+  useEffect(() => {
+    const fetchTrackers = async () => {
+      try {
+        const { data, error } = await supabase.from('users').select('*').eq('role', 'tracker');
+
+        if (data) {
+          console.log('the data tracker: ', data);
+          setTrackers(data);
+          setTrackersCount(data.length);
+        }
+
+        if (error) {
+          console.log('something went wrong ', error);
+        }
+      } catch (error) {
+        console.log('catched an error ', error);
       }
     };
-    fetch();
-  }, [wilaya]);
+
+    fetchTrackers();
+  }, []);
 
   return (
-    <form onSubmit={createLead}>
+    <form onSubmit={createOrder}>
       <Stack spacing={3}>
         <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ marginTop: '1rem' }}>
           <FormControl fullWidth>
@@ -150,46 +233,54 @@ function CreateOrderForm() {
         </Stack>
 
         <Stack spacing={3}>
-          <FormGroup>
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={isStopDesk}
-                  onChange={(e) => setIsStopDesk(e.target.checked)}
-                  inputProps={{ 'aria-label': 'controlled' }}
-                />
-              }
-              label="Stop desk"
-            />
-          </FormGroup>
-        </Stack>
-        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-          <FormControl fullWidth>
-            <InputLabel>Wilaya</InputLabel>
-            <Select value={wilaya} label="Wilaya" onChange={(e) => setWilaya(e.target.value)}>
-              {wilayas.map((wil) => (
-                <MenuItem value={wil.value}>{wil.label}</MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-          <FormControl fullWidth>
-            <InputLabel>Commune</InputLabel>
-            <Select value={commune} label="Commune" onChange={(e) => setCommune(e.target.value)}>
-              {communes.map((com) => (
-                <MenuItem value={com.value}>{com.label}</MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-          {isStopDesk && (
+          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
             <FormControl fullWidth>
-              <InputLabel>Agency</InputLabel>
-              <Select value={agency} label="Agency" onChange={(e) => setAgency(e.target.value)}>
-                {agencies[wilaya].map((wil) => (
-                  <MenuItem value={wil.value}>{wil.label}</MenuItem>
+              <InputLabel>Wilaya</InputLabel>
+              <Select value={wilaya} label="Wilaya" onChange={(e) => setWilaya(e.target.value)}>
+                {wilayas.map((wil, i) => (
+                  <MenuItem key={i} value={wil.value}>
+                    {wil.label}
+                  </MenuItem>
                 ))}
               </Select>
             </FormControl>
-          )}
+            <FormControl fullWidth>
+              <InputLabel>Commune</InputLabel>
+              <Select value={commune} label="Commune" onChange={(e) => setCommune(e.target.value)}>
+                {communes.map((com, i) => (
+                  <MenuItem key={i} value={com.value} disabled={!com.isDeliverable}>
+                    {com.label} {!com.isDeliverable && '(Undeliverable)'}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Stack>
+          <Stack spacing={3}>
+            <FormGroup>
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={isStopDesk}
+                    onChange={(e) => setIsStopDesk(e.target.checked)}
+                    inputProps={{ 'aria-label': 'controlled' }}
+                  />
+                }
+                label="Stop desk"
+              />
+            </FormGroup>
+            {isStopDesk && commune ? (
+              <FormControl>
+                <InputLabel>Agency</InputLabel>
+                <Select value={agency} label="Agency" onChange={(e) => setAgency(e.target.value)}>
+                  {/* {agencies[commune].map((wil, i) => ( */}
+                  <MenuItem value={agencies[commune].value}>{agencies[commune].label}</MenuItem>
+                  {/* ))} */}
+                </Select>
+              </FormControl>
+            ) : (
+              <></>
+            )}
+          </Stack>
         </Stack>
         <Stack>
           <FormControl fullWidth>
@@ -227,6 +318,9 @@ function CreateOrderForm() {
           {/* </Stack> */}
         </Stack>
         <Stack>
+          <Typography variant="p" component="p" style={{ fontSize: '13px', marginBottom: 8, color: '#666' }}>
+            {deliveryFee && <span>Delivery Fees: {deliveryFee} DA</span>}
+          </Typography>
           <Typography variant="p" component="p" style={{ fontSize: '13px' }}>
             Total: {(productPrice + shippingPrice).toFixed(2)} DA
           </Typography>

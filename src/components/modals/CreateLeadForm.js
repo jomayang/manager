@@ -10,12 +10,13 @@ import {
   TextField,
 } from '@mui/material';
 import { Stack } from '@mui/system';
-import React, { forwardRef, useEffect, useState } from 'react';
+import React, { forwardRef, useContext, useEffect, useState } from 'react';
 import MuiAlert, { AlertProps } from '@mui/material/Alert';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import supabase from '../../config/SupabaseClient';
-import { wilayas } from './wilayas';
+import { wilayas } from '../../data/wilayas';
+import { UserContext } from '../../context/UserContext';
 
 const Alert = forwardRef((props, ref) => {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -68,7 +69,10 @@ function CreateLeadForm() {
   const [address, setAddress] = useState('');
   const [phone, setPhone] = useState('');
   const [product, setProduct] = useState('');
-
+  const [agents, setAgents] = useState([]);
+  const [agentsCount, setAgentsCount] = useState(0);
+  const [currentAgentId, setCurrentAgentId] = useState('');
+  const { user } = useContext(UserContext);
   const handleClose = (event, reason) => {
     if (reason === 'clickaway') {
       return;
@@ -77,13 +81,64 @@ function CreateLeadForm() {
     setOpen(false);
   };
 
+  useEffect(() => {
+    const fetchAgents = async () => {
+      try {
+        const { data, error } = await supabase.from('users').select('*').eq('role', 'agent');
+
+        if (data) {
+          console.log('the data tracker: ', data);
+          setAgents(data);
+          setAgentsCount(data.length);
+          console.log('the user context: ', user);
+          if (user) {
+            const { email } = user;
+            const relevantEmail = data.filter((item) => item.email === email);
+            if (relevantEmail.length !== 0) {
+              setCurrentAgentId(relevantEmail[0].id);
+            } else {
+              setCurrentAgentId(null);
+            }
+          }
+        }
+
+        if (error) {
+          console.log('something went wrong ', error);
+        }
+      } catch (error) {
+        console.log('catched an error ', error);
+      }
+    };
+
+    fetchAgents();
+  }, []);
+
   const createLead = async (e) => {
     e.preventDefault();
     try {
       console.log({ first_name: firstName, last_name: lastName, address, phone, wilaya, commune, product });
+      let agentId;
+      if (agentsCount !== 0) {
+        if (currentAgentId) {
+          agentId = currentAgentId;
+        } else {
+          agentId = agents[Math.floor(Math.random() * agentsCount)].id;
+        }
+      } else {
+        agentId = null;
+      }
       const { data, error } = await supabase
         .from('leads')
-        .insert([{ first_name: firstName, last_name: lastName, address, phone, wilaya, commune, product }])
+        .insert({
+          first_name: firstName,
+          last_name: lastName,
+          address,
+          phone,
+          wilaya,
+          commune,
+          product,
+          agent_id: agentId,
+        })
         .select();
 
       if (error) {
