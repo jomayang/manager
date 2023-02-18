@@ -28,42 +28,7 @@ function CreateLeadForm() {
   const [feedback, setFeedback] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
-  const [communes, setCommunes] = useState([
-    { value: 'Adrar', label: 'Adrar - أدرار' },
-    { value: 'Akabli', label: 'Akabli - اقبلي' },
-    { value: 'Aougrout', label: 'Aougrout - أوقروت' },
-    { value: 'Aoulef', label: 'Aoulef - أولف' },
-    {
-      value: 'Bordj Badji Mokhtar',
-      label: 'Bordj Badji Mokhtar - برج باجي مختار',
-    },
-    { value: 'Bouda', label: 'Bouda - بودة' },
-    { value: 'Charouine', label: 'Charouine - شروين' },
-    { value: 'Deldoul', label: 'Deldoul - دلدول' },
-    { value: 'Fenoughil', label: 'Fenoughil - فنوغيل' },
-    { value: 'In Zghmir', label: 'In Zghmir - انزجمير' },
-    { value: 'Ksar Kaddour', label: 'Ksar Kaddour - قصر قدور' },
-    { value: 'Metarfa', label: 'Metarfa - المطارفة' },
-    {
-      value: 'Ouled Ahmed Tammi',
-      label: 'Ouled Ahmed Timmi - أولاد أحمد تيمي',
-    },
-    { value: 'Ouled Aïssa', label: 'Ouled Aissa - أولاد عيسى' },
-    { value: 'Ouled Saïd', label: 'Ouled Said - أولاد سعيد' },
-    { value: 'Reggane', label: 'Reggane - رقان' },
-    { value: 'Sali', label: 'Sali - سالي' },
-    { value: 'Sebaa', label: 'Sebaa - سبع' },
-    { value: 'Talmine', label: 'Talmine - طلمين' },
-    { value: 'Tamantit', label: 'Tamantit - تمنطيط' },
-    { value: 'Tamekten', label: 'Timekten - تيمقطن' },
-    { value: 'Tamest', label: 'Tamest - تامست' },
-    { value: 'Timiaouine', label: 'Timiaouine - تيمياوين' },
-    { value: 'Timimoun', label: 'Timimoun - تيميمون' },
-    { value: 'Tinerkouk', label: 'Tinerkouk - تينركوك' },
-    { value: 'Tit', label: 'Tit - تيط' },
-    { value: 'Tsabit', label: 'Tsabit - تسابيت' },
-    { value: 'Zaouiet Kounta', label: 'Zaouiet Kounta - زاوية كنتة' },
-  ]);
+  const [communes, setCommunes] = useState([]);
   const [commune, setCommune] = useState('');
   const [wilaya, setWilaya] = useState('');
   const [address, setAddress] = useState('');

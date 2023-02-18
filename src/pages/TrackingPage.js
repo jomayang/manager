@@ -386,12 +386,25 @@ export default function TrackingPage() {
     if (trackingState && trackingState[tracking]) {
       console.log('--------------xx->', trackingState);
       console.log('--------------xx->', trackingState[tracking]);
-      if (status === 'Centre') return trackingState[tracking].isHandledCenter;
-      if (status === 'Reçu à Wilaya') return trackingState[tracking].isHandledReceived;
-      if (status === 'Sorti en livraison') return trackingState[tracking].isHandledOut;
-      if (status === 'Tentative échouée') return trackingState[tracking].isHandledMissed;
-      if (status === 'Prêt à expédier') return trackingState[tracking].isHandledMissed;
-      if (status === 'En préparation') return trackingState[tracking].isHandledCenter;
+      if (status === 'Centre') {
+        return trackingState[tracking].isHandledCenter;
+      }
+      if (status === 'Reçu à Wilaya') {
+        return trackingState[tracking].isHandledReceived;
+      }
+      if (status === 'Sorti en livraison') {
+        return trackingState[tracking].isHandledOut;
+      }
+      if (status === 'Tentative échouée') {
+        return trackingState[tracking].isHandledMissed;
+      }
+      if (status === 'Prêt à expédier') {
+        console.log('statoos: ', trackingState[tracking].isHandledMissed);
+        return trackingState[tracking].isHandledMissed;
+      }
+      if (status === 'En préparation') {
+        return trackingState[tracking].isHandledCenter;
+      }
     }
 
     return false;
