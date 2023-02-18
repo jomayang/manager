@@ -32,6 +32,7 @@ import {
   InputLabel,
   FormControlLabel,
   Switch,
+  Skeleton,
 } from '@mui/material';
 // components
 import axios from 'axios';
@@ -155,6 +156,8 @@ export default function TrackingPage() {
   const [rowsCount, setRowsCount] = useState(0);
   const [trackingState, setTrackingState] = useState({});
   const [currentUserId, setCurrentUserId] = useState();
+  const [loading, setLoading] = useState(false);
+
   const handleOpenMenu = (event) => {
     setOpen(event.currentTarget);
   };
@@ -285,6 +288,7 @@ export default function TrackingPage() {
         };
       // if (page && rowsPerPage) {
       try {
+        setLoading(true);
         const response = await axios({
           url: `https://ecom-api-5wlr.onrender.com/`,
           method: 'post',
@@ -296,6 +300,8 @@ export default function TrackingPage() {
         setLeads(response.data.data.data);
       } catch (error) {
         console.log(error);
+      } finally {
+        setLoading(false);
       }
       // }
     };
@@ -460,6 +466,37 @@ export default function TrackingPage() {
                   onSelectAllClick={handleSelectAllClick}
                 />
                 <TableBody>
+                  {loading && (
+                    <TableRow>
+                      <TableCell>
+                        <p> </p>
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton variant="text" sx={{ fontSize: '0.7rem' }} />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton variant="text" sx={{ fontSize: '0.7rem' }} />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton variant="text" sx={{ fontSize: '0.7rem' }} />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton variant="text" sx={{ fontSize: '0.7rem' }} />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton variant="text" sx={{ fontSize: '0.7rem' }} />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton variant="text" sx={{ fontSize: '0.7rem' }} />
+                      </TableCell>
+                      <TableCell align="right">
+                        <Stack direction="row" spacing={2}>
+                          <Skeleton variant="circular" width={20} height={20} />
+                          <Skeleton variant="circular" width={20} height={20} />
+                        </Stack>
+                      </TableCell>
+                    </TableRow>
+                  )}
                   {leads.map((row) => {
                     const {
                       tracking: id,

@@ -14,7 +14,7 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import React, { forwardRef, useEffect, useState } from 'react';
+import React, { forwardRef, useContext, useEffect, useState } from 'react';
 import MuiAlert from '@mui/material/Alert';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
@@ -24,6 +24,7 @@ import { wilayas } from '../../data/wilayas';
 import { communesList } from '../../data/communes';
 import { communesStopdesk } from '../../data/communesStopdesk';
 import { fees } from '../../data/fees';
+import { UserContext } from '../../context/UserContext';
 
 const Alert = forwardRef((props, ref) => <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />);
 
@@ -49,7 +50,8 @@ function EditLeadForm({ id }) {
   const [deliveryFee, setDeliveryFee] = useState(null);
   const [trackers, setTrackers] = useState([]);
   const [trackersCount, setTrackersCount] = useState(0);
-
+  const [currentAgentId, setCurrentAgentId] = useState();
+  const { user } = useContext(UserContext);
   const handleClose = (event, reason) => {
     if (reason === 'clickaway') {
       return;
@@ -78,6 +80,37 @@ function EditLeadForm({ id }) {
     };
 
     fetchTrackers();
+  }, []);
+
+  useEffect(() => {
+    const fetchAgents = async () => {
+      try {
+        const { data, error } = await supabase.from('users').select('*').eq('role', 'agent');
+
+        if (data) {
+          console.log('the data tracker: ', data);
+
+          console.log('the user context: ', user);
+          if (user) {
+            const { email } = user;
+            const relevantEmail = data.filter((item) => item.email === email);
+            if (relevantEmail.length !== 0) {
+              setCurrentAgentId(relevantEmail[0].id);
+            } else {
+              setCurrentAgentId(null);
+            }
+          }
+        }
+
+        if (error) {
+          console.log('something went wrong ', error);
+        }
+      } catch (error) {
+        console.log('catched an error ', error);
+      }
+    };
+
+    fetchAgents();
   }, []);
 
   useEffect(() => {
@@ -205,6 +238,7 @@ function EditLeadForm({ id }) {
             tracking_id: response.data[`order_${trackerId}`].tracking,
             delivery_fees: deliveryFee,
             tracker_id: trackerId,
+            agent_id: currentAgentId,
           })
           .select();
 
