@@ -121,6 +121,8 @@ const StyledRoot = styled(Toolbar)(({ theme }) => ({
   padding: theme.spacing(0, 1, 0, 3),
 }));
 
+const followupStatusArray = ['Centre', 'Reçu à Wilaya', 'Sorti en livraison', 'Tentative échouée'];
+
 const StyledSearch = styled(OutlinedInput)(({ theme }) => ({
   width: 240,
   transition: theme.transitions.create(['box-shadow', 'width'], {
@@ -589,7 +591,6 @@ export default function TrackingPage() {
 
                         <TableCell align="right">
                           <Stack direction={{ xs: 'column', sm: 'row' }}>
-                            {getIsActive(tracking, status)}
                             <ParcelDetailsModal
                               tracking={tracking}
                               fullName={`${firstName} ${lastName}`}
@@ -602,10 +603,14 @@ export default function TrackingPage() {
                               creationDate={creationDate}
                               expeditionDate={expeditionDate}
                             />
-                            {!getIsActive(tracking, status) && (
-                              <IconButton aria-label="Done" onClick={() => handleValidateTask(tracking, status)}>
-                                <Iconify icon="eva:checkmark-circle-outline" />
-                              </IconButton>
+                            {followupStatusArray.includes(status) && (
+                              <>
+                                {!getIsActive(tracking, status) && (
+                                  <IconButton aria-label="Done" onClick={() => handleValidateTask(tracking, status)}>
+                                    <Iconify icon="eva:checkmark-circle-outline" />
+                                  </IconButton>
+                                )}
+                              </>
                             )}
                           </Stack>
                         </TableCell>
