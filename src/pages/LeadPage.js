@@ -59,7 +59,7 @@ const TABLE_HEAD = [
 
 const statusColors = {
   initial: 'info',
-  canceled: 'danger',
+  canceled: 'error',
   confirmed: 'success',
   'not-responding': 'warning',
   unreachable: 'warning',
