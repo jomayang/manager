@@ -136,7 +136,7 @@ export default function LeadPage() {
   const [filterName, setFilterName] = useState('');
   const [isError, setIsError] = useState(false);
   const [feedback, setFeedback] = useState('');
-  const [rowsPerPage, setRowsPerPage] = useState(2);
+  const [rowsPerPage, setRowsPerPage] = useState(25);
   const [leads, setLeads] = useState([]);
   const [searchInput, setSearchInput] = useState('');
   const [rowsCount, setRowsCount] = useState(0);

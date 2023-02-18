@@ -117,7 +117,7 @@ export default function OrderPage() {
 
   const [filterName, setFilterName] = useState('');
   const [rowsCount, setRowsCount] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(2);
+  const [rowsPerPage, setRowsPerPage] = useState(25);
   const [orders, setOrders] = useState([]);
   const [searchInput, setSearchInput] = useState('');
   const handleOpenMenu = (event) => {

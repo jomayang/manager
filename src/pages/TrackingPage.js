@@ -149,7 +149,7 @@ export default function TrackingPage() {
 
   const [filterName, setFilterName] = useState('');
   const [filterStatus, setFilterStatus] = useState('');
-  const [rowsPerPage, setRowsPerPage] = useState(2);
+  const [rowsPerPage, setRowsPerPage] = useState(25);
   const [leads, setLeads] = useState([]);
   const [searchInput, setSearchInput] = useState('');
   const [rowsCount, setRowsCount] = useState(0);
@@ -271,10 +271,6 @@ export default function TrackingPage() {
     const fetchParcels = async () => {
       let data;
       let object;
-      console.log('***************user id : ', currentUserId);
-      console.log('page = ', page);
-      console.log('filterStatus = ', filterStatus);
-      console.log('rowsPerPage = ', rowsPerPage);
       if (filterStatus !== '')
         data = {
           extension: `?page_size=${rowsPerPage}&page=${
@@ -297,9 +293,6 @@ export default function TrackingPage() {
         });
 
         setRowsCount(response.data.data.total_data);
-        console.log(response.data.data.total_data);
-        console.log(response.data);
-        console.log('the dataaaa: ', response.data);
         setLeads(response.data.data.data);
       } catch (error) {
         console.log(error);
@@ -330,7 +323,7 @@ export default function TrackingPage() {
           );
           setTrackingState(object);
         }
-        console.log('tracking data: ', trackingData);
+
         if (trackingError) console.log('tracking error: ', trackingError);
       } catch (error) {
         console.log(error);
@@ -341,7 +334,6 @@ export default function TrackingPage() {
 
   const handleValidateTask = async (tracking, status) => {
     try {
-      console.log('validating:', tracking, status);
       let queryObject;
       switch (status) {
         case 'Centre':
@@ -356,17 +348,10 @@ export default function TrackingPage() {
         case 'Tentative échouée':
           queryObject = { is_handled_missed: true };
           break;
-        case 'Prêt à expédier':
-          queryObject = { is_handled_missed: true };
-          break;
-        case 'En préparation':
-          queryObject = { is_handled_center: true };
-          break;
         default:
           return;
         // break;
       }
-      console.log('after status: ', queryObject);
       const { data, error } = await supabase.from('followups').update(queryObject).eq('tracking', tracking);
 
       if (data) {
@@ -384,8 +369,6 @@ export default function TrackingPage() {
 
   const getIsActive = (tracking, status) => {
     if (trackingState && trackingState[tracking]) {
-      console.log('--------------xx->', trackingState);
-      console.log('--------------xx->', trackingState[tracking]);
       if (status === 'Centre') {
         return trackingState[tracking].isHandledCenter;
       }
@@ -397,13 +380,6 @@ export default function TrackingPage() {
       }
       if (status === 'Tentative échouée') {
         return trackingState[tracking].isHandledMissed;
-      }
-      if (status === 'Prêt à expédier') {
-        console.log('statoos: ', trackingState[tracking].isHandledMissed);
-        return trackingState[tracking].isHandledMissed;
-      }
-      if (status === 'En préparation') {
-        return trackingState[tracking].isHandledCenter;
       }
     }
 
@@ -452,8 +428,6 @@ export default function TrackingPage() {
                   <MenuItem value={'Reçu à Wilaya'}>Reçu à Wilaya</MenuItem>
                   <MenuItem value={'Sorti en livraison'}>Sorti en livraison</MenuItem>
                   <MenuItem value={'Tentative échouée'}>Tentative échouée</MenuItem>
-                  <MenuItem value={'Prêt à expédier'}>Prêt à expédier</MenuItem>
-                  <MenuItem value={'En préparation'}>En préparation</MenuItem>
                 </Select>
               </FormControl>
             )}
@@ -578,6 +552,7 @@ export default function TrackingPage() {
 
                         <TableCell align="right">
                           <Stack direction={{ xs: 'column', sm: 'row' }}>
+                            {getIsActive(tracking, status)}
                             <ParcelDetailsModal
                               tracking={tracking}
                               fullName={`${firstName} ${lastName}`}

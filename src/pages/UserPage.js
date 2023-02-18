@@ -131,7 +131,7 @@ export default function UserPage() {
 
   const [filterName, setFilterName] = useState('');
 
-  const [rowsPerPage, setRowsPerPage] = useState(2);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
   const [users, setUsers] = useState([]);
   const [searchInput, setSearchInput] = useState('');
   const [rowsCount, setRowsCount] = useState(0);

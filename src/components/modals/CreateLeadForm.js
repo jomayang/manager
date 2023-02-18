@@ -182,16 +182,20 @@ function CreateLeadForm() {
           <FormControl fullWidth>
             <InputLabel>Wilaya</InputLabel>
             <Select value={wilaya} label="Wilaya" onChange={(e) => setWilaya(e.target.value)}>
-              {wilayas.map((wil) => (
-                <MenuItem value={wil.value}>{wil.label}</MenuItem>
+              {wilayas.map((wil, i) => (
+                <MenuItem key={i} value={wil.value}>
+                  {wil.label}
+                </MenuItem>
               ))}
             </Select>
           </FormControl>
           <FormControl fullWidth>
             <InputLabel>Commune</InputLabel>
             <Select value={commune} label="Commune" onChange={(e) => setCommune(e.target.value)}>
-              {communes.map((com) => (
-                <MenuItem value={com.value}>{com.label}</MenuItem>
+              {communes.map((com, i) => (
+                <MenuItem key={i} value={com.value}>
+                  {com.label}
+                </MenuItem>
               ))}
             </Select>
           </FormControl>
