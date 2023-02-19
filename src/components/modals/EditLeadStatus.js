@@ -1,4 +1,4 @@
-import { Box, Button, Modal, Typography } from '@mui/material';
+import { Box, Button, IconButton, Modal, Typography } from '@mui/material';
 import React, { useState } from 'react';
 import Iconify from '../iconify/Iconify';
 import EditLeadForm from './EditLeadForm';
@@ -34,9 +34,9 @@ function EditLeadStatus({
 
   return (
     <div>
-      <Button onClick={handleOpen} variant="contained" startIcon={<Iconify icon="eva:edit-2-outline" />}>
-        Edit status
-      </Button>
+      <IconButton size="large" color="secondary" onClick={handleOpen}>
+        <Iconify icon="eva:edit-2-outline" />
+      </IconButton>
       <Modal
         open={open}
         onClose={handleClose}
