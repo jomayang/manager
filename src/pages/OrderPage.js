@@ -1,5 +1,5 @@
 import { Helmet } from 'react-helmet-async';
-import { filter } from 'lodash';
+import { create, filter } from 'lodash';
 import { sentenceCase } from 'change-case';
 import { useEffect, useState, forwardRef } from 'react';
 // @mui
@@ -42,6 +42,7 @@ import USERLIST from '../_mock/user';
 import { OrderListHead, OrderListToolbar } from '../sections/@dashboard/order';
 import CreateOrderModal from '../components/modals/CreateOrderModal';
 import supabase from '../config/SupabaseClient';
+import OrderDetailsModal from '../components/modals/OrderDetailsModal';
 
 // ----------------------------------------------------------------------
 const Alert = forwardRef((props, ref) => <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />);
@@ -197,7 +198,7 @@ export default function OrderPage() {
       try {
         const { count, data, error } = await supabase
           .from('orders')
-          .select('id, first_name, last_name, phone, wilaya, commune, status, tracking_id', { count: 'exact' })
+          .select('*', { count: 'exact' })
           .order('created_at', { ascending: false })
           .range(page * rowsPerPage, page * rowsPerPage + rowsPerPage - 1);
         console.log([page * rowsPerPage, page * rowsPerPage + rowsPerPage - 1]);
@@ -212,6 +213,12 @@ export default function OrderPage() {
             wilaya: order.wilaya,
             status: order.status,
             trackingId: order.tracking_id,
+            product: order.product,
+            shippingPrice: order.shipping_price,
+            productPrice: order.product_price,
+            stopdesk: order.stopdesk,
+            isStopdesk: order.is_stopdesk,
+            createdAt: order.created_at,
           }));
           setRowsCount(count);
           setOrders(fetchedOrders);
@@ -232,7 +239,7 @@ export default function OrderPage() {
       try {
         const { count, data, error } = await supabase
           .from('orders')
-          .select('id, first_name, last_name, phone, wilaya, commune, status, tracking_id', { count: 'exact' })
+          .select('*', { count: 'exact' })
           .like('phone', `%${searchInput}%`)
           .order('created_at', { ascending: false })
           .range(page * rowsPerPage, page * rowsPerPage + rowsPerPage - 1);
@@ -247,6 +254,12 @@ export default function OrderPage() {
             wilaya: order.wilaya,
             status: order.status,
             trackingId: order.tracking_id,
+            product: order.product,
+            shippingPrice: order.shipping_price,
+            productPrice: order.product_price,
+            stopdesk: order.stopdesk,
+            isStopdesk: order.is_stopdesk,
+            createdAt: order.created_at,
           }));
           setRowsCount(count);
           setOrders(fetchedOrders);
@@ -359,7 +372,21 @@ export default function OrderPage() {
                 />
                 <TableBody>
                   {filteredOrders.map((row) => {
-                    const { id, fullName, phone, wilaya, commune, status, trackingId } = row;
+                    const {
+                      id,
+                      fullName,
+                      phone,
+                      wilaya,
+                      commune,
+                      status,
+                      trackingId,
+                      product,
+                      shippingPrice,
+                      productPrice,
+                      stopdesk,
+                      isStopdesk,
+                      createdAt,
+                    } = row;
                     const selectedOrder = selected.indexOf(id) !== -1;
 
                     return (
@@ -391,11 +418,28 @@ export default function OrderPage() {
                         </TableCell>
 
                         <TableCell align="right">
-                          {status === 'initial' && (
-                            <IconButton size="large" color="inherit" onClick={() => handleDeleteOrder(trackingId)}>
-                              <Iconify icon={'eva:trash-2-outline'} />
-                            </IconButton>
-                          )}
+                          <Stack direction="row" justifyContent="right">
+                            {status === 'initial' && (
+                              <IconButton size="large" color="inherit" onClick={() => handleDeleteOrder(trackingId)}>
+                                <Iconify icon={'eva:trash-2-outline'} />
+                              </IconButton>
+                            )}
+
+                            <OrderDetailsModal
+                              fullNameAttr={fullName}
+                              id={id}
+                              phoneAttr={phone}
+                              communeAttr={commune}
+                              wilayaAttr={wilaya}
+                              statusAttr={status}
+                              isStopDeskAttr={isStopdesk}
+                              stopdeskAttr={stopdesk}
+                              productAttr={product}
+                              shippingPriceAttr={shippingPrice}
+                              productPriceAttr={productPrice}
+                              createdAtAttr={createdAt}
+                            />
+                          </Stack>
                         </TableCell>
                       </TableRow>
                     );

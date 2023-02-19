@@ -509,6 +509,9 @@ export default function LeadPage() {
 
                         <TableCell align="right">
                           <Stack direction="row">
+                            <IconButton size="large" color="inherit" onClick={() => handleDeleteLead(id)}>
+                              <Iconify icon={'eva:trash-2-outline'} />
+                            </IconButton>
                             <LeadDetailsModal
                               id={id}
                               communeAttr={commune}
@@ -522,9 +525,6 @@ export default function LeadPage() {
                               phoneAttr={phone}
                               createdAtAttr={createdAt}
                             />
-                            <IconButton size="large" color="inherit" onClick={() => handleDeleteLead(id)}>
-                              <Iconify icon={'eva:trash-2-outline'} />
-                            </IconButton>
                           </Stack>
                         </TableCell>
                       </TableRow>

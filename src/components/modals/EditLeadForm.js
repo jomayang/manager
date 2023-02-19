@@ -331,11 +331,12 @@ function EditLeadForm({
                   />
                 </FormControl>
                 <FormControl fullWidth>
-                  <InputLabel>Product</InputLabel>
-                  <Select value={product} label="product" onChange={(e) => setProduct(e.target.value)}>
-                    <MenuItem value={'prod-1'}>Product 1</MenuItem>
-                    <MenuItem value={'prod-2'}>Product 2</MenuItem>
-                  </Select>
+                  <TextField
+                    name="product"
+                    label="Product"
+                    value={product}
+                    onChange={(e) => setProduct(e.target.value)}
+                  />
                 </FormControl>
               </Stack>
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>

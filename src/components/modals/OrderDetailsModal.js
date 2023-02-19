@@ -48,7 +48,7 @@ const statusColors = {
   'Echange échoué': 'error',
 };
 
-function LeadDetailsModal({
+function OrderDetailsModal({
   id,
   communeAttr,
   wilayaAttr,
@@ -56,8 +56,12 @@ function LeadDetailsModal({
   productAttr,
   firstNameAttr,
   lastNameAttr,
-  commentAttr,
+  fullNameAttr,
   statusAttr,
+  isStopDeskAttr,
+  stopdeskAttr,
+  productPriceAttr,
+  shippingPriceAttr,
   phoneAttr,
   createdAtAttr,
 }) {
@@ -91,7 +95,7 @@ function LeadDetailsModal({
             <b>Creation date:</b> {new Date(createdAtAttr).toLocaleString('en-US')}
           </Typography>
           <Typography id="modal-modal-title" variant="p" component="p">
-            <b>Customer:</b> {firstNameAttr} {lastNameAttr}
+            <b>Customer:</b> {fullNameAttr}
           </Typography>
           <Typography id="modal-modal-title" variant="p" component="p">
             <b>Phone number:</b> {phoneAttr}
@@ -99,11 +103,10 @@ function LeadDetailsModal({
           <Typography id="modal-modal-title" variant="p" component="p">
             <b>Status:</b> {statusAttr}
           </Typography>
-          {commentAttr && (
-            <Typography id="modal-modal-title" variant="p" component="p">
-              <b>Comment:</b> {commentAttr}
-            </Typography>
-          )}
+
+          <Typography id="modal-modal-title" variant="p" component="p">
+            <b>Delivery Type:</b> {isStopDeskAttr ? 'Stopdesk' : 'Home delivery'}
+          </Typography>
 
           <hr style={{ border: '1px solid #eee', marginTop: 10, marginBottom: 20 }} />
 
@@ -119,10 +122,26 @@ function LeadDetailsModal({
               <b>Commune:</b> {communeAttr}
             </Typography>
           )}
+          {stopdeskAttr && (
+            <Typography id="modal-modal-title" variant="p" component="p">
+              <b>Agency:</b> {stopdeskAttr}
+            </Typography>
+          )}
 
           {addressAttr && (
             <Typography id="modal-modal-title" variant="p" component="p">
               <b>Address:</b> {addressAttr}
+            </Typography>
+          )}
+
+          {shippingPriceAttr && (
+            <Typography id="modal-modal-title" variant="p" component="p">
+              <b>Shipping price:</b> {shippingPriceAttr}
+            </Typography>
+          )}
+          {productPriceAttr && (
+            <Typography id="modal-modal-title" variant="p" component="p">
+              <b>product price:</b> {productPriceAttr}
             </Typography>
           )}
         </Box>
@@ -131,4 +150,4 @@ function LeadDetailsModal({
   );
 }
 
-export default LeadDetailsModal;
+export default OrderDetailsModal;
