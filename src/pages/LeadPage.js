@@ -229,7 +229,7 @@ export default function LeadPage() {
             error: errorLeads,
           } = await supabase
             .from('leads')
-            .select('id, first_name, last_name, phone, wilaya, commune, status', { count: 'exact' })
+            .select('*', { count: 'exact' })
             .eq('agent_id', dataUser.id)
             .order('created_at', { ascending: false })
             .range(page * rowsPerPage, page * rowsPerPage + rowsPerPage - 1);
