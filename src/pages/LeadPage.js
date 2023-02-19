@@ -43,7 +43,6 @@ import CreateLeadModal from '../components/modals/CreateLeadModal';
 import EditLeadStatus from '../components/modals/EditLeadStatus';
 import ImportLeadsModal from '../components/modals/ImportLeadsModal';
 import LeadDetailsModal from '../components/modals/LeadDetailsModal';
-
 // ----------------------------------------------------------------------
 
 const Alert = forwardRef((props, ref) => <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />);

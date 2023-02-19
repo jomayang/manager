@@ -128,7 +128,7 @@ export default function BackupPage() {
       setUpdating(true);
       const localLogsPromise = parcels.map(async (parcel, i) => {
         let finalStatus;
-        if (parcels.includes(parcel.last_status)) {
+        if (returned.includes(parcel.last_status)) {
           finalStatus = 'returned';
         } else if (parcel.last_status === 'Livré') {
           finalStatus = 'delivered';
