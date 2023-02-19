@@ -56,6 +56,13 @@ const TABLE_HEAD = [
   { id: '' },
 ];
 
+const statusColors = {
+  initial: 'info',
+  processing: 'warning',
+  returned: 'error',
+  delivered: 'success',
+};
+
 // ----------------------------------------------------------------------
 
 function descendingComparator(a, b, orderBy) {
@@ -414,7 +421,7 @@ export default function OrderPage() {
                         <TableCell align="left">{commune}</TableCell>
 
                         <TableCell align="left">
-                          <Label color={'success'}>{status}</Label>
+                          <Label color={statusColors[status]}>{status}</Label>
                         </TableCell>
 
                         <TableCell align="right">
