@@ -14,12 +14,12 @@ export const navAgentConfig = [
   {
     title: 'lead',
     path: '/dashboard/leads',
-    icon: icon('ic_user'),
+    icon: icon('ic_file'),
   },
   {
     title: 'order',
     path: '/dashboard/orders',
-    icon: icon('ic_cart'),
+    icon: icon('ic_invoice'),
   },
 ];
 
@@ -32,22 +32,27 @@ export const navAdminConfig = [
   {
     title: 'lead',
     path: '/dashboard/leads',
-    icon: icon('ic_user'),
+    icon: icon('ic_file'),
   },
   {
     title: 'order',
     path: '/dashboard/orders',
-    icon: icon('ic_cart'),
+    icon: icon('ic_invoice'),
   },
   {
     title: 'Tracking',
     path: '/dashboard/tracking',
-    icon: icon('ic_cart'),
+    icon: icon('ic_calendar'),
   },
   {
     title: 'Users',
     path: '/dashboard/users',
-    icon: icon('ic_cart'),
+    icon: icon('ic_user'),
+  },
+  {
+    title: 'Backup',
+    path: '/dashboard/backup',
+    icon: icon('ic_dashboard'),
   },
 ];
 
@@ -60,11 +65,11 @@ export const navTrackerConfig = [
   {
     title: 'order',
     path: '/dashboard/orders',
-    icon: icon('ic_cart'),
+    icon: icon('ic_invoice'),
   },
   {
     title: 'Tracking',
     path: '/dashboard/tracking',
-    icon: icon('ic_cart'),
+    icon: icon('ic_calendar'),
   },
 ];

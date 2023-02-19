@@ -276,8 +276,12 @@ export const agencies = {
   Cheraga: { value: '165001', label: 'Agence de Cheraga' },
   Draria: { value: '165301', label: 'Agence de Draria' },
   Tamanrasset: {
-    value: '382101',
-    label: 'Agence de Tissemsilt',
+    value: '110101',
+    label: 'Agence de Tamanrasset',
+  },
+  'In Salah': {
+    value: '110801',
+    label: 'Agence de In Salah',
   },
   Sétif: {
     value: '195501',
@@ -346,6 +350,10 @@ export const agencies = {
   Naâma: {
     value: '450101',
     label: 'Agence de Naâma',
+  },
+  Mecheria: {
+    value: '450201',
+    label: 'Agence de Mecheria',
   },
   Boumerdes: {
     value: '350101',

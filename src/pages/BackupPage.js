@@ -132,6 +132,8 @@ export default function BackupPage() {
           finalStatus = 'returned';
         } else if (parcel.last_status === 'Livré') {
           finalStatus = 'delivered';
+        } else if (parcel.last_status === 'En préparation') {
+          finalStatus = 'initial';
         } else {
           finalStatus = 'processing';
         }

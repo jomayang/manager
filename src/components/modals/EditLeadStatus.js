@@ -16,7 +16,18 @@ const style = {
   p: 4,
 };
 
-function EditLeadStatus({ id }) {
+function EditLeadStatus({
+  id,
+  communeAttr,
+  wilayaAttr,
+  addressAttr,
+  productAttr,
+  firstNameAttr,
+  lastNameAttr,
+  commentAttr,
+  statusAttr,
+  phoneAttr,
+}) {
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -36,7 +47,18 @@ function EditLeadStatus({ id }) {
           <Typography id="modal-modal-title" variant="h5" component="h5" style={{ textAlign: 'center' }}>
             Edit lead status
           </Typography>
-          <EditLeadForm id={id} />
+          <EditLeadForm
+            id={id}
+            communeAttr={communeAttr}
+            wilayaAttr={wilayaAttr}
+            addressAttr={addressAttr}
+            productAttr={productAttr}
+            firstNameAttr={firstNameAttr}
+            lastNameAttr={lastNameAttr}
+            commentAttr={commentAttr}
+            statusAttr={statusAttr}
+            phoneAttr={phoneAttr}
+          />
           {/* <CreateOrderForm /> */}
         </Box>
       </Modal>

@@ -178,6 +178,7 @@ function CreateOrderForm() {
   useEffect(() => {
     const fetchTrackers = async () => {
       try {
+        console.log('ag: ', agencies);
         const { data, error } = await supabase.from('users').select('*').eq('role', 'tracker');
 
         if (data) {

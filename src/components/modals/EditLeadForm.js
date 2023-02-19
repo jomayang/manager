@@ -28,7 +28,18 @@ import { UserContext } from '../../context/UserContext';
 
 const Alert = forwardRef((props, ref) => <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />);
 
-function EditLeadForm({ id }) {
+function EditLeadForm({
+  id,
+  communeAttr,
+  wilayaAttr,
+  addressAttr,
+  productAttr,
+  firstNameAttr,
+  lastNameAttr,
+  commentAttr,
+  statusAttr,
+  phoneAttr,
+}) {
   const [open, setOpen] = useState(false);
   const [isStopDesk, setIsStopDesk] = useState(false);
   const [shippingPrice, setShippingPrice] = useState(0);
@@ -36,17 +47,17 @@ function EditLeadForm({ id }) {
   const [isError, setIsError] = useState(false);
   const [feedback, setFeedback] = useState('');
   const [currentLead, setCurrentLead] = useState(null);
-  const [status, setStatus] = useState('initial');
+  const [status, setStatus] = useState(statusAttr);
   const [agency, setAgency] = useState(null);
-  const [comment, setComment] = useState('');
+  const [comment, setComment] = useState(commentAttr);
   const [communes, setCommunes] = useState([]);
-  const [commune, setCommune] = useState('');
-  const [address, setAddress] = useState('');
-  const [wilaya, setWilaya] = useState('');
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [phone, setPhone] = useState('');
-  const [product, setProduct] = useState('');
+  const [commune, setCommune] = useState(communeAttr);
+  const [address, setAddress] = useState(addressAttr);
+  const [wilaya, setWilaya] = useState(wilayaAttr);
+  const [firstName, setFirstName] = useState(firstNameAttr);
+  const [lastName, setLastName] = useState(lastNameAttr);
+  const [phone, setPhone] = useState(phoneAttr);
+  const [product, setProduct] = useState(productAttr);
   const [deliveryFee, setDeliveryFee] = useState(null);
   const [trackers, setTrackers] = useState([]);
   const [trackersCount, setTrackersCount] = useState(0);
@@ -63,6 +74,7 @@ function EditLeadForm({ id }) {
   useEffect(() => {
     const fetchTrackers = async () => {
       try {
+        console.log('the status->', statusAttr, status);
         const { data, error } = await supabase.from('users').select('*').eq('role', 'tracker');
 
         if (data) {
@@ -116,6 +128,7 @@ function EditLeadForm({ id }) {
   useEffect(() => {
     const fetchLead = async () => {
       try {
+        console.log('the status is', status);
         const { data, error } = await supabase.from('leads').select().eq('id', id).single();
 
         if (data) {
@@ -138,7 +151,8 @@ function EditLeadForm({ id }) {
   }, [id]);
 
   useEffect(() => {
-    if (wilaya !== '') {
+    const wilayaValues = wilayas.map((wil, i) => wil.value);
+    if (wilayaValues.includes(wilaya)) {
       console.log('wilaya', wilayas);
       console.log('communes', communesStopdesk[wilaya]);
       console.log('communes', communesList[wilaya]);
@@ -334,7 +348,7 @@ function EditLeadForm({ id }) {
                       </MenuItem>
                     ))}
                   </Select>
-                  <FormHelperText>{currentLead.wilaya}</FormHelperText>
+                  <FormHelperText>{wilaya}</FormHelperText>
                 </FormControl>
                 <FormControl fullWidth>
                   <InputLabel>Commune</InputLabel>
@@ -345,7 +359,7 @@ function EditLeadForm({ id }) {
                       </MenuItem>
                     ))}
                   </Select>
-                  <FormHelperText>{currentLead.commune}</FormHelperText>
+                  <FormHelperText>{commune}</FormHelperText>
                 </FormControl>
               </Stack>
               <Stack spacing={3}>
@@ -379,7 +393,7 @@ function EditLeadForm({ id }) {
                   <TextField
                     name="address"
                     label="Address"
-                    value={address || currentLead.address}
+                    value={address}
                     onChange={(e) => {
                       setAddress(e.target.value);
                     }}

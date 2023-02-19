@@ -42,6 +42,7 @@ import { LeadListHead } from '../sections/@dashboard/lead';
 import CreateLeadModal from '../components/modals/CreateLeadModal';
 import EditLeadStatus from '../components/modals/EditLeadStatus';
 import ImportLeadsModal from '../components/modals/ImportLeadsModal';
+import LeadDetailsModal from '../components/modals/LeadDetailsModal';
 
 // ----------------------------------------------------------------------
 
@@ -243,7 +244,7 @@ export default function LeadPage() {
             error: errorLeads,
           } = await supabase
             .from('leads')
-            .select('id, first_name, last_name, phone, wilaya, commune, status', { count: 'exact' })
+            .select('*', { count: 'exact' })
             .order('created_at', { ascending: false })
             .range(page * rowsPerPage, page * rowsPerPage + rowsPerPage - 1);
 
@@ -270,8 +271,12 @@ export default function LeadPage() {
             lastName: lead.last_name,
             phone: lead.phone,
             commune: lead.commune,
-            wilaya: lead.wilaya,
+            product: lead.product,
+            address: lead.address,
+            comment: lead.comment,
             status: lead.status,
+            wilaya: lead.wilaya,
+            createdAt: lead.created_at,
           }));
           setRowsCount(count);
           setLeads(fetchedLeads);
@@ -314,7 +319,7 @@ export default function LeadPage() {
       try {
         const { count, data, error } = await supabase
           .from('leads')
-          .select('id, first_name, last_name, phone, wilaya, commune', { count: 'exact' })
+          .select('*', { count: 'exact' })
           .like('phone', `%${searchInput}%`)
           .order('created_at', { ascending: false })
           .range(page * rowsPerPage, page * rowsPerPage + rowsPerPage - 1);
@@ -327,7 +332,12 @@ export default function LeadPage() {
             lastName: lead.last_name,
             phone: lead.phone,
             commune: lead.commune,
+            product: lead.product,
+            address: lead.address,
+            comment: lead.comment,
+            status: lead.status,
             wilaya: lead.wilaya,
+            createdAt: lead.created_at,
           }));
 
           setRowsCount(count);
@@ -439,7 +449,20 @@ export default function LeadPage() {
                 />
                 <TableBody>
                   {filteredLeads.map((row) => {
-                    const { id, fullName, status, phone, wilaya, commune } = row;
+                    const {
+                      id,
+                      fullName,
+                      status,
+                      phone,
+                      wilaya,
+                      commune,
+                      address,
+                      comment,
+                      product,
+                      firstName,
+                      lastName,
+                      createdAt,
+                    } = row;
                     const selectedLead = selected.indexOf(id) !== -1;
 
                     return (
@@ -469,12 +492,40 @@ export default function LeadPage() {
                         <TableCell align="left">
                           <Label color={statusColors[status]}>{sentenceCase(status)}</Label>
                         </TableCell>
-                        <TableCell align="right">{status !== 'confirmed' && <EditLeadStatus id={id} />}</TableCell>
+                        <TableCell align="right">
+                          <EditLeadStatus
+                            id={id}
+                            communeAttr={commune}
+                            wilayaAttr={wilaya}
+                            addressAttr={address}
+                            productAttr={product}
+                            firstNameAttr={firstName}
+                            lastNameAttr={lastName}
+                            commentAttr={comment}
+                            statusAttr={status}
+                            phoneAttr={phone}
+                          />
+                        </TableCell>
 
                         <TableCell align="right">
-                          <IconButton size="large" color="inherit" onClick={() => handleDeleteLead(id)}>
-                            <Iconify icon={'eva:trash-2-outline'} />
-                          </IconButton>
+                          <Stack direction="row">
+                            <LeadDetailsModal
+                              id={id}
+                              communeAttr={commune}
+                              wilayaAttr={wilaya}
+                              addressAttr={address}
+                              productAttr={product}
+                              firstNameAttr={firstName}
+                              lastNameAttr={lastName}
+                              commentAttr={comment}
+                              statusAttr={status}
+                              phoneAttr={phone}
+                              createdAtAttr={createdAt}
+                            />
+                            <IconButton size="large" color="inherit" onClick={() => handleDeleteLead(id)}>
+                              <Iconify icon={'eva:trash-2-outline'} />
+                            </IconButton>
+                          </Stack>
                         </TableCell>
                       </TableRow>
                     );

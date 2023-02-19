@@ -1,7 +1,7 @@
 import { Helmet } from 'react-helmet-async';
 import { filter } from 'lodash';
 import { sentenceCase } from 'change-case';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, forwardRef } from 'react';
 // @mui
 import {
   Card,
@@ -27,8 +27,11 @@ import {
   Tooltip,
   InputAdornment,
   Toolbar,
+  Snackbar,
 } from '@mui/material';
+import MuiAlert from '@mui/material/Alert';
 // components
+import axios from 'axios';
 import Label from '../components/label';
 import Iconify from '../components/iconify';
 import Scrollbar from '../components/scrollbar';
@@ -41,6 +44,7 @@ import CreateOrderModal from '../components/modals/CreateOrderModal';
 import supabase from '../config/SupabaseClient';
 
 // ----------------------------------------------------------------------
+const Alert = forwardRef((props, ref) => <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />);
 
 const TABLE_HEAD = [
   { id: 'name', label: 'Name', alignRight: false },
@@ -119,6 +123,9 @@ export default function OrderPage() {
   const [rowsCount, setRowsCount] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(25);
   const [orders, setOrders] = useState([]);
+  const [triggerFetch, setTriggerFetch] = useState();
+  const [isError, setIsError] = useState(false);
+  const [feedback, setFeedback] = useState('');
   const [searchInput, setSearchInput] = useState('');
   const handleOpenMenu = (event) => {
     setOpen(event.currentTarget);
@@ -141,6 +148,14 @@ export default function OrderPage() {
       return;
     }
     setSelected([]);
+  };
+
+  const handleClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    setOpen(false);
   };
 
   const handleClick = (event, name) => {
@@ -182,7 +197,7 @@ export default function OrderPage() {
       try {
         const { count, data, error } = await supabase
           .from('orders')
-          .select('id, first_name, last_name, phone, wilaya, commune, status', { count: 'exact' })
+          .select('id, first_name, last_name, phone, wilaya, commune, status, tracking_id', { count: 'exact' })
           .order('created_at', { ascending: false })
           .range(page * rowsPerPage, page * rowsPerPage + rowsPerPage - 1);
         console.log([page * rowsPerPage, page * rowsPerPage + rowsPerPage - 1]);
@@ -196,6 +211,7 @@ export default function OrderPage() {
             commune: order.commune,
             wilaya: order.wilaya,
             status: order.status,
+            trackingId: order.tracking_id,
           }));
           setRowsCount(count);
           setOrders(fetchedOrders);
@@ -209,14 +225,14 @@ export default function OrderPage() {
       }
     };
     fetchOrders();
-  }, [rowsPerPage, page]);
+  }, [rowsPerPage, page, triggerFetch]);
 
   const handleSearchInDb = async (e) => {
     if (e.key === 'Enter') {
       try {
         const { count, data, error } = await supabase
           .from('orders')
-          .select('id, first_name, last_name, phone, wilaya, commune, status', { count: 'exact' })
+          .select('id, first_name, last_name, phone, wilaya, commune, status, tracking_id', { count: 'exact' })
           .like('phone', `%${searchInput}%`)
           .order('created_at', { ascending: false })
           .range(page * rowsPerPage, page * rowsPerPage + rowsPerPage - 1);
@@ -230,6 +246,7 @@ export default function OrderPage() {
             commune: order.commune,
             wilaya: order.wilaya,
             status: order.status,
+            trackingId: order.tracking_id,
           }));
           setRowsCount(count);
           setOrders(fetchedOrders);
@@ -239,6 +256,36 @@ export default function OrderPage() {
       }
     }
   };
+
+  const handleDeleteOrder = async (trackingId) => {
+    try {
+      console.log('tracking is', trackingId);
+      const response = await axios({
+        url: `https://ecom-api-5wlr.onrender.com/delete/`,
+        method: 'post',
+        headers: { 'Content-Type': 'application/json' },
+        data: { tracking: trackingId },
+      });
+      const { error: errorFollowup } = await supabase.from('followups').delete().eq('tracking', trackingId);
+      const { error } = await supabase.from('orders').delete().eq('tracking_id', trackingId);
+
+      if (error || errorFollowup) {
+        setFeedback('a Problem accured when removing the lead');
+        setIsError(true);
+      } else {
+        setFeedback('Lead removed successfully!');
+        setIsError(false);
+        setTriggerFetch(Math.random());
+      }
+      setOpen(true);
+    } catch (error) {
+      console.log(error);
+      setFeedback('a Problem accured!');
+      setIsError(true);
+      setOpen(true);
+    }
+  };
+
   return (
     <>
       <Helmet>
@@ -312,7 +359,7 @@ export default function OrderPage() {
                 />
                 <TableBody>
                   {filteredOrders.map((row) => {
-                    const { id, fullName, phone, wilaya, commune, status } = row;
+                    const { id, fullName, phone, wilaya, commune, status, trackingId } = row;
                     const selectedOrder = selected.indexOf(id) !== -1;
 
                     return (
@@ -344,9 +391,11 @@ export default function OrderPage() {
                         </TableCell>
 
                         <TableCell align="right">
-                          {/* <IconButton size="large" color="inherit" onClick={handleOpenMenu}>
-                            <Iconify icon={'eva:more-vertical-fill'} />
-                          </IconButton> */}
+                          {status === 'initial' && (
+                            <IconButton size="large" color="inherit" onClick={() => handleDeleteOrder(trackingId)}>
+                              <Iconify icon={'eva:trash-2-outline'} />
+                            </IconButton>
+                          )}
                         </TableCell>
                       </TableRow>
                     );
@@ -396,35 +445,16 @@ export default function OrderPage() {
           />
         </Card>
       </Container>
-
-      <Popover
-        open={Boolean(open)}
-        anchorEl={open}
-        onClose={handleCloseMenu}
-        anchorOrigin={{ vertical: 'top', horizontal: 'left' }}
-        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-        PaperProps={{
-          sx: {
-            p: 1,
-            width: 140,
-            '& .MuiMenuItem-root': {
-              px: 1,
-              typography: 'body2',
-              borderRadius: 0.75,
-            },
-          },
-        }}
+      <Snackbar
+        open={open}
+        autoHideDuration={6000}
+        onClose={handleClose}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
       >
-        <MenuItem>
-          <Iconify icon={'eva:edit-fill'} sx={{ mr: 2 }} />
-          Edit
-        </MenuItem>
-
-        <MenuItem sx={{ color: 'error.main' }}>
-          <Iconify icon={'eva:trash-2-outline'} sx={{ mr: 2 }} />
-          Delete
-        </MenuItem>
-      </Popover>
+        <Alert onClose={handleClose} severity={isError ? 'error' : 'success'} sx={{ width: '100%' }}>
+          {feedback}
+        </Alert>
+      </Snackbar>
     </>
   );
 }

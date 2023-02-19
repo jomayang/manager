@@ -129,7 +129,10 @@ export const communesStopdesk = {
     { value: 'Cheraga', label: 'Cheraga - الشراقة' },
     { value: 'Draria', label: 'Draria - الدرارية' },
   ],
-  Tamanrasset: [{ value: 'Tamanrasset', label: 'Tamanrasset - تامنغست' }],
+  Tamanrasset: [
+    { value: 'Tamanrasset', label: 'Tamanrasset - تامنغست' },
+    { value: 'In Salah', label: 'In Salah - عين صالح' },
+  ],
   Sétif: [
     { value: 'Sétif', label: 'Setif - سطيف' },
     { value: 'El Eulma', label: 'El Eulma - العلمة' },
@@ -154,7 +157,10 @@ export const communesStopdesk = {
     { value: 'Arzew', label: 'Arzew - أرزيو' },
   ],
   'Souk Ahras': [{ value: 'Souk Ahras', label: 'Souk Ahras - سوق أهراس' }],
-  Naâma: [{ value: 'Naâma', label: 'Naama - النعامة' }],
+  Naâma: [
+    { value: 'Naâma', label: 'Naama - النعامة' },
+    { value: 'Mecheria', label: 'Mecheria - مشرية' },
+  ],
   Boumerdès: [
     { value: 'Boumerdes', label: 'Boumerdes - بومرداس' },
     { value: 'Bordj Menaiel', label: 'Bordj Menaiel - برج منايل' },
