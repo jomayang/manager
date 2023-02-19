@@ -1,7 +1,7 @@
 import { Helmet } from 'react-helmet-async';
 import { filter } from 'lodash';
 import { sentenceCase } from 'change-case';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 // @mui
 import {
   Card,
@@ -49,6 +49,7 @@ import CreateLeadModal from '../components/modals/CreateLeadModal';
 import EditLeadStatus from '../components/modals/EditLeadStatus';
 import ParcelHistoryModal from '../components/modals/ParcelHistoryModal';
 import ParcelDetailsModal from '../components/modals/ParcelDetailsModal';
+import { UserContext } from '../context/UserContext';
 
 // ----------------------------------------------------------------------
 
@@ -159,7 +160,8 @@ export default function TrackingPage() {
   const [trackingState, setTrackingState] = useState({});
   const [currentUserId, setCurrentUserId] = useState();
   const [loading, setLoading] = useState(false);
-
+  const [currentUserRole, setCurrentUserRole] = useState('');
+  const { user } = useContext(UserContext);
   const handleOpenMenu = (event) => {
     setOpen(event.currentTarget);
   };
@@ -207,6 +209,18 @@ export default function TrackingPage() {
           const { data: dataAuth, error: errorAuth } = await supabase.auth.getSession();
           if (dataAuth) {
             const { email } = dataAuth.session.user;
+            const { data: dataUser, error: errorUser } = await supabase
+              .from('users')
+              .select()
+              .eq('email', email)
+              .single();
+
+            if (dataUser) {
+              setCurrentUserRole(dataUser.role);
+            }
+            if (errorUser) {
+              console.log(errorUser);
+            }
             const relevantEmail = data.filter((item) => item.email === email);
             if (relevantEmail.length !== 0) {
               setCurrentUserId(relevantEmail[0].id);
@@ -276,39 +290,50 @@ export default function TrackingPage() {
     const fetchParcels = async () => {
       let data;
       let object;
-      if (filterStatus !== '')
+      if (currentUserRole === 'admin' && filterStatus !== '') {
+        data = {
+          extension: `?page_size=${rowsPerPage}&page=${page + 1}&order_by=date_last_status&last_status=${filterStatus}`,
+        };
+      } else if (currentUserRole === 'admin' && filterStatus === '') {
+        data = {
+          extension: `?page_size=${rowsPerPage}&page=${page + 1}&order_by=date_last_status`,
+        };
+      } else if (currentUserRole !== 'admin' && filterStatus !== '') {
         data = {
           extension: `?page_size=${rowsPerPage}&page=${
             page + 1
           }&order_by=date_last_status&last_status=${filterStatus}&order_id=order_${currentUserId}`,
         };
-      else
+      } else if (currentUserRole !== 'admin' && filterStatus === '') {
         data = {
           extension: `?page_size=${rowsPerPage}&page=${
             page + 1
           }&order_by=date_last_status&order_id=order_${currentUserId}`,
         };
-      // if (page && rowsPerPage) {
-      try {
-        setLoading(true);
-        const response = await axios({
-          url: `https://ecom-api-5wlr.onrender.com/`,
-          method: 'post',
-          headers: { 'Content-Type': 'application/json' },
-          data,
-        });
-
-        setRowsCount(response.data.data.total_data);
-        setLeads(response.data.data.data);
-      } catch (error) {
-        console.log(error);
-      } finally {
-        setLoading(false);
       }
-      // }
+      console.log('user id', currentUserId, 'user role', currentUserRole);
+      if (currentUserRole !== '') {
+        try {
+          console.log('useEffect called');
+          setLoading(true);
+          const response = await axios({
+            url: `https://ecom-api-5wlr.onrender.com/`,
+            method: 'post',
+            headers: { 'Content-Type': 'application/json' },
+            data,
+          });
+
+          setRowsCount(response.data.data.total_data);
+          setLeads(response.data.data.data);
+        } catch (error) {
+          console.log(error);
+        } finally {
+          setLoading(false);
+        }
+      }
     };
     fetchParcels();
-  }, [page, rowsPerPage, filterStatus, currentUserId]);
+  }, [page, rowsPerPage, filterStatus, currentUserId, currentUserRole]);
 
   useEffect(() => {
     const fetch = async () => {
@@ -605,7 +630,7 @@ export default function TrackingPage() {
                             />
                             {followupStatusArray.includes(status) && (
                               <>
-                                {!getIsActive(tracking, status) && (
+                                {!getIsActive(tracking, status) && currentUserRole !== 'admin' && (
                                   <IconButton aria-label="Done" onClick={() => handleValidateTask(tracking, status)}>
                                     <Iconify icon="eva:checkmark-circle-outline" />
                                   </IconButton>
