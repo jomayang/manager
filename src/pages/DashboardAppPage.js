@@ -232,7 +232,7 @@ export default function DashboardAppPage() {
 
             <Grid item xs={12} md={6} lg={4}>
               <AppCurrentVisits
-                title="Current Visits"
+                title="Delivery Rate"
                 chartData={[
                   { label: 'Delivered', value: deliveredCount },
                   { label: 'Returned', value: returnedCount },
