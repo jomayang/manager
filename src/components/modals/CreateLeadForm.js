@@ -180,8 +180,8 @@ function CreateLeadForm() {
             <InputLabel>Commune</InputLabel>
             <Select value={commune} label="Commune" onChange={(e) => setCommune(e.target.value)}>
               {communes.map((com, i) => (
-                <MenuItem key={i} value={com.value}>
-                  {com.label}
+                <MenuItem key={i} value={com.value} disabled={!com.isDeliverable}>
+                  {com.label} {!com.isDeliverable && '(Undeliverable)'}
                 </MenuItem>
               ))}
             </Select>
