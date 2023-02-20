@@ -17,6 +17,7 @@ import axios from 'axios';
 import supabase from '../../config/SupabaseClient';
 import { wilayas } from '../../data/wilayas';
 import { UserContext } from '../../context/UserContext';
+import { communesList } from '../../data/communes';
 
 const Alert = forwardRef((props, ref) => {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -126,21 +127,11 @@ function CreateLeadForm() {
   };
 
   useEffect(() => {
-    const fetch = async () => {
-      if (wilaya !== '') {
-        const getCommunes = await axios({
-          url: `https://province-api.onrender.com/`,
-          method: 'post',
-          headers: { 'Content-Type': 'application/json' },
-          data: {
-            wilaya,
-          },
-        });
-        setCommunes(getCommunes.data.communes);
-        console.log('the new communes: ', getCommunes.data);
-      }
-    };
-    fetch();
+    if (wilaya !== '') {
+      console.log('wilaya', wilayas);
+      console.log('communes', communesList[wilaya]);
+      setCommunes(communesList[wilaya]);
+    }
   }, [wilaya]);
 
   return (

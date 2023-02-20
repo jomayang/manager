@@ -113,13 +113,13 @@ export default function DashboardAppPage() {
         console.log('number of delivered: ', count);
         const netPayments = data.map((order) => order.product_price + order.shipping_price - order.delivery_fees);
         const totalRev = netPayments.reduce((partialSum, a) => partialSum + a, 0);
-        setTotalRevenue(totalRev);
+        setTotalRevenue(totalRev - returnedCount * 350);
         setDeliveredCount(count);
         console.log('orders', data, totalRev);
       }
     };
     fetchDelivered();
-  }, []);
+  }, [returnedCount]);
 
   useEffect(() => {
     const fetchOrders = async () => {
