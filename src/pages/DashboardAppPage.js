@@ -28,6 +28,13 @@ export default function DashboardAppPage() {
   const { user: userAuth } = useContext(UserContext);
   const navigate = useNavigate();
   const [userRole, setUserRole] = useState('');
+  const [deliveredCount, setDeliveredCount] = useState(0);
+  const [returnedCount, setReturnedCount] = useState(0);
+  const [totalRevenue, setTotalRevenue] = useState(0);
+  const [totalOrders, setTotalOrders] = useState(0);
+  const [netRevenue, setNetRevenue] = useState(0);
+  const [totalDeliveryFees, setTotalDeliveryFees] = useState(0);
+  const [deliveryRate, setDeliveryRate] = useState(0);
   const theme = useTheme();
   useEffect(() => {
     const getSession = async () => {
@@ -94,6 +101,53 @@ export default function DashboardAppPage() {
       navigate('/dashboard/leads', { replace: true });
     } else if (userRole === 'tracker') navigate('/dashboard/tracking', { replace: true });
   }, [userRole]);
+
+  useEffect(() => {
+    const fetchDelivered = async () => {
+      const { count, data, error } = await supabase
+        .from('orders')
+        .select('product_price, shipping_price, delivery_fees', { count: 'exact' })
+        .eq('status', 'delivered');
+
+      if (data) {
+        console.log('number of delivered: ', count);
+        const netPayments = data.map((order) => order.product_price + order.shipping_price - order.delivery_fees);
+        const totalRev = netPayments.reduce((partialSum, a) => partialSum + a, 0);
+        setTotalRevenue(totalRev);
+        setDeliveredCount(count);
+        console.log('orders', data, totalRev);
+      }
+    };
+    fetchDelivered();
+  }, []);
+
+  useEffect(() => {
+    const fetchOrders = async () => {
+      const { count, data, error } = await supabase
+        .from('orders')
+        .select('product_price, shipping_price, delivery_fees', { count: 'exact' });
+
+      if (data) {
+        setTotalOrders(count);
+      }
+    };
+    fetchOrders();
+  }, []);
+
+  useEffect(() => {
+    const fetchDelivered = async () => {
+      const {
+        count: countOrder,
+        data: dataOrder,
+        error: errorOrder,
+      } = await supabase.from('orders').select('id', { count: 'exact' }).eq('status', 'returned');
+      if (dataOrder) {
+        setReturnedCount(countOrder);
+      }
+    };
+    fetchDelivered();
+  }, []);
+
   return (
     <>
       <Helmet>
@@ -107,19 +161,28 @@ export default function DashboardAppPage() {
         {userRole === 'admin' && (
           <Grid container spacing={3}>
             <Grid item xs={12} sm={6} md={3}>
-              <AppWidgetSummary title="Weekly Sales" total={714000} icon={'ant-design:android-filled'} />
-            </Grid>
-
-            <Grid item xs={12} sm={6} md={3}>
-              <AppWidgetSummary title="New Users" total={1352831} color="info" icon={'ant-design:apple-filled'} />
+              <AppWidgetSummary
+                title="Total Revenue (DA)"
+                total={totalRevenue}
+                icon={'ant-design:dollar-circle-filled'}
+              />
             </Grid>
 
             <Grid item xs={12} sm={6} md={3}>
               <AppWidgetSummary
-                title="Item Orders"
-                total={1723315}
-                color="warning"
-                icon={'ant-design:windows-filled'}
+                title="Delivered Orders"
+                total={deliveredCount}
+                color="info"
+                icon={'ant-design:credit-card-filled'}
+              />
+            </Grid>
+
+            <Grid item xs={12} sm={6} md={3}>
+              <AppWidgetSummary
+                title="Confirmed Leads"
+                total={totalOrders}
+                color="success"
+                icon={'ant-design:funnel-plot-filled'}
               />
             </Grid>
 
@@ -171,17 +234,10 @@ export default function DashboardAppPage() {
               <AppCurrentVisits
                 title="Current Visits"
                 chartData={[
-                  { label: 'America', value: 4344 },
-                  { label: 'Asia', value: 5435 },
-                  { label: 'Europe', value: 1443 },
-                  { label: 'Africa', value: 4443 },
+                  { label: 'Delivered', value: deliveredCount },
+                  { label: 'Returned', value: returnedCount },
                 ]}
-                chartColors={[
-                  theme.palette.primary.main,
-                  theme.palette.info.main,
-                  theme.palette.warning.main,
-                  theme.palette.error.main,
-                ]}
+                chartColors={[theme.palette.success.main, theme.palette.error.main]}
               />
             </Grid>
 
