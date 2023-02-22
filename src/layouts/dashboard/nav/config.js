@@ -45,6 +45,11 @@ export const navAdminConfig = [
     icon: icon('ic_calendar'),
   },
   {
+    title: 'Stats',
+    path: '/dashboard/stats',
+    icon: icon('ic_analytics'),
+  },
+  {
     title: 'Users',
     path: '/dashboard/users',
     icon: icon('ic_user'),

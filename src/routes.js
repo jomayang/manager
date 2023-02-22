@@ -15,6 +15,7 @@ import OrderPage from './pages/OrderPage';
 import TrackingPage from './pages/TrackingPage';
 import supabase from './config/SupabaseClient';
 import BackupPage from './pages/BackupPage';
+import StatPage from './pages/StatPage';
 
 // ----------------------------------------------------------------------
 
@@ -31,7 +32,7 @@ const ADMIN_ROUTES = [
       { path: 'backup', element: <BackupPage /> },
       // { path: 'user', element: <UserPage /> },
       { path: 'users', element: <UserPage /> },
-      { path: 'blog', element: <BlogPage /> },
+      { path: 'stats', element: <StatPage /> },
     ],
   },
   {

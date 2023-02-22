@@ -43,6 +43,7 @@ import { OrderListHead, OrderListToolbar } from '../sections/@dashboard/order';
 import CreateOrderModal from '../components/modals/CreateOrderModal';
 import supabase from '../config/SupabaseClient';
 import OrderDetailsModal from '../components/modals/OrderDetailsModal';
+import EditOrderStatus from '../components/modals/EditOrderStatus';
 
 // ----------------------------------------------------------------------
 const Alert = forwardRef((props, ref) => <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />);
@@ -53,6 +54,7 @@ const TABLE_HEAD = [
   { id: 'wilaya', label: 'wilaya', alignRight: false },
   { id: 'commune', label: 'Commune', alignRight: false },
   { id: 'status', label: 'Status', alignRight: false },
+  { id: '', alignRight: false },
   { id: '' },
 ];
 
@@ -423,7 +425,9 @@ export default function OrderPage() {
                         <TableCell align="left">
                           <Label color={statusColors[status]}>{status}</Label>
                         </TableCell>
-
+                        <TableCell align="right">
+                          <EditOrderStatus id={id} statusAttr={status} />
+                        </TableCell>
                         <TableCell align="right">
                           <Stack direction="row" justifyContent="right">
                             {status === 'initial' && (

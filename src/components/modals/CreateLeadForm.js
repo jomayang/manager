@@ -1,4 +1,4 @@
-import { DesktopDatePicker } from '@mui/lab';
+import { DesktopDatePicker, LoadingButton } from '@mui/lab';
 import {
   Button,
   FormControl,
@@ -37,6 +37,7 @@ function CreateLeadForm() {
   const [product, setProduct] = useState('');
   const [agents, setAgents] = useState([]);
   const [agentsCount, setAgentsCount] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
   const [currentAgentId, setCurrentAgentId] = useState('');
   const { user } = useContext(UserContext);
   const handleClose = (event, reason) => {
@@ -82,6 +83,7 @@ function CreateLeadForm() {
   const createLead = async (e) => {
     e.preventDefault();
     try {
+      setIsLoading(true);
       console.log({ first_name: firstName, last_name: lastName, address, phone, wilaya, commune, product });
       let agentId;
       if (agentsCount !== 0) {
@@ -119,6 +121,7 @@ function CreateLeadForm() {
         setFeedback('A new lead added!');
         setOpen(true);
       }
+      setIsLoading(false);
     } catch (error) {
       setFeedback('a Problem accured when adding the new Lead!');
       setIsError(true);
@@ -136,7 +139,7 @@ function CreateLeadForm() {
 
   return (
     <form onSubmit={createLead}>
-      <Stack spacing={3}>
+      <Stack spacing={3} sx={{ maxHeight: '70vh', overflowY: 'scroll', paddingRight: '1rem' }}>
         <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ marginTop: '1rem' }}>
           <FormControl fullWidth>
             <TextField
@@ -198,9 +201,9 @@ function CreateLeadForm() {
               Add Lead
             </Button>
           ) : (
-            <Button type="submit" fullWidth size="large" variant="contained">
+            <LoadingButton loading={isLoading} type="submit" fullWidth size="large" variant="contained">
               Add Lead
-            </Button>
+            </LoadingButton>
           )}
         </Stack>
       </Stack>
@@ -211,7 +214,7 @@ function CreateLeadForm() {
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
       >
         <Alert onClose={handleClose} severity={isError ? 'error' : 'success'} sx={{ width: '100%' }}>
-          {feedback} {!isError && <Link to={`/dashboard/patient/`}>(click here)</Link>}
+          {feedback}
         </Alert>
       </Snackbar>
     </form>

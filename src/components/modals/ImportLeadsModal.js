@@ -1,5 +1,6 @@
 import { Box, Modal, Button, Typography, IconButton, Snackbar } from '@mui/material';
 import React, { forwardRef, useEffect, useRef, useState } from 'react';
+import { LoadingButton } from '@mui/lab';
 import Papa from 'papaparse';
 import MuiAlert, { AlertProps } from '@mui/material/Alert';
 import supabase from '../../config/SupabaseClient';
@@ -11,7 +12,8 @@ const style = {
   top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
-  width: 600,
+  width: ['90%', '80%', 600],
+  maxHeight: '90%',
   bgcolor: 'background.paper',
   // border: '2px solid #000',
   borderRadius: '20px',
@@ -106,6 +108,7 @@ function ImportLeadsModal() {
             last_name: '',
             wilaya,
             commune: '',
+            product: 'زيت اللحية',
             address,
             phone,
             created_at: new Date(createdTime),
@@ -183,9 +186,16 @@ function ImportLeadsModal() {
                 }}
               />
             </div>
-            <Button onClick={handleUploadCSV} fullWidth disabled={uploading} size="large" variant="contained">
+            <LoadingButton
+              loading={uploading}
+              onClick={handleUploadCSV}
+              fullWidth
+              disabled={uploading}
+              size="large"
+              variant="contained"
+            >
               {uploading ? 'Importing...' : 'Import'}
-            </Button>
+            </LoadingButton>
           </div>
           <Snackbar
             open={openSnack}

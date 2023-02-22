@@ -1,4 +1,4 @@
-import { DesktopDatePicker } from '@mui/lab';
+import { DesktopDatePicker, LoadingButton } from '@mui/lab';
 import {
   Button,
   FormControl,
@@ -16,7 +16,7 @@ import {
   Typography,
 } from '@mui/material';
 import { Stack } from '@mui/system';
-import React, { forwardRef, useEffect, useState } from 'react';
+import React, { forwardRef, useContext, useEffect, useState } from 'react';
 import MuiAlert, { AlertProps } from '@mui/material/Alert';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
@@ -26,6 +26,7 @@ import { agencies } from '../../data/agencies';
 import { fees } from '../../data/fees';
 import { communesList } from '../../data/communes';
 import { communesStopdesk } from '../../data/communesStopdesk';
+import { UserContext } from '../../context/UserContext';
 
 const Alert = forwardRef((props, ref) => {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -52,7 +53,11 @@ function CreateOrderForm() {
 
   const [trackers, setTrackers] = useState([]);
   const [trackersCount, setTrackersCount] = useState(0);
-
+  const [agents, setAgents] = useState([]);
+  const [agentsCount, setAgentsCount] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+  const [currentAgentId, setCurrentAgentId] = useState('');
+  const { user } = useContext(UserContext);
   const handleClose = (event, reason) => {
     if (reason === 'clickaway') {
       return;
@@ -64,12 +69,25 @@ function CreateOrderForm() {
   const createOrder = async (e) => {
     e.preventDefault();
     try {
+      setIsLoading(true);
+      let agentId;
+      if (agentsCount !== 0) {
+        if (currentAgentId) {
+          agentId = currentAgentId;
+        } else {
+          agentId = agents[Math.floor(Math.random() * agentsCount)].id;
+        }
+      } else {
+        agentId = null;
+      }
+
       let trackerId;
       if (trackersCount !== 0) {
         trackerId = trackers[Math.floor(Math.random() * trackersCount)].id;
       } else {
         trackerId = null;
       }
+
       console.log('choosen tracker is: ', trackerId, 'count:', trackersCount);
       console.log({
         firstName,
@@ -133,6 +151,7 @@ function CreateOrderForm() {
             tracking_id: response.data[`order_${trackerId}`].tracking,
             delivery_fees: deliveryFee,
             tracker_id: trackerId,
+            agent_id: agentId,
           },
         ])
         .select();
@@ -149,6 +168,7 @@ function CreateOrderForm() {
         setIsError(false);
         setFeedback('A new order added!');
       }
+      setIsLoading(false);
       setOpen(true);
     } catch (error) {
       setFeedback('a Problem accured when adding the new Lead!');
@@ -178,7 +198,7 @@ function CreateOrderForm() {
   useEffect(() => {
     const fetchTrackers = async () => {
       try {
-        console.log('ag: ', agencies);
+        // console.log('ag: ', agencies);
         const { data, error } = await supabase.from('users').select('*').eq('role', 'tracker');
 
         if (data) {
@@ -198,9 +218,31 @@ function CreateOrderForm() {
     fetchTrackers();
   }, []);
 
+  useEffect(() => {
+    const fetchAgents = async () => {
+      const { data, error } = await supabase.from('users').select('*').eq('role', 'agent');
+
+      if (data) {
+        console.log('the data tracker: ', data);
+        setAgents(data);
+        setAgentsCount(data.length);
+        console.log('the user context: ', user);
+        if (user) {
+          const { email } = user;
+          const relevantEmail = data.filter((item) => item.email === email);
+          if (relevantEmail.length !== 0) {
+            setCurrentAgentId(relevantEmail[0].id);
+          } else {
+            setCurrentAgentId(null);
+          }
+        }
+      }
+    };
+    fetchAgents();
+  }, []);
   return (
     <form onSubmit={createOrder}>
-      <Stack spacing={3}>
+      <Stack spacing={3} sx={{ maxHeight: '70vh', overflowY: 'scroll', paddingRight: '1rem' }}>
         <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ marginTop: '1rem' }}>
           <FormControl fullWidth>
             <TextField
@@ -333,9 +375,9 @@ function CreateOrderForm() {
               Add Order
             </Button>
           ) : (
-            <Button type="submit" fullWidth size="large" variant="contained">
+            <LoadingButton loading={isLoading} type="submit" fullWidth size="large" variant="contained">
               Add Order
-            </Button>
+            </LoadingButton>
           )}
         </Stack>
       </Stack>
@@ -346,7 +388,7 @@ function CreateOrderForm() {
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
       >
         <Alert onClose={handleClose} severity={isError ? 'error' : 'success'} sx={{ width: '100%' }}>
-          {feedback} {!isError && <Link to={`/dashboard/patient/`}>(click here)</Link>}
+          {feedback}
         </Alert>
       </Snackbar>
     </form>

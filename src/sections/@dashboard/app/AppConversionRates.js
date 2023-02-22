@@ -31,7 +31,7 @@ export default function AppConversionRates({ title, subheader, chartData, ...oth
       },
     },
     plotOptions: {
-      bar: { horizontal: true, barHeight: '28%', borderRadius: 2 },
+      bar: { horizontal: false, barHeight: '28%', borderRadius: 2 },
     },
     xaxis: {
       categories: chartLabels,

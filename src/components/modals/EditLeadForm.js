@@ -16,6 +16,7 @@ import {
 } from '@mui/material';
 import React, { forwardRef, useContext, useEffect, useState } from 'react';
 import MuiAlert from '@mui/material/Alert';
+import { LoadingButton } from '@mui/lab';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { agencies } from '../../data/agencies';
@@ -62,6 +63,7 @@ function EditLeadForm({
   const [trackers, setTrackers] = useState([]);
   const [trackersCount, setTrackersCount] = useState(0);
   const [currentAgentId, setCurrentAgentId] = useState();
+  const [updateLoading, setUpdateLoading] = useState(false);
   const { user } = useContext(UserContext);
   const handleClose = (event, reason) => {
     if (reason === 'clickaway') {
@@ -171,6 +173,7 @@ function EditLeadForm({
   const updateStatus = async (e) => {
     e.preventDefault();
     try {
+      setUpdateLoading(true);
       const { data: dataUpdate, error: errorUpdate } = await supabase
         .from('leads')
         .update({ status, comment })
@@ -271,11 +274,13 @@ function EditLeadForm({
           setIsError(true);
         }
       }
+      setUpdateLoading(false);
       setOpen(true);
     } catch (error) {
       console.log('something went wrong: ', error);
       setFeedback('a Problem accured!');
       setIsError(true);
+      setUpdateLoading(false);
     }
   };
   return (
@@ -441,9 +446,9 @@ function EditLeadForm({
           )}
         </Stack>
         <Stack>
-          <Button type="submit" fullWidth size="large" variant="contained">
+          <LoadingButton loading={updateLoading} type="submit" fullWidth size="large" variant="contained">
             Update
-          </Button>
+          </LoadingButton>
         </Stack>
       </Stack>
       <Snackbar
@@ -453,7 +458,7 @@ function EditLeadForm({
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
       >
         <Alert onClose={handleClose} severity={isError ? 'error' : 'success'} sx={{ width: '100%' }}>
-          {feedback} {!isError && <Link to={`/dashboard/patient/`}>(click here)</Link>}
+          {feedback}
         </Alert>
       </Snackbar>
     </form>
