@@ -503,6 +503,7 @@ export default function LeadPage() {
                             commentAttr={comment}
                             statusAttr={status}
                             phoneAttr={phone}
+                            createdAtAttr={createdAt}
                           />
                         </TableCell>
 

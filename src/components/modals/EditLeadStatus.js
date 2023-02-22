@@ -28,6 +28,7 @@ function EditLeadStatus({
   commentAttr,
   statusAttr,
   phoneAttr,
+  createdAtAttr,
 }) {
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
@@ -48,6 +49,10 @@ function EditLeadStatus({
           <Typography id="modal-modal-title" variant="h5" component="h5" style={{ textAlign: 'center' }}>
             Edit lead status
           </Typography>
+          <Typography id="modal-modal-title" variant="p" component="p" style={{ textAlign: 'center', color: '#777' }}>
+            {new Date(createdAtAttr).toLocaleString()}
+          </Typography>
+
           <EditLeadForm
             id={id}
             communeAttr={communeAttr}
