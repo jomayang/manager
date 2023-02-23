@@ -111,7 +111,7 @@ function EditLeadForm({
             if (relevantEmail.length !== 0) {
               setCurrentAgentId(relevantEmail[0].id);
             } else {
-              setCurrentAgentId(null);
+              setCurrentAgentId(8);
             }
           }
         }
@@ -198,7 +198,7 @@ function EditLeadForm({
         if (trackersCount !== 0) {
           trackerId = trackers[Math.floor(Math.random() * trackersCount)].id;
         } else {
-          trackerId = null;
+          trackerId = 8;
         }
         const response = await axios({
           url: `https://ecom-api-5wlr.onrender.com/create/`,
@@ -360,8 +360,8 @@ function EditLeadForm({
                   <InputLabel>Commune</InputLabel>
                   <Select value={commune} label="Commune" onChange={(e) => setCommune(e.target.value)}>
                     {communes.map((com, i) => (
-                      <MenuItem key={i} value={com.value} disabled={!com.isDeliverable}>
-                        {com.label} {!com.isDeliverable && '(Undeliverable)'}
+                      <MenuItem key={i} value={com.value} disabled={!isStopDesk && !com.isDeliverable}>
+                        {com.label} {!isStopDesk && !com.isDeliverable && '(Undeliverable)'}
                       </MenuItem>
                     ))}
                   </Select>

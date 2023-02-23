@@ -494,35 +494,95 @@ export default function TrackingPage() {
                 />
                 <TableBody>
                   {loading && (
-                    <TableRow>
-                      <TableCell>
-                        <p> </p>
-                      </TableCell>
-                      <TableCell>
-                        <Skeleton variant="text" sx={{ fontSize: '0.7rem' }} />
-                      </TableCell>
-                      <TableCell>
-                        <Skeleton variant="text" sx={{ fontSize: '0.7rem' }} />
-                      </TableCell>
-                      <TableCell>
-                        <Skeleton variant="text" sx={{ fontSize: '0.7rem' }} />
-                      </TableCell>
-                      <TableCell>
-                        <Skeleton variant="text" sx={{ fontSize: '0.7rem' }} />
-                      </TableCell>
-                      <TableCell>
-                        <Skeleton variant="text" sx={{ fontSize: '0.7rem' }} />
-                      </TableCell>
-                      <TableCell>
-                        <Skeleton variant="text" sx={{ fontSize: '0.7rem' }} />
-                      </TableCell>
-                      <TableCell align="right">
-                        <Stack direction="row" spacing={2}>
-                          <Skeleton variant="circular" width={20} height={20} />
-                          <Skeleton variant="circular" width={20} height={20} />
-                        </Stack>
-                      </TableCell>
-                    </TableRow>
+                    <>
+                      <TableRow>
+                        <TableCell>
+                          <p> </p>
+                        </TableCell>
+                        <TableCell>
+                          <Skeleton variant="text" sx={{ fontSize: '0.7rem' }} />
+                        </TableCell>
+                        <TableCell>
+                          <Skeleton variant="text" sx={{ fontSize: '0.7rem' }} />
+                        </TableCell>
+                        <TableCell>
+                          <Skeleton variant="text" sx={{ fontSize: '0.7rem' }} />
+                        </TableCell>
+                        <TableCell>
+                          <Skeleton variant="text" sx={{ fontSize: '0.7rem' }} />
+                        </TableCell>
+                        <TableCell>
+                          <Skeleton variant="text" sx={{ fontSize: '0.7rem' }} />
+                        </TableCell>
+                        <TableCell>
+                          <Skeleton variant="text" sx={{ fontSize: '0.7rem' }} />
+                        </TableCell>
+                        <TableCell align="right">
+                          <Stack direction="row" spacing={2}>
+                            <Skeleton variant="circular" width={20} height={20} />
+                            <Skeleton variant="circular" width={20} height={20} />
+                          </Stack>
+                        </TableCell>
+                      </TableRow>
+                      <TableRow>
+                        <TableCell>
+                          <p> </p>
+                        </TableCell>
+                        <TableCell>
+                          <Skeleton variant="text" sx={{ fontSize: '0.7rem' }} />
+                        </TableCell>
+                        <TableCell>
+                          <Skeleton variant="text" sx={{ fontSize: '0.7rem' }} />
+                        </TableCell>
+                        <TableCell>
+                          <Skeleton variant="text" sx={{ fontSize: '0.7rem' }} />
+                        </TableCell>
+                        <TableCell>
+                          <Skeleton variant="text" sx={{ fontSize: '0.7rem' }} />
+                        </TableCell>
+                        <TableCell>
+                          <Skeleton variant="text" sx={{ fontSize: '0.7rem' }} />
+                        </TableCell>
+                        <TableCell>
+                          <Skeleton variant="text" sx={{ fontSize: '0.7rem' }} />
+                        </TableCell>
+                        <TableCell align="right">
+                          <Stack direction="row" spacing={2}>
+                            <Skeleton variant="circular" width={20} height={20} />
+                            <Skeleton variant="circular" width={20} height={20} />
+                          </Stack>
+                        </TableCell>
+                      </TableRow>
+                      <TableRow>
+                        <TableCell>
+                          <p> </p>
+                        </TableCell>
+                        <TableCell>
+                          <Skeleton variant="text" sx={{ fontSize: '0.7rem' }} />
+                        </TableCell>
+                        <TableCell>
+                          <Skeleton variant="text" sx={{ fontSize: '0.7rem' }} />
+                        </TableCell>
+                        <TableCell>
+                          <Skeleton variant="text" sx={{ fontSize: '0.7rem' }} />
+                        </TableCell>
+                        <TableCell>
+                          <Skeleton variant="text" sx={{ fontSize: '0.7rem' }} />
+                        </TableCell>
+                        <TableCell>
+                          <Skeleton variant="text" sx={{ fontSize: '0.7rem' }} />
+                        </TableCell>
+                        <TableCell>
+                          <Skeleton variant="text" sx={{ fontSize: '0.7rem' }} />
+                        </TableCell>
+                        <TableCell align="right">
+                          <Stack direction="row" spacing={2}>
+                            <Skeleton variant="circular" width={20} height={20} />
+                            <Skeleton variant="circular" width={20} height={20} />
+                          </Stack>
+                        </TableCell>
+                      </TableRow>
+                    </>
                   )}
                   {leads.map((row) => {
                     const {
@@ -642,11 +702,11 @@ export default function TrackingPage() {
                       </TableRow>
                     );
                   })}
-                  {emptyRows > 0 && (
+                  {/* {emptyRows > 0 && (
                     <TableRow style={{ height: 53 * emptyRows }}>
                       <TableCell colSpan={6} />
                     </TableRow>
-                  )}
+                  )} */}
                 </TableBody>
 
                 {isNotFound && (

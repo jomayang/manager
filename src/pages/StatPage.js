@@ -6,7 +6,10 @@ import { useTheme } from '@mui/material/styles';
 import { useContext, useEffect, useState } from 'react';
 import { LoadingButton } from '@mui/lab';
 import { useNavigate } from 'react-router-dom';
-import { Grid, Container, Typography, Select, MenuItem, Button } from '@mui/material';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { Grid, Container, Typography, Select, MenuItem, Button, TextField, Box } from '@mui/material';
 // components
 import Iconify from '../components/iconify';
 // sections
@@ -47,6 +50,16 @@ export default function StatPage() {
   const [confirmationRatesByX, setConfirmationRatesByX] = useState([]);
   const [confirmationRatesBy, setConfirmationRatesBy] = useState('agent');
   const [users, setUsers] = useState([]);
+
+  const [deliveryRateFromDate, setDeliveryRateFromDate] = useState();
+  const [deliveryRateToDate, setDeliveryRateToDate] = useState();
+
+  const [confirmationRateFromDate, setConfirmationRateFromDate] = useState();
+  const [confirmationRateToDate, setConfirmationRateToDate] = useState();
+
+  const [salesFromDate, setSalesFromDate] = useState();
+  const [salesToDate, setSalesToDate] = useState();
+
   const theme = useTheme();
 
   useEffect(() => {
@@ -122,26 +135,79 @@ export default function StatPage() {
   const handleGetSalesStats = async () => {
     try {
       setIsSalesLoading(true);
-      if (salesBy === 'wilaya') {
-        const { data, error } = await supabase.rpc('get_sales_by_province');
+      let formatedFromDate = '';
+      let formatedToDate = '';
+      if (salesFromDate && salesToDate) {
+        console.log(salesFromDate);
+        const fromDateDay = salesFromDate.month();
+        const fromDateMonth = salesFromDate.date();
+        const fromDateYear = salesFromDate.year();
 
-        if (data) {
-          console.log('sales: ', data);
-          setSalesByX(data);
+        const toDateDay = salesToDate.day();
+        const toDateMonth = salesToDate.month();
+        const toDateYear = salesToDate.year();
+
+        formatedFromDate = salesFromDate.toISOString().split('T')[0];
+        formatedToDate = salesToDate.toISOString().split('T')[0];
+        console.log('from:', formatedFromDate);
+        console.log('to:', formatedToDate);
+      }
+      if (salesBy === 'wilaya') {
+        if (salesFromDate && salesToDate) {
+          const { data, error } = await supabase.rpc('get_sales_by_province_with_date_range', {
+            date1: formatedFromDate,
+            date2: formatedToDate,
+          });
+
+          if (data) {
+            console.log('sales: ', data);
+            setSalesByX(data);
+          }
+        } else {
+          const { data, error } = await supabase.rpc('get_sales_by_province');
+
+          if (data) {
+            console.log('sales: ', data);
+            setSalesByX(data);
+          }
         }
       } else if (salesBy === 'product') {
-        const { data, error } = await supabase.rpc('get_sales_by_product');
+        if (salesFromDate && salesToDate) {
+          const { data, error } = await supabase.rpc('get_sales_by_product_with_date_range', {
+            date1: formatedFromDate,
+            date2: formatedToDate,
+          });
 
-        if (data) {
-          console.log('sales: ', data);
-          setSalesByX(data);
+          if (data) {
+            console.log('sales: ', data);
+            setSalesByX(data);
+          }
+        } else {
+          const { data, error } = await supabase.rpc('get_sales_by_product');
+
+          if (data) {
+            console.log('sales: ', data);
+            setSalesByX(data);
+          }
         }
       } else if (salesBy === 'agent') {
-        const { data, error } = await supabase.rpc('get_sales_by_agent');
+        if (salesFromDate && salesToDate) {
+          const { data, error } = await supabase.rpc('get_sales_by_agent_with_date_range', {
+            date1: formatedFromDate,
+            date2: formatedToDate,
+          });
 
-        if (data) {
-          const agents = data.map((item) => ({ key: users[item.key], value: item.value }));
-          setSalesByX(agents);
+          if (data) {
+            const agents = data.map((item) => ({ key: users[item.key], value: item.value }));
+            setSalesByX(agents);
+          }
+        } else {
+          const { data, error } = await supabase.rpc('get_sales_by_agent');
+
+          if (data) {
+            const agents = data.map((item) => ({ key: users[item.key], value: item.value }));
+            setSalesByX(agents);
+          }
         }
       }
       setIsSalesLoading(false);
@@ -153,35 +219,112 @@ export default function StatPage() {
   const handleGetDeliveryRatesStats = async () => {
     try {
       setIsDeliveryRateLoading(true);
+      let formatedFromDate = '';
+      let formatedToDate = '';
+      if (deliveryRateFromDate && deliveryRateToDate) {
+        console.log(deliveryRateFromDate);
+        const fromDateDay = deliveryRateFromDate.month();
+        const fromDateMonth = deliveryRateFromDate.date();
+        const fromDateYear = deliveryRateFromDate.year();
+
+        const toDateDay = deliveryRateToDate.day();
+        const toDateMonth = deliveryRateToDate.month();
+        const toDateYear = deliveryRateToDate.year();
+
+        formatedFromDate = deliveryRateFromDate.toISOString().split('T')[0];
+        formatedToDate = deliveryRateToDate.toISOString().split('T')[0];
+        console.log('from:', formatedFromDate);
+        console.log('to:', formatedToDate);
+      }
       let dataOrders;
       let dataDelivered;
       if (deliveryRatesBy === 'wilaya') {
-        const { data: dataO, error: errorO } = await supabase.rpc('get_orders_by_wilaya');
-        const { data: dataD, error: errorD } = await supabase.rpc('get_delivered_count_by_wilaya');
-        if (dataD && dataO) {
-          dataOrders = dataO;
-          dataDelivered = dataD;
+        if (deliveryRateFromDate && deliveryRateToDate) {
+          const { data: dataO, error: errorO } = await supabase.rpc('get_orders_by_wilaya_with_date_range', {
+            date1: formatedFromDate,
+            date2: formatedToDate,
+          });
+          const { data: dataD, error: errorD } = await supabase.rpc('get_delivered_count_by_wilaya_with_date_range', {
+            date1: formatedFromDate,
+            date2: formatedToDate,
+          });
+          if (dataD && dataO) {
+            dataOrders = dataO;
+            dataDelivered = dataD;
+          }
+        } else {
+          const { data: dataO, error: errorO } = await supabase.rpc('get_orders_by_wilaya');
+          const { data: dataD, error: errorD } = await supabase.rpc('get_delivered_count_by_wilaya');
+          if (dataD && dataO) {
+            dataOrders = dataO;
+            dataDelivered = dataD;
+          }
         }
       } else if (deliveryRatesBy === 'product') {
-        const { data: dataO, error: errorO } = await supabase.rpc('get_orders_by_product');
-        const { data: dataD, error: errorD } = await supabase.rpc('get_delivered_count_by_product');
-        if (dataD && dataO) {
-          dataOrders = dataO;
-          dataDelivered = dataD;
+        if (deliveryRateFromDate && deliveryRateToDate) {
+          const { data: dataO, error: errorO } = await supabase.rpc('get_orders_by_product_with_date_range', {
+            date1: formatedFromDate,
+            date2: formatedToDate,
+          });
+          const { data: dataD, error: errorD } = await supabase.rpc('get_delivered_count_by_product_with_date_range', {
+            date1: formatedFromDate,
+            date2: formatedToDate,
+          });
+          if (dataD && dataO) {
+            dataOrders = dataO;
+            dataDelivered = dataD;
+          }
+        } else {
+          const { data: dataO, error: errorO } = await supabase.rpc('get_orders_by_product');
+          const { data: dataD, error: errorD } = await supabase.rpc('get_delivered_count_by_product');
+          if (dataD && dataO) {
+            dataOrders = dataO;
+            dataDelivered = dataD;
+          }
         }
       } else if (deliveryRatesBy === 'tracker') {
-        const { data: dataO, error: errorO } = await supabase.rpc('get_orders_by_tracker');
-        const { data: dataD, error: errorD } = await supabase.rpc('get_delivered_count_by_tracker');
-        if (dataD && dataO) {
-          dataOrders = dataO;
-          dataDelivered = dataD;
+        if (deliveryRateFromDate && deliveryRateToDate) {
+          const { data: dataO, error: errorO } = await supabase.rpc('get_orders_by_tracker_with_date_range', {
+            date1: formatedFromDate,
+            date2: formatedToDate,
+          });
+          const { data: dataD, error: errorD } = await supabase.rpc('get_delivered_count_by_tracker_with_date_range', {
+            date1: formatedFromDate,
+            date2: formatedToDate,
+          });
+          if (dataD && dataO) {
+            dataOrders = dataO;
+            dataDelivered = dataD;
+          }
+        } else {
+          const { data: dataO, error: errorO } = await supabase.rpc('get_orders_by_tracker');
+          const { data: dataD, error: errorD } = await supabase.rpc('get_delivered_count_by_tracker');
+          if (dataD && dataO) {
+            dataOrders = dataO;
+            dataDelivered = dataD;
+          }
         }
       } else if (deliveryRatesBy === 'agent') {
-        const { data: dataO, error: errorO } = await supabase.rpc('get_orders_by_agent');
-        const { data: dataD, error: errorD } = await supabase.rpc('get_delivered_count_by_agent');
-        if (dataD && dataO) {
-          dataOrders = dataO;
-          dataDelivered = dataD;
+        if (deliveryRateFromDate && deliveryRateToDate) {
+          const { data: dataO, error: errorO } = await supabase.rpc('get_orders_by_agent_with_date_range', {
+            date1: formatedFromDate,
+            date2: formatedToDate,
+          });
+          const { data: dataD, error: errorD } = await supabase.rpc('get_delivered_count_by_agent_with_date_range', {
+            date1: formatedFromDate,
+            date2: formatedToDate,
+          });
+          if (dataD && dataO) {
+            dataOrders = dataO;
+            dataDelivered = dataD;
+          }
+        } else {
+          const { data: dataO, error: errorO } = await supabase.rpc('get_orders_by_agent');
+          const { data: dataD, error: errorD } = await supabase.rpc('get_delivered_count_by_agent');
+          if (dataD && dataO) {
+            dataOrders = dataO;
+            dataDelivered = dataD;
+          }
         }
       }
       if (dataOrders && dataDelivered) {
@@ -227,16 +370,62 @@ export default function StatPage() {
   const handleGetConfirmationRatesStats = async () => {
     try {
       setIsConfirmationRateLoading(true);
+      let formatedFromDate = '';
+      let formatedToDate = '';
+      if (confirmationRateFromDate && confirmationRateToDate) {
+        console.log(confirmationRateFromDate);
+        const fromDateDay = confirmationRateFromDate.month();
+        const fromDateMonth = confirmationRateFromDate.date();
+        const fromDateYear = confirmationRateFromDate.year();
+
+        const toDateDay = confirmationRateToDate.day();
+        const toDateMonth = confirmationRateToDate.month();
+        const toDateYear = confirmationRateToDate.year();
+
+        formatedFromDate = confirmationRateFromDate.toISOString().split('T')[0];
+        formatedToDate = confirmationRateToDate.toISOString().split('T')[0];
+        console.log('from:', formatedFromDate);
+        console.log('to:', formatedToDate);
+      }
+
       let dataOrders;
       let dataConfirmed;
-      if (confirmationRatesBy === 'agent') {
+
+      if (confirmationRatesBy === 'agent' && confirmationRateFromDate && confirmationRateToDate) {
+        const { data: dataO, error: errorO } = await supabase.rpc('get_leads_by_agent_with_date_range', {
+          date1: formatedFromDate,
+          date2: formatedToDate,
+        });
+        const { data: dataD, error: errorD } = await supabase.rpc('get_confirmed_count_by_agent_with_date_range', {
+          date1: formatedFromDate,
+          date2: formatedToDate,
+        });
+        if (dataD && dataO) {
+          dataOrders = dataO;
+          dataConfirmed = dataD;
+          console.log(dataO);
+        }
+      } else if ((confirmationRatesBy === 'agent' && !confirmationRateFromDate) || !confirmationRateToDate) {
         const { data: dataO, error: errorO } = await supabase.rpc('get_leads_by_agent');
         const { data: dataD, error: errorD } = await supabase.rpc('get_confirmed_count_by_agent');
         if (dataD && dataO) {
           dataOrders = dataO;
           dataConfirmed = dataD;
         }
-      } else if (confirmationRatesBy === 'product') {
+      } else if (confirmationRatesBy === 'product' && confirmationRateFromDate && confirmationRateToDate) {
+        const { data: dataO, error: errorO } = await supabase.rpc('get_leads_by_product_with_date_range', {
+          date1: formatedFromDate,
+          date2: formatedToDate,
+        });
+        const { data: dataD, error: errorD } = await supabase.rpc('get_confirmed_count_by_product_with_date_range', {
+          date1: formatedFromDate,
+          date2: formatedToDate,
+        });
+        if (dataD && dataO) {
+          dataOrders = dataO;
+          dataConfirmed = dataD;
+        }
+      } else if ((confirmationRatesBy === 'product' && !confirmationRateFromDate) || !confirmationRateToDate) {
         const { data: dataO, error: errorO } = await supabase.rpc('get_leads_by_product');
         const { data: dataD, error: errorD } = await supabase.rpc('get_confirmed_count_by_product');
         if (dataD && dataO) {
@@ -244,7 +433,7 @@ export default function StatPage() {
           dataConfirmed = dataD;
         }
       }
-
+      console.log('data order', dataOrders);
       if (dataOrders && dataConfirmed) {
         let confirmationRate;
         if (confirmationRatesBy === 'agent') {
@@ -296,18 +485,40 @@ export default function StatPage() {
             <Typography variant="h3" mb={3}>
               Confirmation rate stats
             </Typography>
-            <Stack direction="row" width={'50%'} spacing={3} marginBottom={1}>
+            <Stack direction={{ sm: 'row' }} spacing={3} marginBottom={1}>
               <Select
-                size="small"
                 value={confirmationRatesBy}
                 fullWidth
+                sx={{ marginBottom: [2, 0] }}
                 label="confirmation rate by"
                 onChange={(e) => setConfirmationRatesBy(e.target.value)}
               >
                 <MenuItem value="agent">Agent</MenuItem>
                 <MenuItem value="product">Product</MenuItem>
               </Select>
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DatePicker
+                  label="From"
+                  value={confirmationRateFromDate}
+                  onChange={(newValue) => {
+                    setConfirmationRateFromDate(newValue);
+                  }}
+                  renderInput={(params) => <TextField sx={{ marginBottom: [2, 0] }} fullWidth {...params} />}
+                />
+              </LocalizationProvider>
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DatePicker
+                  label="To"
+                  value={confirmationRateToDate}
+                  onChange={(newValue) => {
+                    setConfirmationRateToDate(newValue);
+                  }}
+                  renderInput={(params) => <TextField sx={{ marginBottom: [2, 0] }} fullWidth {...params} />}
+                />
+              </LocalizationProvider>
+
               <LoadingButton
+                sx={{ marginBottom: 2 }}
                 loading={isConfirmationRateLoading}
                 fullWidth
                 variant={'contained'}
@@ -340,6 +551,26 @@ export default function StatPage() {
                 <MenuItem value="tracker">Tracker</MenuItem>
                 <MenuItem value="product">Product</MenuItem>
               </Select>
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DatePicker
+                  label="From"
+                  value={deliveryRateFromDate}
+                  onChange={(newValue) => {
+                    setDeliveryRateFromDate(newValue);
+                  }}
+                  renderInput={(params) => <TextField sx={{ marginBottom: [2, 0] }} fullWidth {...params} />}
+                />
+              </LocalizationProvider>
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DatePicker
+                  label="To"
+                  value={deliveryRateToDate}
+                  onChange={(newValue) => {
+                    setDeliveryRateToDate(newValue);
+                  }}
+                  renderInput={(params) => <TextField sx={{ marginBottom: [2, 0] }} fullWidth {...params} />}
+                />
+              </LocalizationProvider>
               <LoadingButton
                 loading={isDeliveryRateLoading}
                 fullWidth
@@ -361,7 +592,7 @@ export default function StatPage() {
             <Typography variant="h3" mb={3}>
               Sales stats
             </Typography>
-            <Stack direction="row" width={'50%'} spacing={3} marginBottom={1}>
+            <Stack direction="row" sx={{ width: ['100%'] }} spacing={3} marginBottom={1}>
               <Select
                 size="small"
                 value={salesBy}
@@ -373,6 +604,26 @@ export default function StatPage() {
                 <MenuItem value="agent">Agent</MenuItem>
                 <MenuItem value="product">Product</MenuItem>
               </Select>
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DatePicker
+                  label="From"
+                  value={salesFromDate}
+                  onChange={(newValue) => {
+                    setSalesFromDate(newValue);
+                  }}
+                  renderInput={(params) => <TextField sx={{ marginBottom: [2, 0] }} fullWidth {...params} />}
+                />
+              </LocalizationProvider>
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DatePicker
+                  label="To"
+                  value={salesToDate}
+                  onChange={(newValue) => {
+                    setSalesToDate(newValue);
+                  }}
+                  renderInput={(params) => <TextField sx={{ marginBottom: [2, 0] }} fullWidth {...params} />}
+                />
+              </LocalizationProvider>
               <LoadingButton loading={isSalesLoading} fullWidth variant={'contained'} onClick={handleGetSalesStats}>
                 Get stats
               </LoadingButton>

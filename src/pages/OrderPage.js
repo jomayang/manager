@@ -28,6 +28,7 @@ import {
   InputAdornment,
   Toolbar,
   Snackbar,
+  Skeleton,
 } from '@mui/material';
 import MuiAlert from '@mui/material/Alert';
 // components
@@ -137,6 +138,7 @@ export default function OrderPage() {
   const [isError, setIsError] = useState(false);
   const [feedback, setFeedback] = useState('');
   const [searchInput, setSearchInput] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const handleOpenMenu = (event) => {
     setOpen(event.currentTarget);
   };
@@ -205,6 +207,7 @@ export default function OrderPage() {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
+        setIsLoading(true);
         const { count, data, error } = await supabase
           .from('orders')
           .select('*', { count: 'exact' })
@@ -236,8 +239,10 @@ export default function OrderPage() {
         if (error) {
           console.log('something went wrong', error);
         }
+        setIsLoading(false);
       } catch (error) {
         console.log('something was wrong', error);
+        setIsLoading(false);
       }
     };
     fetchOrders();
@@ -246,6 +251,7 @@ export default function OrderPage() {
   const handleSearchInDb = async (e) => {
     if (e.key === 'Enter') {
       try {
+        setIsLoading(true);
         const { count, data, error } = await supabase
           .from('orders')
           .select('*', { count: 'exact' })
@@ -273,8 +279,10 @@ export default function OrderPage() {
           setRowsCount(count);
           setOrders(fetchedOrders);
         }
+        setIsLoading(false);
       } catch (error) {
         console.log('something went wrong', error);
+        setIsLoading(false);
       }
     }
   };
@@ -380,81 +388,180 @@ export default function OrderPage() {
                   onSelectAllClick={handleSelectAllClick}
                 />
                 <TableBody>
-                  {filteredOrders.map((row) => {
-                    const {
-                      id,
-                      fullName,
-                      phone,
-                      wilaya,
-                      commune,
-                      status,
-                      trackingId,
-                      product,
-                      shippingPrice,
-                      productPrice,
-                      stopdesk,
-                      isStopdesk,
-                      createdAt,
-                    } = row;
-                    const selectedOrder = selected.indexOf(id) !== -1;
-
-                    return (
-                      <TableRow hover key={id} tabIndex={-1} role="checkbox" selected={selectedOrder}>
-                        <TableCell padding="checkbox">
-                          <Checkbox checked={selectedOrder} onChange={(event) => handleClick(event, id)} />
+                  {isLoading ? (
+                    <>
+                      <TableRow>
+                        <TableCell>
+                          <p> </p>
                         </TableCell>
-
-                        <TableCell component="th" scope="row" padding="none">
-                          <Stack direction="row" alignItems="center" spacing={2}>
-                            <Avatar
-                              alt={fullName}
-                              src={`https://api.dicebear.com/5.x/fun-emoji/svg?seed=${fullName}`}
-                            />
-                            <Typography variant="subtitle2" noWrap>
-                              {fullName}
-                            </Typography>
-                          </Stack>
+                        <TableCell>
+                          <Skeleton variant="text" sx={{ fontSize: '0.7rem' }} />
                         </TableCell>
-
-                        <TableCell align="left">{phone}</TableCell>
-
-                        <TableCell align="left">{wilaya}</TableCell>
-
-                        <TableCell align="left">{commune}</TableCell>
-
-                        <TableCell align="left">
-                          <Label color={statusColors[status]}>{status}</Label>
+                        <TableCell>
+                          <Skeleton variant="text" sx={{ fontSize: '0.7rem' }} />
+                        </TableCell>
+                        <TableCell>
+                          <Skeleton variant="text" sx={{ fontSize: '0.7rem' }} />
+                        </TableCell>
+                        <TableCell>
+                          <Skeleton variant="text" sx={{ fontSize: '0.7rem' }} />
+                        </TableCell>
+                        <TableCell>
+                          <Skeleton variant="text" sx={{ fontSize: '0.7rem' }} />
+                        </TableCell>
+                        <TableCell>
+                          <Skeleton variant="text" sx={{ fontSize: '0.7rem' }} />
                         </TableCell>
                         <TableCell align="right">
-                          <EditOrderStatus id={id} statusAttr={status} />
-                        </TableCell>
-                        <TableCell align="right">
-                          <Stack direction="row" justifyContent="right">
-                            {status === 'initial' && (
-                              <IconButton size="large" color="inherit" onClick={() => handleDeleteOrder(trackingId)}>
-                                <Iconify icon={'eva:trash-2-outline'} />
-                              </IconButton>
-                            )}
-
-                            <OrderDetailsModal
-                              fullNameAttr={fullName}
-                              id={id}
-                              phoneAttr={phone}
-                              communeAttr={commune}
-                              wilayaAttr={wilaya}
-                              statusAttr={status}
-                              isStopDeskAttr={isStopdesk}
-                              stopdeskAttr={stopdesk}
-                              productAttr={product}
-                              shippingPriceAttr={shippingPrice}
-                              productPriceAttr={productPrice}
-                              createdAtAttr={createdAt}
-                            />
+                          <Stack direction="row" spacing={2}>
+                            <Skeleton variant="circular" width={20} height={20} />
+                            <Skeleton variant="circular" width={20} height={20} />
                           </Stack>
                         </TableCell>
                       </TableRow>
-                    );
-                  })}
+                      <TableRow>
+                        <TableCell>
+                          <p> </p>
+                        </TableCell>
+                        <TableCell>
+                          <Skeleton variant="text" sx={{ fontSize: '0.7rem' }} />
+                        </TableCell>
+                        <TableCell>
+                          <Skeleton variant="text" sx={{ fontSize: '0.7rem' }} />
+                        </TableCell>
+                        <TableCell>
+                          <Skeleton variant="text" sx={{ fontSize: '0.7rem' }} />
+                        </TableCell>
+                        <TableCell>
+                          <Skeleton variant="text" sx={{ fontSize: '0.7rem' }} />
+                        </TableCell>
+                        <TableCell>
+                          <Skeleton variant="text" sx={{ fontSize: '0.7rem' }} />
+                        </TableCell>
+                        <TableCell>
+                          <Skeleton variant="text" sx={{ fontSize: '0.7rem' }} />
+                        </TableCell>
+                        <TableCell align="right">
+                          <Stack direction="row" spacing={2}>
+                            <Skeleton variant="circular" width={20} height={20} />
+                            <Skeleton variant="circular" width={20} height={20} />
+                          </Stack>
+                        </TableCell>
+                      </TableRow>
+                      <TableRow>
+                        <TableCell>
+                          <p> </p>
+                        </TableCell>
+                        <TableCell>
+                          <Skeleton variant="text" sx={{ fontSize: '0.7rem' }} />
+                        </TableCell>
+                        <TableCell>
+                          <Skeleton variant="text" sx={{ fontSize: '0.7rem' }} />
+                        </TableCell>
+                        <TableCell>
+                          <Skeleton variant="text" sx={{ fontSize: '0.7rem' }} />
+                        </TableCell>
+                        <TableCell>
+                          <Skeleton variant="text" sx={{ fontSize: '0.7rem' }} />
+                        </TableCell>
+                        <TableCell>
+                          <Skeleton variant="text" sx={{ fontSize: '0.7rem' }} />
+                        </TableCell>
+                        <TableCell>
+                          <Skeleton variant="text" sx={{ fontSize: '0.7rem' }} />
+                        </TableCell>
+                        <TableCell align="right">
+                          <Stack direction="row" spacing={2}>
+                            <Skeleton variant="circular" width={20} height={20} />
+                            <Skeleton variant="circular" width={20} height={20} />
+                          </Stack>
+                        </TableCell>
+                      </TableRow>
+                    </>
+                  ) : (
+                    <>
+                      {filteredOrders.map((row) => {
+                        const {
+                          id,
+                          fullName,
+                          phone,
+                          wilaya,
+                          commune,
+                          status,
+                          trackingId,
+                          product,
+                          shippingPrice,
+                          productPrice,
+                          stopdesk,
+                          isStopdesk,
+                          createdAt,
+                        } = row;
+                        const selectedOrder = selected.indexOf(id) !== -1;
+
+                        return (
+                          <TableRow hover key={id} tabIndex={-1} role="checkbox" selected={selectedOrder}>
+                            <TableCell padding="checkbox">
+                              <Checkbox checked={selectedOrder} onChange={(event) => handleClick(event, id)} />
+                            </TableCell>
+
+                            <TableCell component="th" scope="row" padding="none">
+                              <Stack direction="row" alignItems="center" spacing={2}>
+                                <Avatar
+                                  alt={fullName}
+                                  src={`https://api.dicebear.com/5.x/fun-emoji/svg?seed=${fullName}`}
+                                />
+                                <Typography variant="subtitle2" noWrap>
+                                  {fullName}
+                                </Typography>
+                              </Stack>
+                            </TableCell>
+
+                            <TableCell align="left">{phone}</TableCell>
+
+                            <TableCell align="left">{wilaya}</TableCell>
+
+                            <TableCell align="left">{commune}</TableCell>
+
+                            <TableCell align="left">
+                              <Label color={statusColors[status]}>{status}</Label>
+                            </TableCell>
+                            <TableCell align="right">
+                              <EditOrderStatus id={id} statusAttr={status} />
+                            </TableCell>
+                            <TableCell align="right">
+                              <Stack direction="row" justifyContent="right">
+                                {status === 'initial' && (
+                                  <IconButton
+                                    size="large"
+                                    color="inherit"
+                                    onClick={() => handleDeleteOrder(trackingId)}
+                                  >
+                                    <Iconify icon={'eva:trash-2-outline'} />
+                                  </IconButton>
+                                )}
+
+                                <OrderDetailsModal
+                                  fullNameAttr={fullName}
+                                  id={id}
+                                  phoneAttr={phone}
+                                  communeAttr={commune}
+                                  wilayaAttr={wilaya}
+                                  statusAttr={status}
+                                  isStopDeskAttr={isStopdesk}
+                                  stopdeskAttr={stopdesk}
+                                  productAttr={product}
+                                  shippingPriceAttr={shippingPrice}
+                                  productPriceAttr={productPrice}
+                                  createdAtAttr={createdAt}
+                                />
+                              </Stack>
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
+                    </>
+                  )}
+
                   {/* {emptyRows > 0 && (
                     <TableRow style={{ height: 53 * emptyRows }}>
                       <TableCell colSpan={6} />

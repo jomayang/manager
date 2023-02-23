@@ -27,6 +27,7 @@ import {
   Toolbar,
   alpha,
   Snackbar,
+  Skeleton,
 } from '@mui/material';
 import MuiAlert from '@mui/material/Alert';
 // components
@@ -43,6 +44,7 @@ import CreateLeadModal from '../components/modals/CreateLeadModal';
 import EditLeadStatus from '../components/modals/EditLeadStatus';
 import ImportLeadsModal from '../components/modals/ImportLeadsModal';
 import LeadDetailsModal from '../components/modals/LeadDetailsModal';
+import { missedLeads } from '../data/missedLeads';
 // ----------------------------------------------------------------------
 
 const Alert = forwardRef((props, ref) => <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />);
@@ -140,6 +142,7 @@ export default function LeadPage() {
   const [leads, setLeads] = useState([]);
   const [searchInput, setSearchInput] = useState('');
   const [rowsCount, setRowsCount] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     console.log(selected);
@@ -197,7 +200,7 @@ export default function LeadPage() {
     setFilterName(event.target.value);
   };
 
-  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - USERLIST.length) : 0;
+  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - leads.length) : 0;
 
   const filteredLeads = applySortFilter(leads, getComparator(order, orderBy), filterName);
 
@@ -206,6 +209,7 @@ export default function LeadPage() {
   useEffect(() => {
     const fetchLeads = async () => {
       try {
+        setIsLoading(true);
         const { data: dataAuth, error: errorAuth } = await supabase.auth.getSession();
         const { email } = dataAuth.session.user;
         const { data: dataUser, error: errorUser } = await supabase.from('users').select().eq('email', email).single();
@@ -284,8 +288,10 @@ export default function LeadPage() {
         if (error) {
           console.log('something went wrong', error);
         }
+        setIsLoading(false);
       } catch (error) {
         console.log('something was wrong', error);
+        setIsLoading(false);
       }
     };
     fetchLeads();
@@ -316,6 +322,7 @@ export default function LeadPage() {
   const handleSearchInDb = async (e) => {
     if (e.key === 'Enter') {
       try {
+        setIsLoading(true);
         const { count, data, error } = await supabase
           .from('leads')
           .select('*', { count: 'exact' })
@@ -345,8 +352,10 @@ export default function LeadPage() {
         if (error) {
           console.log(error);
         }
+        setIsLoading(false);
       } catch (error) {
         console.log('something went wrong', error);
+        setIsLoading(false);
       }
     }
   };
@@ -372,6 +381,19 @@ export default function LeadPage() {
     }
   };
 
+  const handleAddMissedLeads = async () => {
+    try {
+      const { error } = await supabase.from('leads').update({ product: 'زيت اللحية' }).eq('product', '');
+      if (error) {
+        console.log('something not good', error);
+      } else {
+        console.log('success');
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <>
       <Helmet>
@@ -384,6 +406,7 @@ export default function LeadPage() {
             Leads
           </Typography>
           <Stack direction="row">
+            <button onClick={handleAddMissedLeads}>Add Leads</button>
             <CreateLeadModal />
             <ImportLeadsModal />
           </Stack>
@@ -447,94 +470,189 @@ export default function LeadPage() {
                   onSelectAllClick={handleSelectAllClick}
                 />
                 <TableBody>
-                  {filteredLeads.map((row) => {
-                    const {
-                      id,
-                      fullName,
-                      status,
-                      phone,
-                      wilaya,
-                      commune,
-                      address,
-                      comment,
-                      product,
-                      firstName,
-                      lastName,
-                      createdAt,
-                    } = row;
-                    const selectedLead = selected.indexOf(id) !== -1;
-
-                    return (
-                      <TableRow hover key={id + page} tabIndex={-1} role="checkbox" selected={selectedLead}>
-                        <TableCell padding="checkbox">
-                          <Checkbox checked={selectedLead} onChange={(event) => handleClick(event, id)} />
+                  {isLoading ? (
+                    <>
+                      <TableRow>
+                        <TableCell>
+                          <p> </p>
                         </TableCell>
-
-                        <TableCell component="th" scope="row" padding="none">
-                          <Stack direction="row" alignItems="center" spacing={2}>
-                            <Avatar
-                              alt={fullName}
-                              src={`https://api.dicebear.com/5.x/fun-emoji/svg?seed=${fullName}`}
-                            />
-                            <Typography variant="subtitle2" noWrap>
-                              {fullName}
-                            </Typography>
-                          </Stack>
+                        <TableCell>
+                          <Skeleton variant="text" sx={{ fontSize: '0.7rem' }} />
                         </TableCell>
-
-                        <TableCell align="left">{phone}</TableCell>
-
-                        <TableCell align="left">{wilaya}</TableCell>
-
-                        <TableCell align="left">{commune}</TableCell>
-
-                        <TableCell align="left">
-                          <Label color={statusColors[status]}>{sentenceCase(status)}</Label>
+                        <TableCell>
+                          <Skeleton variant="text" sx={{ fontSize: '0.7rem' }} />
+                        </TableCell>
+                        <TableCell>
+                          <Skeleton variant="text" sx={{ fontSize: '0.7rem' }} />
+                        </TableCell>
+                        <TableCell>
+                          <Skeleton variant="text" sx={{ fontSize: '0.7rem' }} />
+                        </TableCell>
+                        <TableCell>
+                          <Skeleton variant="text" sx={{ fontSize: '0.7rem' }} />
+                        </TableCell>
+                        <TableCell>
+                          <Skeleton variant="text" sx={{ fontSize: '0.7rem' }} />
                         </TableCell>
                         <TableCell align="right">
-                          <EditLeadStatus
-                            id={id}
-                            communeAttr={commune}
-                            wilayaAttr={wilaya}
-                            addressAttr={address}
-                            productAttr={product}
-                            firstNameAttr={firstName}
-                            lastNameAttr={lastName}
-                            commentAttr={comment}
-                            statusAttr={status}
-                            phoneAttr={phone}
-                            createdAtAttr={createdAt}
-                          />
-                        </TableCell>
-
-                        <TableCell align="right">
-                          <Stack direction="row">
-                            <IconButton size="large" color="inherit" onClick={() => handleDeleteLead(id)}>
-                              <Iconify icon={'eva:trash-2-outline'} />
-                            </IconButton>
-                            <LeadDetailsModal
-                              id={id}
-                              communeAttr={commune}
-                              wilayaAttr={wilaya}
-                              addressAttr={address}
-                              productAttr={product}
-                              firstNameAttr={firstName}
-                              lastNameAttr={lastName}
-                              commentAttr={comment}
-                              statusAttr={status}
-                              phoneAttr={phone}
-                              createdAtAttr={createdAt}
-                            />
+                          <Stack direction="row" spacing={2}>
+                            <Skeleton variant="circular" width={20} height={20} />
+                            <Skeleton variant="circular" width={20} height={20} />
                           </Stack>
                         </TableCell>
                       </TableRow>
-                    );
-                  })}
-                  {emptyRows > 0 && (
+                      <TableRow>
+                        <TableCell>
+                          <p> </p>
+                        </TableCell>
+                        <TableCell>
+                          <Skeleton variant="text" sx={{ fontSize: '0.7rem' }} />
+                        </TableCell>
+                        <TableCell>
+                          <Skeleton variant="text" sx={{ fontSize: '0.7rem' }} />
+                        </TableCell>
+                        <TableCell>
+                          <Skeleton variant="text" sx={{ fontSize: '0.7rem' }} />
+                        </TableCell>
+                        <TableCell>
+                          <Skeleton variant="text" sx={{ fontSize: '0.7rem' }} />
+                        </TableCell>
+                        <TableCell>
+                          <Skeleton variant="text" sx={{ fontSize: '0.7rem' }} />
+                        </TableCell>
+                        <TableCell>
+                          <Skeleton variant="text" sx={{ fontSize: '0.7rem' }} />
+                        </TableCell>
+                        <TableCell align="right">
+                          <Stack direction="row" spacing={2}>
+                            <Skeleton variant="circular" width={20} height={20} />
+                            <Skeleton variant="circular" width={20} height={20} />
+                          </Stack>
+                        </TableCell>
+                      </TableRow>
+                      <TableRow>
+                        <TableCell>
+                          <p> </p>
+                        </TableCell>
+                        <TableCell>
+                          <Skeleton variant="text" sx={{ fontSize: '0.7rem' }} />
+                        </TableCell>
+                        <TableCell>
+                          <Skeleton variant="text" sx={{ fontSize: '0.7rem' }} />
+                        </TableCell>
+                        <TableCell>
+                          <Skeleton variant="text" sx={{ fontSize: '0.7rem' }} />
+                        </TableCell>
+                        <TableCell>
+                          <Skeleton variant="text" sx={{ fontSize: '0.7rem' }} />
+                        </TableCell>
+                        <TableCell>
+                          <Skeleton variant="text" sx={{ fontSize: '0.7rem' }} />
+                        </TableCell>
+                        <TableCell>
+                          <Skeleton variant="text" sx={{ fontSize: '0.7rem' }} />
+                        </TableCell>
+                        <TableCell align="right">
+                          <Stack direction="row" spacing={2}>
+                            <Skeleton variant="circular" width={20} height={20} />
+                            <Skeleton variant="circular" width={20} height={20} />
+                          </Stack>
+                        </TableCell>
+                      </TableRow>
+                    </>
+                  ) : (
+                    <>
+                      {filteredLeads.map((row) => {
+                        const {
+                          id,
+                          fullName,
+                          status,
+                          phone,
+                          wilaya,
+                          commune,
+                          address,
+                          comment,
+                          product,
+                          firstName,
+                          lastName,
+                          createdAt,
+                        } = row;
+                        const selectedLead = selected.indexOf(id) !== -1;
+
+                        return (
+                          <TableRow hover key={id + page} tabIndex={-1} role="checkbox" selected={selectedLead}>
+                            <TableCell padding="checkbox">
+                              <Checkbox checked={selectedLead} onChange={(event) => handleClick(event, id)} />
+                            </TableCell>
+
+                            <TableCell component="th" scope="row" padding="none">
+                              <Stack direction="row" alignItems="center" spacing={2}>
+                                <Avatar
+                                  alt={fullName}
+                                  src={`https://api.dicebear.com/5.x/fun-emoji/svg?seed=${fullName}`}
+                                />
+                                <Typography variant="subtitle2" noWrap>
+                                  {fullName}
+                                </Typography>
+                              </Stack>
+                            </TableCell>
+
+                            <TableCell align="left">{phone}</TableCell>
+
+                            <TableCell align="left">{wilaya}</TableCell>
+
+                            <TableCell align="left">{commune}</TableCell>
+
+                            <TableCell align="left">
+                              <Label color={statusColors[status]}>{sentenceCase(status)}</Label>
+                            </TableCell>
+                            <TableCell align="right">
+                              <EditLeadStatus
+                                id={id}
+                                communeAttr={commune}
+                                wilayaAttr={wilaya}
+                                addressAttr={address}
+                                productAttr={product}
+                                firstNameAttr={firstName}
+                                lastNameAttr={lastName}
+                                commentAttr={comment}
+                                statusAttr={status}
+                                phoneAttr={phone}
+                                createdAtAttr={createdAt}
+                              />
+                            </TableCell>
+
+                            <TableCell align="right">
+                              <Stack direction="row">
+                                <IconButton size="large" color="inherit" onClick={() => handleDeleteLead(id)}>
+                                  <Iconify icon={'eva:trash-2-outline'} />
+                                </IconButton>
+                                <LeadDetailsModal
+                                  id={id}
+                                  communeAttr={commune}
+                                  wilayaAttr={wilaya}
+                                  addressAttr={address}
+                                  productAttr={product}
+                                  firstNameAttr={firstName}
+                                  lastNameAttr={lastName}
+                                  commentAttr={comment}
+                                  statusAttr={status}
+                                  phoneAttr={phone}
+                                  createdAtAttr={createdAt}
+                                />
+                              </Stack>
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
+                    </>
+                  )}
+
+                  {/* {emptyRows > 0 && (
                     <TableRow style={{ height: 53 * emptyRows }}>
                       <TableCell colSpan={6} />
                     </TableRow>
-                  )}
+                  )} */}
                 </TableBody>
 
                 {isNotFound && (
