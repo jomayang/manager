@@ -538,11 +538,12 @@ export default function StatPage() {
             <Typography variant="h3" mb={3}>
               Derlivery rate stats
             </Typography>
-            <Stack direction="row" width={'50%'} spacing={3} marginBottom={1}>
+            <Stack direction={{ sm: 'row' }} width={'100%'} spacing={3} marginBottom={1}>
               <Select
                 size="small"
                 value={deliveryRatesBy}
                 fullWidth
+                sx={{ marginBottom: [2, 0] }}
                 label="sales by"
                 onChange={(e) => setDeliveryRatesBy(e.target.value)}
               >
@@ -592,11 +593,12 @@ export default function StatPage() {
             <Typography variant="h3" mb={3}>
               Sales stats
             </Typography>
-            <Stack direction="row" sx={{ width: ['100%'] }} spacing={3} marginBottom={1}>
+            <Stack direction={{ sm: 'row' }} sx={{ width: ['100%'] }} spacing={3} marginBottom={1}>
               <Select
                 size="small"
                 value={salesBy}
                 fullWidth
+                sx={{ marginBottom: [2, 0] }}
                 label="sales by"
                 onChange={(e) => setSalesBy(e.target.value)}
               >

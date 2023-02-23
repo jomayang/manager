@@ -406,7 +406,6 @@ export default function LeadPage() {
             Leads
           </Typography>
           <Stack direction="row">
-            <button onClick={handleAddMissedLeads}>Add Leads</button>
             <CreateLeadModal />
             <ImportLeadsModal />
           </Stack>
