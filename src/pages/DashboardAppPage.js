@@ -39,7 +39,7 @@ export default function DashboardAppPage() {
   const [weekDates, setWeekDates] = useState();
   const [ordersByDay, setOrdersByDate] = useState();
   const [confirmRateByDay, setConfirmRateByDay] = useState();
-
+  const [leadsByStatus, setLeadsByStatus] = useState([]);
   const theme = useTheme();
   useEffect(() => {
     const getSession = async () => {
@@ -232,6 +232,25 @@ export default function DashboardAppPage() {
     getUsers();
   }, []);
 
+  useEffect(() => {
+    const getUsers = async () => {
+      const { data, error } = await supabase.rpc('get_leads_by_status');
+      if (data) {
+        console.log('the status data: ', data);
+        const getLeadsStatus = data.map((item) => ({
+          label: item.key,
+          value: item.value,
+        }));
+        setLeadsByStatus(getLeadsStatus);
+      }
+
+      if (error) {
+        console.log('something went wrong', error);
+      }
+    };
+    getUsers();
+  }, []);
+
   return (
     <>
       <Helmet>
@@ -308,7 +327,7 @@ export default function DashboardAppPage() {
             />
           </Grid>
 
-          {/* <Grid item xs={12} md={6} lg={8}>
+          <Grid item xs={12} md={8} lg={8}>
             <AppConversionRates
               title="Conversion Rates"
               subheader="(+43%) than last year"
@@ -326,8 +345,23 @@ export default function DashboardAppPage() {
               ]}
             />
           </Grid>
-
-          <Grid item xs={12} md={6} lg={4}>
+          <Grid item xs={12} md={4} lg={4}>
+            <AppCurrentVisits
+              title="Confirmation Rate"
+              chartData={leadsByStatus}
+              chartColors={[
+                theme.palette.error.main,
+                theme.palette.success.main,
+                '#ffd263',
+                '#638fff',
+                '#eaea27',
+                '#db25cf',
+                '#d0ea27',
+                '#7863ff',
+              ]}
+            />
+          </Grid>
+          {/* <Grid item xs={12} md={6} lg={4}>
             <AppCurrentSubject
               title="Current Subject"
               chartLabels={['Consistency', 'Availability', 'Confirm Rate', 'Delivery Rate', 'Volume']}
