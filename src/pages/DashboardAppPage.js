@@ -38,6 +38,7 @@ export default function DashboardAppPage() {
 
   const [weekDates, setWeekDates] = useState();
   const [ordersByDay, setOrdersByDate] = useState();
+  const [leadsByDay, setLeadsByDay] = useState();
   const [confirmRateByDay, setConfirmRateByDay] = useState();
   const [leadsByStatus, setLeadsByStatus] = useState([]);
   const theme = useTheme();
@@ -201,6 +202,8 @@ export default function DashboardAppPage() {
       if (dataLeads && dataConfirmed) {
         // console.log('leads', dataLeads);
         // console.log('confirms', dataConfirmed);
+        const leadsLastWeek = dataLeads.map((item) => item.value);
+        setLeadsByDay(leadsLastWeek);
         const confirmationRate = dataLeads.map((item, i) => {
           const correspondingConfirmedItem = dataConfirmed.filter((itemD) => itemD.key === item.key);
           // console.log('the corresponding item is ', correspondingDeliveredItem);
@@ -328,21 +331,21 @@ export default function DashboardAppPage() {
           </Grid>
 
           <Grid item xs={12} md={8} lg={8}>
-            <AppConversionRates
-              title="Conversion Rates"
-              subheader="(+43%) than last year"
+            <AppWebsiteVisits
+              title="Last week's Leads"
+              subheader="Recent lead generation performance stats"
+              chartLabels={weekDates}
+              isPercent
               chartData={[
-                { label: 'Italy', value: 400 },
-                { label: 'Japan', value: 430 },
-                { label: 'China', value: 448 },
-                { label: 'Canada', value: 470 },
-                { label: 'France', value: 540 },
-                { label: 'Germany', value: 580 },
-                { label: 'South Korea', value: 690 },
-                { label: 'Netherlands', value: 1100 },
-                { label: 'United States', value: 1200 },
-                { label: 'United Kingdom', value: 1380 },
+                {
+                  name: 'Number of leads',
+                  type: 'bar',
+                  fill: 'solid',
+                  data: leadsByDay,
+                  color: theme.palette.primary.main,
+                },
               ]}
+              // chartColors={[theme.palette.success.main]}
             />
           </Grid>
           <Grid item xs={12} md={4} lg={4}>
