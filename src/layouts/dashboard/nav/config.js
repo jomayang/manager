@@ -27,7 +27,7 @@ export const navAdminConfig = [
   {
     title: 'dashboard',
     path: '/dashboard/app',
-    icon: icon('ic_analytics'),
+    icon: icon('ic_dashboard'),
   },
   {
     title: 'lead',
@@ -57,7 +57,7 @@ export const navAdminConfig = [
   {
     title: 'Backup',
     path: '/dashboard/backup',
-    icon: icon('ic_dashboard'),
+    icon: icon('ic_folder'),
   },
 ];
 
