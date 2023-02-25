@@ -26,6 +26,7 @@ import {
 } from '../sections/@dashboard/app';
 import supabase from '../config/SupabaseClient';
 import { UserContext } from '../context/UserContext';
+import AppDoubleChart from '../sections/@dashboard/app/AppDoubleChart';
 
 // ----------------------------------------------------------------------
 
@@ -46,6 +47,9 @@ export default function StatPage() {
   const [isDeliveryRateLoading, setIsDeliveryRateLoading] = useState(false);
   const [isConfirmationRateLoading, setIsConfirmationRateLoading] = useState(false);
   const [deliveryRatesByX, setDeliveryRatesByX] = useState([]);
+  const [deliveryRatesCountByX, setDeliveryRatesCountByX] = useState([]);
+  const [deliveryRatesKeyByX, setDeliveryRateKeyByX] = useState([]);
+  const [deliveryRatesValueByX, setDeliveryRatesValueByX] = useState([]);
   const [deliveryRatesBy, setDeliveryRatesBy] = useState('agent');
   const [confirmationRatesByX, setConfirmationRatesByX] = useState([]);
   const [confirmationRatesBy, setConfirmationRatesBy] = useState('agent');
@@ -81,11 +85,17 @@ export default function StatPage() {
         const { data: dataDelivered, error: errorDelivered } = await supabase.rpc('get_delivered_count_by_agent');
         console.log('here we are');
         if (dataOrders && dataDelivered) {
+          const countOrders = dataOrders.map((item) => item.value);
+          setDeliveryRatesCountByX(countOrders);
           const deliveryRate = dataOrders.map((item, i) => ({
             key: users[item.key],
             value: +((dataDelivered[i].value / item.value) * 100).toFixed(2),
           }));
           console.log(deliveryRate);
+          const drKey = deliveryRate.map((dr) => dr.key);
+          const drVal = deliveryRate.map((dr) => dr.value);
+          setDeliveryRateKeyByX(drKey);
+          setDeliveryRatesValueByX(drVal);
           setDeliveryRatesByX(deliveryRate);
         }
       } catch (error) {
@@ -329,6 +339,8 @@ export default function StatPage() {
       }
       if (dataOrders && dataDelivered) {
         let deliveryRate;
+        const countOrders = dataOrders.map((item) => item.value);
+        setDeliveryRatesCountByX(countOrders);
         if (deliveryRatesBy === 'agent' || deliveryRatesBy === 'tracker') {
           deliveryRate = dataOrders.map((item, i) => ({
             key: users[item.key],
@@ -359,6 +371,10 @@ export default function StatPage() {
           console.log('obj:', deliveryRate);
         }
         console.log('delivery rates: ', deliveryRate);
+        const drKey = deliveryRate.map((dr) => dr.key);
+        const drVal = deliveryRate.map((dr) => dr.value);
+        setDeliveryRateKeyByX(drKey);
+        setDeliveryRatesValueByX(drVal);
         setDeliveryRatesByX(deliveryRate);
       }
       setIsDeliveryRateLoading(false);
@@ -581,12 +597,31 @@ export default function StatPage() {
                 Get stats
               </LoadingButton>
             </Stack>
-
+            <AppDoubleChart
+              title={`Delivery Rates by ${deliveryRatesBy}`}
+              subheader={`Delivery Rates by ${deliveryRatesBy} (in %)`}
+              chartLabels={deliveryRatesKeyByX}
+              chartData={[
+                {
+                  name: 'Delivery rate',
+                  type: 'column',
+                  fill: 'solid',
+                  data: deliveryRatesValueByX,
+                },
+                {
+                  name: 'Orders',
+                  type: 'area',
+                  fill: 'gradient',
+                  data: deliveryRatesCountByX,
+                },
+              ]}
+            />
+            {/* 
             <AppConversionRates
               title={`Delivery Rates by ${deliveryRatesBy}`}
               subheader={`Delivery Rates by ${deliveryRatesBy} (in %)`}
               chartData={deliveryRatesByX.map((dr, i) => ({ label: dr.key, value: dr.value }))}
-            />
+            /> */}
           </Grid>
 
           <Grid item xs={12} md={12} lg={12}>
@@ -630,12 +665,24 @@ export default function StatPage() {
                 Get stats
               </LoadingButton>
             </Stack>
-
-            <AppConversionRates
+            <AppDoubleChart
+              title={`Sales by ${salesBy}`}
+              subheader={`Total sales by ${salesBy} (in DA)`}
+              chartLabels={salesByX.map((sale) => sale.key)}
+              chartData={[
+                {
+                  name: 'Sales',
+                  type: 'column',
+                  fill: 'solid',
+                  data: salesByX.map((sale) => sale.value),
+                },
+              ]}
+            />
+            {/* <AppConversionRates
               title={`Sales by ${salesBy}`}
               subheader={`Total sales by ${salesBy} (in DA)`}
               chartData={salesByX.map((sale, i) => ({ label: sale.key, value: sale.value }))}
-            />
+            /> */}
           </Grid>
         </Grid>
       </Container>
