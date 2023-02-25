@@ -4,17 +4,8 @@
     "browser": true,
     "es2021": true
   },
-  "extends": [
-    "airbnb",
-    "plugin:jsx-a11y/recommended",
-    "plugin:react-hooks/recommended",
-    "prettier"
-  ],
-  "plugins": [
-    "react",
-    "react-hooks",
-    "prettier"
-  ],
+  "extends": ["airbnb", "plugin:jsx-a11y/recommended", "plugin:react-hooks/recommended", "prettier"],
+  "plugins": ["react", "react-hooks", "prettier"],
   "parser": "@babel/eslint-parser",
   "parserOptions": {
     "ecmaVersion": 8,
@@ -25,10 +16,12 @@
     }
   },
   "rules": {
+    "no-console": 1,
+    // "no-console": 2,
     "no-new": 0,
     "no-alert": 0,
     "no-shadow": 0,
-    "no-console": 0,
+    // "no-console": 0,
     "react/jsx-key": 1,
     "import/no-cycle": 0,
     "arrow-body-style": 1,

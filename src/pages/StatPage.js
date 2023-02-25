@@ -109,14 +109,15 @@ export default function StatPage() {
     const getSales = async () => {
       try {
         const { data: dataOrders, error: errorOrders } = await supabase.rpc('get_leads_by_agent');
+
         const { data: dataConfirmed, error: errorDelivered } = await supabase.rpc('get_confirmed_count_by_agent');
-        console.log('here we are');
+
         if (dataOrders && dataConfirmed) {
           const confirmationRate = dataOrders.map((item, i) => ({
             key: users[item.key],
             value: +((dataConfirmed[i].value / item.value) * 100).toFixed(2),
           }));
-          console.log(confirmationRate);
+
           setConfirmationRatesByX(confirmationRate);
         }
       } catch (error) {
@@ -603,16 +604,16 @@ export default function StatPage() {
               chartLabels={deliveryRatesKeyByX}
               chartData={[
                 {
-                  name: 'Delivery rate',
-                  type: 'column',
-                  fill: 'solid',
-                  data: deliveryRatesValueByX,
-                },
-                {
                   name: 'Orders',
-                  type: 'area',
+                  type: 'column',
                   fill: 'gradient',
                   data: deliveryRatesCountByX,
+                },
+                {
+                  name: 'Delivery rate',
+                  type: 'area',
+                  fill: 'gradient',
+                  data: deliveryRatesValueByX,
                 },
               ]}
             />
