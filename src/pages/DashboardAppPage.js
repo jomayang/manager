@@ -65,7 +65,7 @@ export default function DashboardAppPage() {
                   console.log('error happened when trying to add new user');
                 }
               }
-              console.log('user connected!');
+              console.log('user connected!', data);
             }
 
             if (error) {
@@ -100,7 +100,7 @@ export default function DashboardAppPage() {
       }
     };
     getUsers();
-  }, []);
+  }, [userAuth]);
 
   useEffect(() => {
     if (userRole === 'agent') {
@@ -264,107 +264,109 @@ export default function DashboardAppPage() {
         <Typography variant="h4" sx={{ mb: 5 }}>
           Hi, Welcome back
         </Typography>
-        {/* {userRole === 'admin' && ( */}
-        <Grid container spacing={3}>
-          <Grid item xs={12} sm={6} md={3}>
-            <AppWidgetSummary
-              title="Total Revenue (DA)"
-              total={totalRevenue}
-              icon={'ant-design:dollar-circle-filled'}
-            />
-          </Grid>
+        {userRole && (
+          <>
+            {userRole === 'admin' && (
+              <Grid container spacing={3}>
+                <Grid item xs={12} sm={6} md={3}>
+                  <AppWidgetSummary
+                    title="Total Revenue (DA)"
+                    total={totalRevenue}
+                    icon={'ant-design:dollar-circle-filled'}
+                  />
+                </Grid>
 
-          <Grid item xs={12} sm={6} md={3}>
-            <AppWidgetSummary
-              title="Delivered Orders"
-              total={deliveredCount}
-              color="info"
-              icon={'ant-design:credit-card-filled'}
-            />
-          </Grid>
+                <Grid item xs={12} sm={6} md={3}>
+                  <AppWidgetSummary
+                    title="Delivered Orders"
+                    total={deliveredCount}
+                    color="info"
+                    icon={'ant-design:credit-card-filled'}
+                  />
+                </Grid>
 
-          <Grid item xs={12} sm={6} md={3}>
-            <AppWidgetSummary
-              title="Confirmed Leads"
-              total={totalOrders}
-              color="success"
-              icon={'ant-design:funnel-plot-filled'}
-            />
-          </Grid>
+                <Grid item xs={12} sm={6} md={3}>
+                  <AppWidgetSummary
+                    title="Confirmed Leads"
+                    total={totalOrders}
+                    color="success"
+                    icon={'ant-design:funnel-plot-filled'}
+                  />
+                </Grid>
 
-          <Grid item xs={12} sm={6} md={3}>
-            <AppWidgetSummary title="Bug Reports" total={234} color="error" icon={'ant-design:bug-filled'} />
-          </Grid>
+                <Grid item xs={12} sm={6} md={3}>
+                  <AppWidgetSummary title="Bug Reports" total={234} color="error" icon={'ant-design:bug-filled'} />
+                </Grid>
 
-          <Grid item xs={12} md={8} lg={8}>
-            <AppWebsiteVisits
-              title="Last week's sales"
-              subheader="Recent sales performance stats"
-              chartLabels={weekDates}
-              isPercent
-              chartData={[
-                {
-                  name: 'Orders',
-                  type: 'column',
-                  fill: 'solid',
-                  data: ordersByDay,
-                },
-                {
-                  name: 'Confirmation rates',
-                  type: 'area',
-                  fill: 'gradient',
-                  data: confirmRateByDay,
-                },
-              ]}
-            />
-          </Grid>
+                <Grid item xs={12} md={8} lg={8}>
+                  <AppWebsiteVisits
+                    title="Last week's sales"
+                    subheader="Recent sales performance stats"
+                    chartLabels={weekDates}
+                    isPercent
+                    chartData={[
+                      {
+                        name: 'Orders',
+                        type: 'column',
+                        fill: 'solid',
+                        data: ordersByDay,
+                      },
+                      {
+                        name: 'Confirmation rates',
+                        type: 'area',
+                        fill: 'gradient',
+                        data: confirmRateByDay,
+                      },
+                    ]}
+                  />
+                </Grid>
 
-          <Grid item xs={12} md={4} lg={4}>
-            <AppCurrentVisits
-              title="Delivery Rate"
-              chartData={[
-                { label: 'Delivered', value: deliveredCount },
-                { label: 'Returned', value: returnedCount },
-              ]}
-              chartColors={[theme.palette.success.main, theme.palette.error.main]}
-            />
-          </Grid>
+                <Grid item xs={12} md={4} lg={4}>
+                  <AppCurrentVisits
+                    title="Delivery Rate"
+                    chartData={[
+                      { label: 'Delivered', value: deliveredCount },
+                      { label: 'Returned', value: returnedCount },
+                    ]}
+                    chartColors={[theme.palette.success.main, theme.palette.error.main]}
+                  />
+                </Grid>
 
-          <Grid item xs={12} md={8} lg={8}>
-            <AppWebsiteVisits
-              title="Last week's Leads"
-              subheader="Recent lead generation performance stats"
-              chartLabels={weekDates}
-              isPercent
-              chartData={[
-                {
-                  name: 'Number of leads',
-                  type: 'bar',
-                  fill: 'solid',
-                  data: leadsByDay,
-                  color: theme.palette.primary.main,
-                },
-              ]}
-              // chartColors={[theme.palette.success.main]}
-            />
-          </Grid>
-          <Grid item xs={12} md={4} lg={4}>
-            <AppCurrentVisits
-              title="Confirmation Rate"
-              chartData={leadsByStatus}
-              chartColors={[
-                theme.palette.error.main,
-                theme.palette.success.main,
-                '#ffd263',
-                '#638fff',
-                '#eaea27',
-                '#db25cf',
-                '#d0ea27',
-                '#7863ff',
-              ]}
-            />
-          </Grid>
-          {/* <Grid item xs={12} md={6} lg={4}>
+                <Grid item xs={12} md={8} lg={8}>
+                  <AppWebsiteVisits
+                    title="Last week's Leads"
+                    subheader="Recent lead generation performance stats"
+                    chartLabels={weekDates}
+                    isPercent
+                    chartData={[
+                      {
+                        name: 'Number of leads',
+                        type: 'bar',
+                        fill: 'solid',
+                        data: leadsByDay,
+                        color: theme.palette.primary.main,
+                      },
+                    ]}
+                    // chartColors={[theme.palette.success.main]}
+                  />
+                </Grid>
+                <Grid item xs={12} md={4} lg={4}>
+                  <AppCurrentVisits
+                    title="Confirmation Rate"
+                    chartData={leadsByStatus}
+                    chartColors={[
+                      theme.palette.error.main,
+                      theme.palette.success.main,
+                      '#ffd263',
+                      '#638fff',
+                      '#eaea27',
+                      '#db25cf',
+                      '#d0ea27',
+                      '#7863ff',
+                    ]}
+                  />
+                </Grid>
+                {/* <Grid item xs={12} md={6} lg={4}>
             <AppCurrentSubject
               title="Current Subject"
               chartLabels={['Consistency', 'Availability', 'Confirm Rate', 'Delivery Rate', 'Volume']}
@@ -376,8 +378,10 @@ export default function DashboardAppPage() {
               chartColors={[...Array(6)].map(() => theme.palette.text.secondary)}
             />
           </Grid> */}
-        </Grid>
-        {/* )} */}
+              </Grid>
+            )}
+          </>
+        )}
       </Container>
     </>
   );
