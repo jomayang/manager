@@ -737,7 +737,7 @@ export default function TrackingPage() {
           </Scrollbar>
 
           <TablePagination
-            rowsPerPageOptions={[5, 10, 25]}
+            rowsPerPageOptions={[25, 50, 100]}
             component="div"
             count={rowsCount}
             rowsPerPage={rowsPerPage}
