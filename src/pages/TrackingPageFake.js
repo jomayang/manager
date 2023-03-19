@@ -146,7 +146,7 @@ const StyledSearch = styled(OutlinedInput)(({ theme }) => ({
   },
 }));
 
-export default function TrackingPage() {
+export default function TrackingPageFake() {
   const [open, setOpen] = useState(null);
 
   const [page, setPage] = useState(0);
@@ -323,16 +323,11 @@ export default function TrackingPage() {
         try {
           // console.log('calling API');
           setLoading(true);
-          const response = await axios({
-            url: `https://ecom-api-5wlr.onrender.com/`,
-            method: 'post',
-            headers: { 'Content-Type': 'application/json' },
-            data,
-          });
+
           /* -------------------------------------------
            * PARCELS RESPONSE
            */
-          // const response = parcelsResponse;
+          const response = parcelsResponse;
           // console.log('response fulfiled', response);
           setRowsCount(response.data.data.total_data);
           setLeads(response.data.data.data);
@@ -352,22 +347,22 @@ export default function TrackingPage() {
 
       const trackingsStr = trackings.join(',');
       await pause(1000);
-      const data = {
-        extension: `?tracking=${trackingsStr}`,
-      };
+      // const data = {
+      //   extension: `?tracking=${trackingStr}`,
+      // };
 
-      const response = await axios({
-        url: `https://ecom-api-5wlr.onrender.com/histories`,
-        method: 'post',
-        headers: { 'Content-Type': 'application/json' },
-        data,
-      });
+      // const response = await axios({
+      //   url: `https://ecom-api-5wlr.onrender.com/histories`,
+      //   method: 'post',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   data,
+      // });
       // const response =
 
       /* ------------------------------------------------
        * HISTORY RESPONSE
        */
-      // const response = histResponse;
+      const response = histResponse;
 
       const object = response.data.reduce((obj, item) => {
         if (obj[item.tracking])
