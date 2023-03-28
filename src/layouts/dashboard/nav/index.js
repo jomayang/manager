@@ -49,7 +49,7 @@ export default function Nav({ openNav, onCloseNav }) {
         if (user) {
           const { data: dataFetch, error: errorFetch } = await supabase
             .from('users')
-            .select('role')
+            .select('role, name')
             .eq('email', user.email);
           console.log('fetched', dataFetch);
           // let role = '';
