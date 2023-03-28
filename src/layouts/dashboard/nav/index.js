@@ -41,6 +41,7 @@ export default function Nav({ openNav, onCloseNav }) {
   const [navConfig, setNavConfig] = useState();
   const isDesktop = useResponsive('up', 'lg');
   const [userRole, setUserRole] = useState('');
+  const [fullName, setFullName] = useState('');
   const { user } = useContext(UserContext);
   useEffect(() => {
     const getRole = async () => {
@@ -53,6 +54,7 @@ export default function Nav({ openNav, onCloseNav }) {
           console.log('fetched', dataFetch);
           // let role = '';
           if (dataFetch && dataFetch[0]) {
+            setFullName(dataFetch[0].name);
             const { role } = dataFetch[0];
             console.log('the role', dataFetch[0].role, dataFetch[0].role === 'admin');
             if (role === 'admin') {
@@ -107,7 +109,7 @@ export default function Nav({ openNav, onCloseNav }) {
 
               <Box sx={{ ml: 2 }}>
                 <Typography variant="subtitle2" sx={{ color: 'text.primary' }}>
-                  {user.user_metadata.full_name}
+                  {fullName}
                 </Typography>
 
                 {userRole && (
