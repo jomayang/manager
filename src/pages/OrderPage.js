@@ -132,7 +132,7 @@ export default function OrderPage() {
 
   const [filterName, setFilterName] = useState('');
   const [rowsCount, setRowsCount] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(25);
+  const [rowsPerPage, setRowsPerPage] = useState(50);
   const [orders, setOrders] = useState([]);
   const [triggerFetch, setTriggerFetch] = useState();
   const [isError, setIsError] = useState(false);

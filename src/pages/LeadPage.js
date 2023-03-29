@@ -28,6 +28,9 @@ import {
   alpha,
   Snackbar,
   Skeleton,
+  FormControl,
+  InputLabel,
+  Select,
 } from '@mui/material';
 import MuiAlert from '@mui/material/Alert';
 // components
@@ -138,11 +141,12 @@ export default function LeadPage() {
   const [filterName, setFilterName] = useState('');
   const [isError, setIsError] = useState(false);
   const [feedback, setFeedback] = useState('');
-  const [rowsPerPage, setRowsPerPage] = useState(25);
+  const [rowsPerPage, setRowsPerPage] = useState(50);
   const [leads, setLeads] = useState([]);
   const [searchInput, setSearchInput] = useState('');
   const [rowsCount, setRowsCount] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
+  const [filterStatus, setFilterStatus] = useState('');
 
   useEffect(() => {
     console.log(selected);
@@ -226,34 +230,65 @@ export default function LeadPage() {
         let data;
         let error;
         if (dataUser.role === 'agent') {
+          if (filterStatus !== '') {
+            const {
+              count: countFilter,
+              data: dataFilter,
+              error: errorFilter,
+            } = await supabase
+              .from('leads')
+              .select('*', { count: 'exact' })
+              .eq('status', filterStatus)
+              .eq('agent_id', dataUser.id)
+              .order('created_at', { ascending: false })
+              .range(page * rowsPerPage, page * rowsPerPage + rowsPerPage - 1);
+            count = countFilter;
+            data = dataFilter;
+            error = errorFilter;
+          } else {
+            const {
+              count: countAll,
+              data: dataAll,
+              error: errorAll,
+            } = await supabase
+              .from('leads')
+              .select('*', { count: 'exact' })
+              .eq('agent_id', dataUser.id)
+              .order('created_at', { ascending: false })
+              .range(page * rowsPerPage, page * rowsPerPage + rowsPerPage - 1);
+
+            count = countAll;
+            data = dataAll;
+            error = errorAll;
+          }
+        } else if (filterStatus !== '') {
           const {
-            count: countLeads,
-            data: dataLeads,
-            error: errorLeads,
+            count: countFilter,
+            data: dataFilter,
+            error: errorFilter,
           } = await supabase
             .from('leads')
             .select('*', { count: 'exact' })
-            .eq('agent_id', dataUser.id)
+            .eq('status', filterStatus)
             .order('created_at', { ascending: false })
             .range(page * rowsPerPage, page * rowsPerPage + rowsPerPage - 1);
-
-          count = countLeads;
-          data = dataLeads;
-          error = errorLeads;
+          count = countFilter;
+          data = dataFilter;
+          error = errorFilter;
         } else {
           const {
-            count: countLeads,
-            data: dataLeads,
-            error: errorLeads,
+            count: countAll,
+            data: dataAll,
+            error: errorAll,
           } = await supabase
             .from('leads')
             .select('*', { count: 'exact' })
             .order('created_at', { ascending: false })
             .range(page * rowsPerPage, page * rowsPerPage + rowsPerPage - 1);
 
-          count = countLeads;
-          data = dataLeads;
-          error = errorLeads;
+          count = countAll;
+          data = dataAll;
+          error = errorAll;
         }
 
         // if (dataAuth) {
@@ -295,7 +330,7 @@ export default function LeadPage() {
       }
     };
     fetchLeads();
-  }, [rowsPerPage, page, triggerFetch]);
+  }, [rowsPerPage, page, triggerFetch, filterStatus]);
 
   // useEffect(() => {
   //   const init = async () => {
@@ -319,6 +354,74 @@ export default function LeadPage() {
   //   };
   //   init();
   // }, []);
+
+  // useEffect(() => {
+  //   const fetchFilteredLeads = async () => {
+  //     try {
+  //       setIsLoading(true);
+  //       let count;
+  //       let data;
+  //       let error;
+  //       if (filterStatus !== '') {
+  //         const {
+  //           count: countFilter,
+  //           data: dataFilter,
+  //           error: errorFilter,
+  //         } = await supabase
+  //           .from('leads')
+  //           .select('*', { count: 'exact' })
+  //           .eq('status', filterStatus)
+  //           .order('created_at', { ascending: false })
+  //           .range(page * rowsPerPage, page * rowsPerPage + rowsPerPage - 1);
+  //         count = countFilter;
+  //         data = dataFilter;
+  //         error = errorFilter;
+  //       } else {
+  //         const {
+  //           count: countAll,
+  //           data: dataAll,
+  //           error: errorAll,
+  //         } = await supabase
+  //           .from('leads')
+  //           .select('*', { count: 'exact' })
+  //           .order('created_at', { ascending: false })
+  //           .range(page * rowsPerPage, page * rowsPerPage + rowsPerPage - 1);
+
+  //         count = countAll;
+  //         data = dataAll;
+  //         error = errorAll;
+  //       }
+  //       if (data) {
+  //         const fetchedLeads = data.map((lead) => ({
+  //           id: lead.id,
+  //           fullName: `${lead.first_name} ${lead.last_name}`,
+  //           firstName: lead.first_name,
+  //           lastName: lead.last_name,
+  //           phone: lead.phone,
+  //           commune: lead.commune,
+  //           product: lead.product,
+  //           address: lead.address,
+  //           comment: lead.comment,
+  //           status: lead.status,
+  //           wilaya: lead.wilaya,
+  //           createdAt: lead.created_at,
+  //         }));
+
+  //         setRowsCount(count);
+  //         setLeads(fetchedLeads);
+  //       }
+  //       if (error) {
+  //         console.log(error);
+  //       }
+  //       setIsLoading(false);
+  //     } catch (error) {
+  //       console.log('something went wrong', error);
+  //       setIsLoading(false);
+  //     }
+  //   };
+  //   fetchFilteredLeads();
+  // }, [filterStatus]);
+
   const handleSearchInDb = async (e) => {
     if (e.key === 'Enter') {
       try {
@@ -426,17 +529,40 @@ export default function LeadPage() {
               </Typography>
             ) : (
               // <form onSubmit={handleSearchInDb}>
-              <StyledSearch
-                value={searchInput}
-                onChange={(e) => setSearchInput(e.target.value)}
-                onKeyDown={handleSearchInDb}
-                placeholder="Search lead..."
-                startAdornment={
-                  <InputAdornment position="start">
-                    <Iconify icon="eva:search-fill" sx={{ color: 'text.disabled', width: 20, height: 20 }} />
-                  </InputAdornment>
-                }
-              />
+              <div>
+                <StyledSearch
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value)}
+                  onKeyDown={handleSearchInDb}
+                  placeholder="Search lead..."
+                  startAdornment={
+                    <InputAdornment position="start">
+                      <Iconify icon="eva:search-fill" sx={{ color: 'text.disabled', width: 20, height: 20 }} />
+                    </InputAdornment>
+                  }
+                />
+                <FormControl fullWidth style={{ width: 200, marginLeft: 10 }}>
+                  <InputLabel>Filter Status</InputLabel>
+                  <Select
+                    value={filterStatus}
+                    label="filter-status"
+                    onChange={(e) => {
+                      setFilterStatus(e.target.value);
+                      setPage(0);
+                    }}
+                  >
+                    <MenuItem value={''}>All</MenuItem>
+                    <MenuItem value={'initial'}>Initial</MenuItem>
+                    <MenuItem value={'confirmed'}>Confirmed</MenuItem>
+                    <MenuItem value={'not-responding'}>Not Responding</MenuItem>
+                    <MenuItem value={'unreachable'}>Unreachable</MenuItem>
+                    <MenuItem value={'canceled'}>Canceled</MenuItem>
+                    <MenuItem value={'busy'}>Busy</MenuItem>
+                    <MenuItem value={'reported'}>Reported</MenuItem>
+                    <MenuItem value={'other'}>other</MenuItem>
+                  </Select>
+                </FormControl>
+              </div>
               // <button
               // </form>
             )}
