@@ -18,7 +18,7 @@ const style = {
   p: 4,
 };
 
-function CreateOrderModal() {
+function CreateOrderModal({ handleTriggerFetch }) {
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -38,7 +38,7 @@ function CreateOrderModal() {
           <Typography id="modal-modal-title" variant="h3" component="h2" style={{ textAlign: 'center' }}>
             Add new order
           </Typography>
-          <CreateOrderForm />
+          <CreateOrderForm handleTriggerFetch={handleTriggerFetch} />
         </Box>
       </Modal>
     </div>

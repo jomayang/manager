@@ -17,7 +17,7 @@ const style = {
   p: 4,
 };
 
-function EditOrderStatus({ id, statusAttr }) {
+function EditOrderStatus({ id, statusAttr, handleTriggerFetch }) {
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -37,7 +37,7 @@ function EditOrderStatus({ id, statusAttr }) {
           <Typography id="modal-modal-title" variant="h5" component="h5" style={{ textAlign: 'center' }}>
             Edit lead status
           </Typography>
-          <EditOrderForm id={id} statusAttr={statusAttr} />
+          <EditOrderForm id={id} statusAttr={statusAttr} handleTriggerFetch={handleTriggerFetch} />
           {/* <CreateOrderForm /> */}
         </Box>
       </Modal>

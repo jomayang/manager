@@ -23,7 +23,7 @@ const Alert = forwardRef((props, ref) => {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
 
-function CreateLeadForm() {
+function CreateLeadForm({ handleTriggerFetch }) {
   const [open, setOpen] = useState(false);
   const [isError, setIsError] = useState(false);
   const [feedback, setFeedback] = useState('');
@@ -120,6 +120,8 @@ function CreateLeadForm() {
         // setIdentifier(id);
         setFeedback('A new lead added!');
         setOpen(true);
+
+        handleTriggerFetch(Math.random());
       }
       setIsLoading(false);
     } catch (error) {

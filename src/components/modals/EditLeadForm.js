@@ -40,6 +40,7 @@ function EditLeadForm({
   commentAttr,
   statusAttr,
   phoneAttr,
+  handleTriggerFetch,
 }) {
   const [open, setOpen] = useState(false);
   const [isStopDesk, setIsStopDesk] = useState(false);
@@ -278,6 +279,7 @@ function EditLeadForm({
       }
       setUpdateLoading(false);
       setOpen(true);
+      handleTriggerFetch(Math.random());
     } catch (error) {
       console.log('something went wrong: ', error);
       setFeedback('a Problem accured!');

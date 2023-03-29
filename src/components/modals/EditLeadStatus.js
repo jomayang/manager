@@ -29,6 +29,7 @@ function EditLeadStatus({
   statusAttr,
   phoneAttr,
   createdAtAttr,
+  handleTriggerFetch,
 }) {
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
@@ -64,6 +65,7 @@ function EditLeadStatus({
             commentAttr={commentAttr}
             statusAttr={statusAttr}
             phoneAttr={phoneAttr}
+            handleTriggerFetch={handleTriggerFetch}
           />
           {/* <CreateOrderForm /> */}
         </Box>

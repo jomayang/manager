@@ -29,7 +29,7 @@ import { UserContext } from '../../context/UserContext';
 
 const Alert = forwardRef((props, ref) => <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />);
 
-function EditOrderForm({ id, statusAttr }) {
+function EditOrderForm({ id, statusAttr, handleTriggerFetch }) {
   const [open, setOpen] = useState(false);
   const [isError, setIsError] = useState(false);
   const [feedback, setFeedback] = useState('');
@@ -81,7 +81,7 @@ function EditOrderForm({ id, statusAttr }) {
       if (dataUpdate) {
         console.log('--->', dataUpdate);
 
-        setFeedback('lead status updated successfully!');
+        setFeedback('order status updated successfully!');
         setIsError(false);
       }
 
@@ -93,6 +93,8 @@ function EditOrderForm({ id, statusAttr }) {
 
       setUpdateLoading(false);
       setOpen(true);
+
+      handleTriggerFetch(Math.random());
     } catch (error) {
       console.log('something went wrong: ', error);
       setFeedback('a Problem accured!');

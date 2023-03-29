@@ -406,7 +406,7 @@ export default function LeadPage() {
             Leads
           </Typography>
           <Stack direction="row">
-            <CreateLeadModal />
+            <CreateLeadModal handleTriggerFetch={(val) => setTriggerFetch(val)} />
             <ImportLeadsModal />
           </Stack>
         </Stack>
@@ -618,6 +618,7 @@ export default function LeadPage() {
                                 statusAttr={status}
                                 phoneAttr={phone}
                                 createdAtAttr={createdAt}
+                                handleTriggerFetch={(val) => setTriggerFetch(val)}
                               />
                             </TableCell>
 

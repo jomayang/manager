@@ -327,7 +327,7 @@ export default function OrderPage() {
           <Typography variant="h4" gutterBottom>
             Orders
           </Typography>
-          <CreateOrderModal />
+          <CreateOrderModal handleTriggerFetch={(val) => setTriggerFetch(val)} />
         </Stack>
 
         <Card>
@@ -526,7 +526,11 @@ export default function OrderPage() {
                               <Label color={statusColors[status]}>{status}</Label>
                             </TableCell>
                             <TableCell align="right">
-                              <EditOrderStatus id={id} statusAttr={status} />
+                              <EditOrderStatus
+                                id={id}
+                                statusAttr={status}
+                                handleTriggerFetch={(val) => setTriggerFetch(val)}
+                              />
                             </TableCell>
                             <TableCell align="right">
                               <Stack direction="row" justifyContent="right">

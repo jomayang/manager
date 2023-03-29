@@ -17,7 +17,7 @@ const style = {
   p: 4,
 };
 
-function CreateLeadModal() {
+function CreateLeadModal({ handleTriggerFetch }) {
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -37,7 +37,7 @@ function CreateLeadModal() {
           <Typography id="modal-modal-title" variant="h3" component="h2" style={{ textAlign: 'center' }}>
             Add new lead
           </Typography>
-          <CreateLeadForm />
+          <CreateLeadForm handleTriggerFetch={handleTriggerFetch} />
         </Box>
       </Modal>
     </div>

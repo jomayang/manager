@@ -32,7 +32,7 @@ const Alert = forwardRef((props, ref) => {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
 
-function CreateOrderForm() {
+function CreateOrderForm({ handleTriggerFetch }) {
   const [open, setOpen] = useState(false);
   const [isError, setIsError] = useState(false);
   const [feedback, setFeedback] = useState('');
@@ -170,6 +170,8 @@ function CreateOrderForm() {
       }
       setIsLoading(false);
       setOpen(true);
+
+      handleTriggerFetch(Math.random());
     } catch (error) {
       setFeedback('a Problem accured when adding the new Lead!');
       setIsError(true);
