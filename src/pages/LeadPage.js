@@ -261,34 +261,36 @@ export default function LeadPage() {
             data = dataAll;
             error = errorAll;
           }
-        } else if (filterStatus !== '') {
-          const {
-            count: countFilter,
-            data: dataFilter,
-            error: errorFilter,
-          } = await supabase
-            .from('leads')
-            .select('*', { count: 'exact' })
-            .eq('status', filterStatus)
-            .order('created_at', { ascending: false })
-            .range(page * rowsPerPage, page * rowsPerPage + rowsPerPage - 1);
-          count = countFilter;
-          data = dataFilter;
-          error = errorFilter;
-        } else {
-          const {
-            count: countAll,
-            data: dataAll,
-            error: errorAll,
-          } = await supabase
-            .from('leads')
-            .select('*', { count: 'exact' })
-            .order('created_at', { ascending: false })
-            .range(page * rowsPerPage, page * rowsPerPage + rowsPerPage - 1);
+        } else if (dataUser.role !== 'agent') {
+          if (filterStatus !== '') {
+            const {
+              count: countFilter,
+              data: dataFilter,
+              error: errorFilter,
+            } = await supabase
+              .from('leads')
+              .select('*', { count: 'exact' })
+              .eq('status', filterStatus)
+              .order('created_at', { ascending: false })
+              .range(page * rowsPerPage, page * rowsPerPage + rowsPerPage - 1);
+            count = countFilter;
+            data = dataFilter;
+            error = errorFilter;
+          } else {
+            const {
+              count: countAll,
+              data: dataAll,
+              error: errorAll,
+            } = await supabase
+              .from('leads')
+              .select('*', { count: 'exact' })
+              .order('created_at', { ascending: false })
+              .range(page * rowsPerPage, page * rowsPerPage + rowsPerPage - 1);
 
-          count = countAll;
-          data = dataAll;
-          error = errorAll;
+            count = countAll;
+            data = dataAll;
+            error = errorAll;
+          }
         }
 
         // if (dataAuth) {
