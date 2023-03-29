@@ -146,7 +146,7 @@ const StyledSearch = styled(OutlinedInput)(({ theme }) => ({
   },
 }));
 
-export default function TrackingPage() {
+export default function TrackingPageX() {
   const [open, setOpen] = useState(null);
 
   const [page, setPage] = useState(0);
@@ -324,19 +324,21 @@ export default function TrackingPage() {
         try {
           // console.log('calling API');
           setLoading(true);
-          const response = await axios({
-            url: `https://ecom-api-5wlr.onrender.com/`,
-            method: 'post',
-            headers: { 'Content-Type': 'application/json' },
-            data,
-          });
+          // const response = await axios({
+          //   url: `https://ecom-api-5wlr.onrender.com/`,
+          //   method: 'post',
+          //   headers: { 'Content-Type': 'application/json' },
+          //   data,
+          // });
           /* -------------------------------------------
            * PARCELS RESPONSE
            */
-          // const response = parcelsResponse;
-          // console.log('response fulfiled', response);
+          const response = parcelsResponse;
+          console.log('response fulfiled', response);
           setRowsCount(response.data.data.total_data);
           setLeads(response.data.data.data);
+          // setRowsCount(response.length);
+          // setLeads(response);
         } catch (error) {
           console.log(error);
         } finally {
@@ -361,21 +363,23 @@ export default function TrackingPage() {
           extension: `?tracking=${trackingsStr}`,
         };
 
-        const response = await axios({
-          url: `https://ecom-api-5wlr.onrender.com/histories`,
-          method: 'post',
-          headers: { 'Content-Type': 'application/json' },
-          data,
-        });
+        // const response = await axios({
+        //   url: `https://ecom-api-5wlr.onrender.com/histories`,
+        //   method: 'post',
+        //   headers: { 'Content-Type': 'application/json' },
+        //   data,
+        // });
         // const response =
 
         /* ------------------------------------------------
          * HISTORY RESPONSE
          */
-        // const response = histResponse;
-        console.log('response -> ', response.data.data.data);
+        const response = histResponse;
+        console.log('***************************', response);
+        console.log('response -> ', response.data);
         if (response) {
-          const responseData = response.data.data.data;
+          // const responseData = response.data.data.data;
+          const responseData = response.data;
           const object = responseData.reduce((obj, item) => {
             if (obj[item.tracking])
               return Object.assign(obj, {
@@ -401,7 +405,7 @@ export default function TrackingPage() {
     const fetch = async () => {
       let object;
       try {
-        console.log('new leads', leads);
+        // console.log('new leads', leads);
         const trackings = leads.map((lead) => lead.tracking);
         const { data: trackingData, error: trackingError } = await supabase
           .from('followups')
@@ -410,7 +414,7 @@ export default function TrackingPage() {
         // const trackings = leads;
 
         if (trackingData) {
-          console.log('tracking data', trackingData);
+          // console.log('tracking data', trackingData);
           object = trackingData.reduce(
             (obj, item) =>
               Object.assign(obj, {
@@ -492,9 +496,9 @@ export default function TrackingPage() {
   };
 
   const getIsActive = (tracking, status) => {
-    console.log(`getIsActive(${tracking}, ${status})`);
-    console.log(trackingState);
-    console.log(histories);
+    // console.log(`getIsActive(${tracking}, ${status})`);
+    // console.log(trackingState);
+    // console.log(histories);
     if (histories && !historiesLoading && trackingState && trackingState[tracking]) {
       console.log('*-*>', histories[tracking]);
       if (status === 'Centre') {

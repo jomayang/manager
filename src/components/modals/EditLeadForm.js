@@ -64,6 +64,7 @@ function EditLeadForm({
   const [trackersCount, setTrackersCount] = useState(0);
   const [currentAgentId, setCurrentAgentId] = useState();
   const [updateLoading, setUpdateLoading] = useState(false);
+  const [estimatedTime, setEstimatedTime] = useState(null);
   const { user } = useContext(UserContext);
   const handleClose = (event, reason) => {
     if (reason === 'clickaway') {
@@ -158,6 +159,7 @@ function EditLeadForm({
       console.log('wilaya', wilayas);
       console.log('communes', communesStopdesk[wilaya]);
       console.log('communes', communesList[wilaya]);
+      setEstimatedTime(fees[wilaya].estimatedDeliveryTime);
       if (isStopDesk) {
         setCommunes(communesStopdesk[wilaya]);
         console.log('fee: ', fees[wilaya].deskFee);
@@ -436,7 +438,18 @@ function EditLeadForm({
               </Stack>
               <Stack>
                 <Typography variant="p" component="p" style={{ fontSize: '13px', marginBottom: 8, color: '#666' }}>
-                  {deliveryFee && <span>Delivery Fees: {deliveryFee} DA</span>}
+                  {deliveryFee && (
+                    <span>
+                      Delivery Fees: <b>{deliveryFee} DA</b>
+                    </span>
+                  )}
+                </Typography>
+                <Typography variant="p" component="p" style={{ fontSize: '13px', marginBottom: 8, color: '#666' }}>
+                  {estimatedTime && (
+                    <span>
+                      Estimated delivery time: <b>{estimatedTime}</b>
+                    </span>
+                  )}
                 </Typography>
                 <Typography variant="p" component="p" style={{ fontSize: '13px' }}>
                   Total: {(productPrice + shippingPrice).toFixed(2)} DA
