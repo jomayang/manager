@@ -362,6 +362,7 @@ export default function TrackingPageX() {
         const data = {
           extension: `?tracking=${trackingsStr}`,
         };
+        console.log('ext: ', data);
 
         // const response = await axios({
         //   url: `https://ecom-api-5wlr.onrender.com/histories`,
