@@ -137,10 +137,12 @@ export default function BackupPage() {
         } else {
           finalStatus = 'processing';
         }
-        console.log(finalStatus);
+        console.log('final status ', finalStatus);
+        console.log('date last: ', new Date(parcel.date_last_status));
+        const modifiedAt = new Date(parcel.date_last_status);
         const { error } = await supabase
           .from('orders')
-          .update({ status: finalStatus, yalidine_status: parcel.last_status })
+          .update({ status: finalStatus, yalidine_status: parcel.last_status, modified_at: modifiedAt })
           .eq('tracking_id', parcel.tracking);
 
         if (error) {

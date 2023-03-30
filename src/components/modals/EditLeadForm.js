@@ -157,21 +157,42 @@ function EditLeadForm({
   useEffect(() => {
     const wilayaValues = wilayas.map((wil, i) => wil.value);
     if (wilayaValues.includes(wilaya)) {
-      console.log('wilaya', wilayas);
-      console.log('communes', communesStopdesk[wilaya]);
-      console.log('communes', communesList[wilaya]);
       setEstimatedTime(fees[wilaya].estimatedDeliveryTime);
       if (isStopDesk) {
         setCommunes(communesStopdesk[wilaya]);
-        console.log('fee: ', fees[wilaya].deskFee);
-        setDeliveryFee(fees[wilaya].deskFee);
       } else {
         setCommunes(communesList[wilaya]);
-        console.log('fee: ', fees[wilaya].homeFee);
-        setDeliveryFee(fees[wilaya].homeFee);
       }
     }
   }, [wilaya, isStopDesk]);
+
+  useEffect(() => {
+    if (wilaya !== '' && commune !== '') {
+      console.log('wilaya => ', wilaya);
+      console.log('wilaya => ', commune);
+      console.log('wilaya => ', communesList[wilaya]);
+
+      const wilayaValues = wilayas.map((wil, i) => wil.value);
+      if (wilayaValues.includes(wilaya)) {
+        const communesListValues = communesList[wilaya].map((com) => com.value);
+        if (communesListValues.includes(commune)) {
+          const associatedCommune = communesList[wilaya].filter((com) => com.value === commune);
+          console.log('assoc com', associatedCommune, commune);
+          if (associatedCommune.length !== 0) {
+            if (isStopDesk) {
+              console.log('fee: ', fees[wilaya].deskFee);
+              setDeliveryFee(fees[wilaya].deskFee);
+            } else {
+              console.log('fee: ', fees[wilaya].homeFee);
+              const communeFee = associatedCommune[0].fee;
+              console.log('associated fee', communeFee, commune);
+              setDeliveryFee(fees[wilaya].homeFee + communeFee - 350);
+            }
+          }
+        }
+      }
+    }
+  }, [wilaya, isStopDesk, commune]);
 
   const updateStatus = async (e) => {
     e.preventDefault();
