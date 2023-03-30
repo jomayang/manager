@@ -186,7 +186,34 @@ function EditLeadForm({
               console.log('fee: ', fees[wilaya].homeFee);
               const communeFee = associatedCommune[0].fee;
               console.log('associated fee', communeFee, commune);
-              setDeliveryFee(fees[wilaya].homeFee + communeFee - 350);
+              let reduction;
+              const near = ['Mila', 'Alger', 'Guelma', 'Jijel', 'Oum El Bouaghi'];
+              const far = [
+                'Laghouat',
+                'Djelfa',
+                'Tébessa',
+                'Béchar',
+                'Ouargla',
+                'El Oued',
+                'Adrar',
+                'Illizi',
+                'Biskra',
+                'Ghardaïa',
+                'Tamanrasset',
+                'Tindouf',
+                'El Bayadh',
+                'Naâma',
+              ];
+              if (near.includes(wilaya)) {
+                reduction = 250;
+              } else if (wilaya === 'Constantine') {
+                reduction = 250;
+              } else if (far.includes(wilaya)) {
+                reduction = 400;
+              } else {
+                reduction = 350;
+              }
+              setDeliveryFee(fees[wilaya].homeFee + communeFee - reduction);
             }
           }
         }
