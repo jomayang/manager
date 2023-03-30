@@ -26,6 +26,7 @@ import { communesList } from '../../data/communes';
 import { communesStopdesk } from '../../data/communesStopdesk';
 import { fees } from '../../data/fees';
 import { UserContext } from '../../context/UserContext';
+import { zone0, zone1, zone2, zone3, zone4, zone5, zone6 } from '../../data/comFees';
 
 const Alert = forwardRef((props, ref) => <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />);
 
@@ -174,49 +175,46 @@ function EditLeadForm({
 
       const wilayaValues = wilayas.map((wil, i) => wil.value);
       if (wilayaValues.includes(wilaya)) {
-        const communesListValues = communesList[wilaya].map((com) => com.value);
-        if (communesListValues.includes(commune)) {
-          const associatedCommune = communesList[wilaya].filter((com) => com.value === commune);
-          console.log('assoc com', associatedCommune, commune);
-          if (associatedCommune.length !== 0) {
-            if (isStopDesk) {
-              console.log('fee: ', fees[wilaya].deskFee);
-              setDeliveryFee(fees[wilaya].deskFee);
-            } else {
-              console.log('fee: ', fees[wilaya].homeFee);
-              const communeFee = associatedCommune[0].fee;
-              console.log('associated fee', communeFee, commune);
-              let reduction;
-              const near = ['Mila', 'Alger', 'Guelma', 'Jijel', 'Oum El Bouaghi'];
-              const far = [
-                'Laghouat',
-                'Djelfa',
-                'Tébessa',
-                'Béchar',
-                'Ouargla',
-                'El Oued',
-                'Adrar',
-                'Illizi',
-                'Biskra',
-                'Ghardaïa',
-                'Tamanrasset',
-                'Tindouf',
-                'El Bayadh',
-                'Naâma',
-              ];
-              if (near.includes(wilaya)) {
-                reduction = 250;
-              } else if (wilaya === 'Constantine') {
-                reduction = 250;
-              } else if (far.includes(wilaya)) {
-                reduction = 400;
-              } else {
-                reduction = 350;
-              }
-              setDeliveryFee(fees[wilaya].homeFee + communeFee - reduction);
-            }
+        // const communesListValues = communesList[wilaya].map((com) => com.value);
+        // if (communesListValues.includes(commune)) {
+        // const associatedCommune = communesList[wilaya].filter((com) => com.value === commune);
+        // console.log('assoc com', associatedCommune, commune);
+        // if (associatedCommune.length !== 0) {
+        if (isStopDesk) {
+          console.log('fee: ', fees[wilaya].deskFee);
+          setDeliveryFee(fees[wilaya].deskFee);
+        } else {
+          console.log('fee: ', fees[wilaya].homeFee);
+          // const communeFee = associatedCommune[0].fee;
+          // console.log('associated fee', communeFee, commune);
+          let reduction;
+          let homeDeliverFee;
+          if (zone0.includes(wilaya)) {
+            homeDeliverFee = fees[wilaya].homeFee;
+            reduction = 250;
+          } else if (zone1.includes(wilaya)) {
+            homeDeliverFee = fees[wilaya].homeFee + 100;
+            reduction = 150;
+          } else if (zone2.includes(wilaya)) {
+            homeDeliverFee = fees[wilaya].homeFee + 100;
+            reduction = 250;
+          } else if (zone3.includes(wilaya)) {
+            homeDeliverFee = fees[wilaya].homeFee + 100;
+            reduction = 300;
+          } else if (zone4.includes(wilaya)) {
+            homeDeliverFee = fees[wilaya].homeFee + 100;
+            reduction = 300;
+          } else if (zone5.includes(wilaya)) {
+            homeDeliverFee = fees[wilaya].homeFee + 100;
+            reduction = 400;
+          } else if (zone6.includes(wilaya)) {
+            homeDeliverFee = fees[wilaya].homeFee;
+            reduction = 100;
           }
+          setDeliveryFee(homeDeliverFee - reduction);
         }
+        // }
+        // }
       }
     }
   }, [wilaya, isStopDesk, commune]);
