@@ -12,12 +12,12 @@ import ProductsPage from './pages/ProductsPage';
 import DashboardAppPage from './pages/DashboardAppPage';
 import LeadPage from './pages/LeadPage';
 import OrderPage from './pages/OrderPage';
-import TrackingPage from './pages/TrackingPage';
+// import TrackingPage from './pages/TrackingPageOldOne';
 import supabase from './config/SupabaseClient';
 import BackupPage from './pages/BackupPage';
 import StatPage from './pages/StatPage';
-import TrackingPageFake from './pages/TrackingPageFake';
-import TrackingPageX from './pages/TrackingPagex';
+// import TrackingPageFake from './pages/TrackingPageFake';
+import TrackingPage from './pages/TrackingPage';
 
 // ----------------------------------------------------------------------
 
@@ -31,8 +31,8 @@ const ADMIN_ROUTES = [
       { path: 'leads', element: <LeadPage /> },
       { path: 'orders', element: <OrderPage /> },
       { path: 'tracking', element: <TrackingPage /> },
-      { path: 'tracking2', element: <TrackingPageFake /> },
-      { path: 'tracking3', element: <TrackingPageX /> },
+      // { path: 'tracking2', element: <TrackingPageFake /> },
+      // { path: 'tracking3', element: <TrackingPageX /> },
       { path: 'backup', element: <BackupPage /> },
       // { path: 'user', element: <UserPage /> },
       { path: 'users', element: <UserPage /> },
@@ -95,6 +95,7 @@ const TRACKER_ROUTES = [
       { path: 'app', element: <DashboardAppPage /> },
       { path: 'orders', element: <OrderPage /> },
       { path: 'tracking', element: <TrackingPage /> },
+      // { path: 'tracking3', element: <TrackingPageX /> },
     ],
   },
   {

@@ -296,6 +296,7 @@ export default function OrderPage() {
         headers: { 'Content-Type': 'application/json' },
         data: { tracking: trackingId },
       });
+      console.log('done');
       const { error: errorFollowup } = await supabase.from('followups').delete().eq('tracking', trackingId);
       const { error } = await supabase.from('orders').delete().eq('tracking_id', trackingId);
 

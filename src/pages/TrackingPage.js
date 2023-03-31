@@ -1,7 +1,7 @@
 import { Helmet } from 'react-helmet-async';
 import { filter } from 'lodash';
 import { sentenceCase } from 'change-case';
-import { useContext, useEffect, useState } from 'react';
+import { useCallback, useContext, useEffect, useState } from 'react';
 // @mui
 import {
   Card,
@@ -50,7 +50,9 @@ import EditLeadStatus from '../components/modals/EditLeadStatus';
 import ParcelHistoryModal from '../components/modals/ParcelHistoryModal';
 import ParcelDetailsModal from '../components/modals/ParcelDetailsModal';
 import { UserContext } from '../context/UserContext';
-
+import { histResponse } from '../data/histResponse';
+import { parcelsResponse } from '../data/parcelsResponse';
+import TrackingListItem from '../components/tracking/TrackingListItem';
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
@@ -95,6 +97,10 @@ function descendingComparator(a, b, orderBy) {
   }
   return 0;
 }
+const pause = (duration) =>
+  new Promise((resolve) => {
+    setTimeout(resolve, duration);
+  });
 
 function getComparator(order, orderBy) {
   return order === 'desc'
@@ -153,7 +159,7 @@ export default function TrackingPage() {
 
   const [filterName, setFilterName] = useState('');
   const [filterStatus, setFilterStatus] = useState('');
-  const [rowsPerPage, setRowsPerPage] = useState(100);
+  const [rowsPerPage, setRowsPerPage] = useState(25);
   const [leads, setLeads] = useState([]);
   const [searchInput, setSearchInput] = useState('');
   const [rowsCount, setRowsCount] = useState(0);
@@ -161,6 +167,8 @@ export default function TrackingPage() {
   const [currentUserId, setCurrentUserId] = useState();
   const [loading, setLoading] = useState(false);
   const [currentUserRole, setCurrentUserRole] = useState('');
+  const [histories, setHistories] = useState(null);
+  const [historiesLoading, setHistoriesLoading] = useState(false);
   const { user } = useContext(UserContext);
   const handleOpenMenu = (event) => {
     setOpen(event.currentTarget);
@@ -314,7 +322,7 @@ export default function TrackingPage() {
       console.log('user id', currentUserId, 'user role', currentUserRole);
       if (currentUserRole !== '') {
         try {
-          console.log('useEffect called');
+          // console.log('calling API');
           setLoading(true);
           const response = await axios({
             url: `https://ecom-api-5wlr.onrender.com/`,
@@ -322,9 +330,15 @@ export default function TrackingPage() {
             headers: { 'Content-Type': 'application/json' },
             data,
           });
-
+          /* -------------------------------------------
+           * PARCELS RESPONSE
+           */
+          // const response = parcelsResponse;
+          console.log('response fulfiled', response);
           setRowsCount(response.data.data.total_data);
           setLeads(response.data.data.data);
+          // setRowsCount(response.length);
+          // setLeads(response);
         } catch (error) {
           console.log(error);
         } finally {
@@ -336,24 +350,92 @@ export default function TrackingPage() {
   }, [page, rowsPerPage, filterStatus, currentUserId, currentUserRole]);
 
   useEffect(() => {
+    const fetchHistories = async () => {
+      try {
+        setHistoriesLoading(true);
+        console.log('new leads', leads);
+        const trackings = leads.map((lead) => lead.tracking);
+
+        const trackingsStr = trackings.join(',');
+
+        await pause(1000);
+        const data = {
+          extension: `?tracking=${trackingsStr}`,
+        };
+        console.log('ext: ', data);
+        // if (currentUserId !== '') {
+        const response = await axios({
+          url: `https://ecom-api-5wlr.onrender.com/histories`,
+          method: 'post',
+          headers: { 'Content-Type': 'application/json' },
+          data,
+        });
+
+        // const response =
+
+        /* ------------------------------------------------
+         * HISTORY RESPONSE
+         */
+        // const response = histResponse;
+        console.log('***************************', response);
+        // console.log('response -> ', response.data);
+        if (response) {
+          // const responseData = response.data.data.data;
+          const responseData = response.data.data.data;
+          // console.log('response data', responseData);
+          const object = responseData.reduce((obj, item) => {
+            if (obj[item.tracking])
+              return Object.assign(obj, {
+                [item.tracking]: [...obj[item.tracking], item.status],
+              });
+            return Object.assign(obj, {
+              [item.tracking]: [item.status],
+            });
+          }, {});
+          console.log('the object => ', object);
+          setHistories(object);
+        }
+        setHistoriesLoading(false);
+        // }
+      } catch (error) {
+        console.log('something went wrong', error);
+        setHistoriesLoading(false);
+      }
+    };
+    fetchHistories();
+  }, [lastChangedTracking, leads, page, rowsPerPage, filterStatus]);
+
+  useEffect(() => {
     const fetch = async () => {
       let object;
       try {
-        const { data: trackingData, error: trackingError } = await supabase.from('followups').select('*');
+        // console.log('new leads', leads);
+        const trackings = leads.map((lead) => lead.tracking);
+        const { data: trackingData, error: trackingError } = await supabase
+          .from('followups')
+          .select('*')
+          .in('tracking', trackings);
+        // const trackings = leads;
 
         if (trackingData) {
+          // console.log('tracking data', trackingData);
           object = trackingData.reduce(
             (obj, item) =>
               Object.assign(obj, {
                 [item.tracking]: {
                   isHandledOut: item.is_handled_out,
+                  isHandledOut2: item.is_handled_out_2,
+                  isHandledOut3: item.is_handled_out_3,
                   isHandledReceived: item.is_handled_received,
                   isHandledCenter: item.is_handled_center,
                   isHandledMissed: item.is_handled_missed,
+                  isHandledMissed2: item.is_handled_missed_2,
+                  isHandledMissed3: item.is_handled_missed_3,
                 },
               }),
             {}
           );
+          // console.log('the object', object);
           setTrackingState(object);
         }
 
@@ -363,61 +445,52 @@ export default function TrackingPage() {
       }
     };
     fetch();
-  }, [lastChangedTracking]);
+  }, [lastChangedTracking, leads, histories, page]);
+  useEffect(() => {
+    console.log('histories === ---> ', histories);
+    console.log('tracking state === --->', trackingState);
+  }, [histories, trackingState]);
 
-  const handleValidateTask = async (tracking, status) => {
-    try {
-      let queryObject;
-      switch (status) {
-        case 'Centre':
-          queryObject = { is_handled_center: true };
-          break;
-        case 'Reçu à Wilaya':
-          queryObject = { is_handled_received: true };
-          break;
-        case 'Sorti en livraison':
-          queryObject = { is_handled_out: true };
-          break;
-        case 'Tentative échouée':
-          queryObject = { is_handled_missed: true };
-          break;
-        default:
-          return;
-        // break;
-      }
-      const { data, error } = await supabase.from('followups').update(queryObject).eq('tracking', tracking);
+  // const getIsActive = (tracking, status) => {
+  //   // console.log(`getIsActive(${tracking}, ${status})`);
+  //   // console.log(trackingState);
+  //   // console.log(histories);
+  //   if (histories && !historiesLoading && trackingState && trackingState[tracking]) {
+  //     // console.log('*-*>', histories);
+  //     // console.log('*-*>', histories[tracking]);
+  //     if (status === 'Centre') {
+  //       return trackingState[tracking].isHandledCenter;
+  //     }
+  //     if (status === 'Reçu à Wilaya') {
+  //       return trackingState[tracking].isHandledReceived;
+  //     }
+  //     if (status === 'Sorti en livraison') {
+  //       const attempt = histories[tracking].filter((state) => state === 'Sorti en livraison').length;
 
-      if (data) {
-        console.log('successful', data);
-      }
+  //       if (attempt === 2) {
+  //         return trackingState[tracking].isHandledOut2;
+  //       }
+  //       if (attempt === 3) {
+  //         return trackingState[tracking].isHandledOut3;
+  //       }
+  //       return trackingState[tracking].isHandledOut;
+  //     }
+  //     if (status === 'Tentative échouée') {
+  //       const attempt = histories[tracking].filter((state) => state === 'Tentative échouée').length;
 
-      if (error) {
-        console.log('error happened', error);
-      }
-      setLastChangedTracking(tracking);
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  //       // console.log('attempt: ', attempt);
+  //       if (attempt === 2) {
+  //         return trackingState[tracking].isHandledMissed2;
+  //       }
+  //       if (attempt === 3) {
+  //         return trackingState[tracking].isHandledMissed3;
+  //       }
+  //       return trackingState[tracking].isHandledMissed;
+  //     }
+  //   }
 
-  const getIsActive = (tracking, status) => {
-    if (trackingState && trackingState[tracking]) {
-      if (status === 'Centre') {
-        return trackingState[tracking].isHandledCenter;
-      }
-      if (status === 'Reçu à Wilaya') {
-        return trackingState[tracking].isHandledReceived;
-      }
-      if (status === 'Sorti en livraison') {
-        return trackingState[tracking].isHandledOut;
-      }
-      if (status === 'Tentative échouée') {
-        return trackingState[tracking].isHandledMissed;
-      }
-    }
-
-    return false;
-  };
+  //   return false;
+  // };
 
   return (
     <>
@@ -602,104 +675,34 @@ export default function TrackingPage() {
                       is_stopdesk: isStopdesk,
                     } = row;
                     const selectedLead = selected.indexOf(id) !== -1;
-                    const styleRow = getIsActive(tracking, status) ? { background: '#e5eef5' } : {};
                     return (
-                      <TableRow
-                        hover
-                        key={id + page}
-                        tabIndex={-1}
-                        role="checkbox"
-                        selected={selectedLead}
-                        style={styleRow}
-                      >
-                        <TableCell padding="checkbox">
-                          <Checkbox checked={selectedLead} onChange={(event) => handleClick(event, id)} />
-                        </TableCell>
-                        <TableCell align="left">
-                          <Label color="primary" variant="filled" style={{ height: 32 }}>
-                            {tracking}
-                            {isStopdesk ? (
-                              <Label
-                                style={{
-                                  height: 16,
-                                  borderRadius: 16,
-                                  padding: '0 1px',
-                                  marginLeft: 6,
-                                  width: 16,
-                                  minWidth: 16,
-                                }}
-                                color="error"
-                                variant="filled"
-                              >
-                                s
-                              </Label>
-                            ) : (
-                              <Label
-                                variant="filled"
-                                style={{
-                                  height: 16,
-                                  borderRadius: 16,
-                                  padding: '0 1px',
-                                  marginLeft: 6,
-                                  width: 16,
-                                  minWidth: 16,
-                                }}
-                              >
-                                H
-                              </Label>
-                            )}
-                          </Label>
-                        </TableCell>
-                        <TableCell component="th" scope="row" padding="none">
-                          <Stack direction="row" spacing={2}>
-                            <Typography variant="subtitle2" noWrap>
-                              {firstName} {lastName}
-                            </Typography>
-                          </Stack>
-                        </TableCell>
-
-                        <TableCell align="left">{phone}</TableCell>
-
-                        <TableCell align="left">{wilaya}</TableCell>
-
-                        <TableCell align="left">{commune}</TableCell>
-
-                        <TableCell align="left">
-                          {/* {statusColors ? ( */}
-
-                          <ParcelHistoryModal status={status} tracking={tracking} colors={statusColors} />
-                          {/* // ) : (
-                           
-                          // )} */}
-                          {/* <Label>{status}</Label> */}
-                        </TableCell>
-
-                        <TableCell align="right">
-                          <Stack direction={{ xs: 'column', sm: 'row' }}>
-                            <ParcelDetailsModal
-                              tracking={tracking}
-                              fullName={`${firstName} ${lastName}`}
-                              phone={phone}
-                              departure="Constantine"
-                              destination={`${wilaya} (${commune})`}
-                              product={product}
-                              price={price}
-                              deliveryFees={deliveryFees}
-                              creationDate={creationDate}
-                              expeditionDate={expeditionDate}
-                            />
-                            {followupStatusArray.includes(status) && (
-                              <>
-                                {!getIsActive(tracking, status) && currentUserRole !== 'admin' && (
-                                  <IconButton aria-label="Done" onClick={() => handleValidateTask(tracking, status)}>
-                                    <Iconify icon="eva:checkmark-circle-outline" />
-                                  </IconButton>
-                                )}
-                              </>
-                            )}
-                          </Stack>
-                        </TableCell>
-                      </TableRow>
+                      <TrackingListItem
+                        key={id}
+                        id={id}
+                        lastName={lastName}
+                        firstName={firstName}
+                        status={status}
+                        wilaya={wilaya}
+                        phone={phone}
+                        commune={commune}
+                        creationDate={creationDate}
+                        expeditionDate={expeditionDate}
+                        deliveryFees={deliveryFees}
+                        price={price}
+                        tracking={tracking}
+                        product={product}
+                        isStopdesk={isStopdesk}
+                        selectedLead={selectedLead}
+                        page={page}
+                        historiesLoading={historiesLoading}
+                        followupStatusArray={followupStatusArray}
+                        currentUserRole={currentUserRole}
+                        statusColors={statusColors}
+                        handleClick={handleClick}
+                        handleLastChangedTracking={(val) => setLastChangedTracking(val)}
+                        histories={histories}
+                        trackingState={trackingState}
+                      />
                     );
                   })}
                   {/* {emptyRows > 0 && (
