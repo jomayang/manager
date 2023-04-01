@@ -159,7 +159,7 @@ export default function TrackingPage() {
 
   const [filterName, setFilterName] = useState('');
   const [filterStatus, setFilterStatus] = useState('');
-  const [rowsPerPage, setRowsPerPage] = useState(25);
+  const [rowsPerPage, setRowsPerPage] = useState(100);
   const [leads, setLeads] = useState([]);
   const [searchInput, setSearchInput] = useState('');
   const [rowsCount, setRowsCount] = useState(0);
@@ -566,7 +566,7 @@ export default function TrackingPage() {
                   onSelectAllClick={handleSelectAllClick}
                 />
                 <TableBody>
-                  {loading && (
+                  {loading ? (
                     <>
                       <TableRow>
                         <TableCell>
@@ -656,55 +656,58 @@ export default function TrackingPage() {
                         </TableCell>
                       </TableRow>
                     </>
+                  ) : (
+                    <>
+                      {leads.map((row) => {
+                        const {
+                          tracking: id,
+                          familyname: lastName,
+                          firstname: firstName,
+                          last_status: status,
+                          contact_phone: phone,
+                          to_wilaya_name: wilaya,
+                          to_commune_name: commune,
+                          date_creation: creationDate,
+                          date_expedition: expeditionDate,
+                          delivery_fee: deliveryFees,
+                          price,
+                          product_list: product,
+                          tracking,
+                          is_stopdesk: isStopdesk,
+                        } = row;
+                        const selectedLead = selected.indexOf(id) !== -1;
+                        return (
+                          <TrackingListItem
+                            key={id}
+                            id={id}
+                            lastName={lastName}
+                            firstName={firstName}
+                            status={status}
+                            wilaya={wilaya}
+                            phone={phone}
+                            commune={commune}
+                            creationDate={creationDate}
+                            expeditionDate={expeditionDate}
+                            deliveryFees={deliveryFees}
+                            price={price}
+                            tracking={tracking}
+                            product={product}
+                            isStopdesk={isStopdesk}
+                            selectedLead={selectedLead}
+                            page={page}
+                            historiesLoading={historiesLoading}
+                            followupStatusArray={followupStatusArray}
+                            currentUserRole={currentUserRole}
+                            statusColors={statusColors}
+                            handleClick={handleClick}
+                            handleLastChangedTracking={(val) => setLastChangedTracking(val)}
+                            histories={histories}
+                            trackingState={trackingState}
+                          />
+                        );
+                      })}
+                    </>
                   )}
-                  {leads.map((row) => {
-                    const {
-                      tracking: id,
-                      familyname: lastName,
-                      firstname: firstName,
-                      last_status: status,
-                      contact_phone: phone,
-                      to_wilaya_name: wilaya,
-                      to_commune_name: commune,
-                      date_creation: creationDate,
-                      date_expedition: expeditionDate,
-                      delivery_fee: deliveryFees,
-                      price,
-                      product_list: product,
-                      tracking,
-                      is_stopdesk: isStopdesk,
-                    } = row;
-                    const selectedLead = selected.indexOf(id) !== -1;
-                    return (
-                      <TrackingListItem
-                        key={id}
-                        id={id}
-                        lastName={lastName}
-                        firstName={firstName}
-                        status={status}
-                        wilaya={wilaya}
-                        phone={phone}
-                        commune={commune}
-                        creationDate={creationDate}
-                        expeditionDate={expeditionDate}
-                        deliveryFees={deliveryFees}
-                        price={price}
-                        tracking={tracking}
-                        product={product}
-                        isStopdesk={isStopdesk}
-                        selectedLead={selectedLead}
-                        page={page}
-                        historiesLoading={historiesLoading}
-                        followupStatusArray={followupStatusArray}
-                        currentUserRole={currentUserRole}
-                        statusColors={statusColors}
-                        handleClick={handleClick}
-                        handleLastChangedTracking={(val) => setLastChangedTracking(val)}
-                        histories={histories}
-                        trackingState={trackingState}
-                      />
-                    );
-                  })}
                   {/* {emptyRows > 0 && (
                     <TableRow style={{ height: 53 * emptyRows }}>
                       <TableCell colSpan={6} />
