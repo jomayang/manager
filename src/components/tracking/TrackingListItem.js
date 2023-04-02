@@ -42,29 +42,33 @@ function TrackingListItem({
       let queryObject;
       const attemptOut = histories[tracking].filter((state) => state === 'Sorti en livraison').length;
       const attemptMissed = histories[tracking].filter((state) => state === 'Tentative échouée').length;
+      const currentDate = new Date().toLocaleString('en-US', {
+        timeZone: 'Europe/Paris',
+      });
+
       switch (status) {
         case 'Centre':
-          queryObject = { is_handled_center: true };
+          queryObject = { is_handled_center: true, last_changed: currentDate };
           break;
         case 'Reçu à Wilaya':
-          queryObject = { is_handled_received: true };
+          queryObject = { is_handled_received: true, last_changed: currentDate };
           break;
         case 'Sorti en livraison':
           if (attemptOut === 2) {
-            queryObject = { is_handled_out_2: true };
+            queryObject = { is_handled_out_2: true, last_changed: currentDate };
           } else if (attemptOut === 3) {
-            queryObject = { is_handled_out_3: true };
+            queryObject = { is_handled_out_3: true, last_changed: currentDate };
           } else {
-            queryObject = { is_handled_out: true };
+            queryObject = { is_handled_out: true, last_changed: currentDate };
           }
           break;
         case 'Tentative échouée':
           if (attemptMissed === 2) {
-            queryObject = { is_handled_missed_2: true };
+            queryObject = { is_handled_missed_2: true, last_changed: currentDate };
           } else if (attemptMissed === 3) {
-            queryObject = { is_handled_missed_3: true };
+            queryObject = { is_handled_missed_3: true, last_changed: currentDate };
           } else {
-            queryObject = { is_handled_missed: true };
+            queryObject = { is_handled_missed: true, last_changed: currentDate };
           }
           break;
         default:

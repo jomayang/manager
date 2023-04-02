@@ -225,12 +225,18 @@ function EditLeadForm({
       setUpdateLoading(true);
       const { data: dataUpdate, error: errorUpdate } = await supabase
         .from('leads')
-        .update({ status, comment })
+        .update({
+          status,
+          comment,
+          last_changed_status: new Date().toLocaleString('en-US', {
+            timeZone: 'Europe/Paris',
+          }),
+        })
         .select()
         .eq('id', id);
 
       if (dataUpdate) {
-        console.log('--->', dataUpdate);
+        // console.log('-------->', dataUpdate);
 
         setFeedback('lead status updated successfully!');
         setIsError(false);
