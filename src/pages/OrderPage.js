@@ -1,7 +1,7 @@
 import { Helmet } from 'react-helmet-async';
 import { create, filter } from 'lodash';
 import { sentenceCase } from 'change-case';
-import { useEffect, useState, forwardRef } from 'react';
+import { useEffect, useState, forwardRef, useContext } from 'react';
 // @mui
 import {
   Card,
@@ -45,6 +45,7 @@ import CreateOrderModal from '../components/modals/CreateOrderModal';
 import supabase from '../config/SupabaseClient';
 import OrderDetailsModal from '../components/modals/OrderDetailsModal';
 import EditOrderStatus from '../components/modals/EditOrderStatus';
+import { UserContext } from '../context/UserContext';
 
 // ----------------------------------------------------------------------
 const Alert = forwardRef((props, ref) => <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />);
@@ -139,8 +140,7 @@ export default function OrderPage() {
   const [feedback, setFeedback] = useState('');
   const [searchInput, setSearchInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [userSession, setUserSession] = useState(null);
-  const [currentUserRole, setCurrentUserRole] = useState('');
+  const { user } = useContext(UserContext);
   const handleOpenMenu = (event) => {
     setOpen(event.currentTarget);
   };
@@ -250,31 +250,6 @@ export default function OrderPage() {
     fetchOrders();
   }, [rowsPerPage, page, triggerFetch]);
 
-  useEffect(() => {
-    const getSession = async () => {
-      try {
-        const { data, error } = await supabase.auth.getSession();
-        console.log('geooooooo', data.session);
-        if (data && data.session) {
-          setUserSession(data.session);
-
-          const { data: dataFetch, error: errorFetch } = await supabase
-            .from('users')
-            .select('role')
-            .eq('email', data.session.user.email);
-
-          let role = '';
-
-          if (dataFetch && dataFetch[0]) role = dataFetch[0].role;
-          setCurrentUserRole(role);
-        }
-      } catch (error) {
-        console.log('something went wrong ', error);
-      }
-    };
-    getSession();
-  }, []);
-
   const handleSearchInDb = async (e) => {
     if (e.key === 'Enter') {
       try {
@@ -314,7 +289,7 @@ export default function OrderPage() {
     }
   };
 
-  const handleDeleteOrder = async (trackingId) => {
+  const handleDeleteOrder = async (trackingId, phone) => {
     try {
       console.log('tracking is', trackingId);
       const response = await axios({
@@ -331,6 +306,17 @@ export default function OrderPage() {
         setFeedback('a Problem accured when removing the lead');
         setIsError(true);
       } else {
+        const { error: errorLeadLog } = await supabase.from('logs').insert({
+          user: user.user_metadata.name,
+          action: 'delete',
+          entity: 'order',
+          number: phone,
+        });
+        if (errorLeadLog) {
+          console.log('oops log: ', errorLeadLog);
+          setFeedback('a Problem accured when adding the new LOG!');
+          setIsError(true);
+        }
         setFeedback('Lead removed successfully!');
         setIsError(false);
         setTriggerFetch(Math.random());
@@ -562,11 +548,11 @@ export default function OrderPage() {
                             </TableCell>
                             <TableCell align="right">
                               <Stack direction="row" justifyContent="right">
-                                {status === 'initial' && currentUserRole === 'admin' && (
+                                {status === 'initial' && (
                                   <IconButton
                                     size="large"
                                     color="inherit"
-                                    onClick={() => handleDeleteOrder(trackingId)}
+                                    onClick={() => handleDeleteOrder(trackingId, phone)}
                                   >
                                     <Iconify icon={'eva:trash-2-outline'} />
                                   </IconButton>
