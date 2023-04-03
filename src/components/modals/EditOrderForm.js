@@ -90,6 +90,18 @@ function EditOrderForm({ id, statusAttr, handleTriggerFetch }) {
         setFeedback('a Problem accured when updating the order!');
         setIsError(true);
       }
+      const { error: errorLeadLog } = await supabase.from('logs').insert({
+        user: user.user_metadata.name,
+        action: 'update',
+        entity: 'order',
+        number: currentOrder.phone,
+        last_status: status,
+      });
+      if (errorLeadLog) {
+        console.log('oops log: ', errorLeadLog);
+        setFeedback('a Problem accured when adding the new LOG!');
+        setIsError(true);
+      }
 
       setUpdateLoading(false);
       setOpen(true);

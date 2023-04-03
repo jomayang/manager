@@ -123,6 +123,17 @@ function CreateLeadForm({ handleTriggerFetch }) {
 
         handleTriggerFetch(Math.random());
       }
+      const { error: errorLeadLog } = await supabase.from('logs').insert({
+        user: user.user_metadata.name,
+        action: 'add',
+        entity: 'lead',
+        number: phone,
+      });
+      if (errorLeadLog) {
+        console.log('oops log: ', errorLeadLog);
+        setFeedback('a Problem accured when adding the new LOG!');
+        setIsError(true);
+      }
       setIsLoading(false);
     } catch (error) {
       setFeedback('a Problem accured when adding the new Lead!');

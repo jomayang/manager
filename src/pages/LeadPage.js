@@ -147,7 +147,8 @@ export default function LeadPage() {
   const [rowsCount, setRowsCount] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [filterStatus, setFilterStatus] = useState('');
-
+  const [userSession, setUserSession] = useState(null);
+  const [currentUserRole, setCurrentUserRole] = useState('');
   useEffect(() => {
     console.log(selected);
   }, [selected]);
@@ -333,7 +334,30 @@ export default function LeadPage() {
     };
     fetchLeads();
   }, [rowsPerPage, page, triggerFetch, filterStatus]);
+  useEffect(() => {
+    const getSession = async () => {
+      try {
+        const { data, error } = await supabase.auth.getSession();
+        console.log('geooooooo', data.session);
+        if (data && data.session) {
+          setUserSession(data.session);
 
+          const { data: dataFetch, error: errorFetch } = await supabase
+            .from('users')
+            .select('role')
+            .eq('email', data.session.user.email);
+
+          let role = '';
+
+          if (dataFetch && dataFetch[0]) role = dataFetch[0].role;
+          setCurrentUserRole(role);
+        }
+      } catch (error) {
+        console.log('something went wrong ', error);
+      }
+    };
+    getSession();
+  }, []);
   // useEffect(() => {
   //   const init = async () => {
   //     try {
@@ -752,9 +776,11 @@ export default function LeadPage() {
 
                             <TableCell align="right">
                               <Stack direction="row">
-                                <IconButton size="large" color="inherit" onClick={() => handleDeleteLead(id)}>
-                                  <Iconify icon={'eva:trash-2-outline'} />
-                                </IconButton>
+                                {currentUserRole === 'admin' && (
+                                  <IconButton size="large" color="inherit" onClick={() => handleDeleteLead(id)}>
+                                    <Iconify icon={'eva:trash-2-outline'} />
+                                  </IconButton>
+                                )}
                                 <LeadDetailsModal
                                   id={id}
                                   communeAttr={commune}

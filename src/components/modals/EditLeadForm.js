@@ -223,14 +223,15 @@ function EditLeadForm({
     e.preventDefault();
     try {
       setUpdateLoading(true);
+      const currentDate = new Date().toLocaleString('en-US', {
+        timeZone: 'Europe/Paris',
+      });
       const { data: dataUpdate, error: errorUpdate } = await supabase
         .from('leads')
         .update({
           status,
           comment,
-          last_changed_status: new Date().toLocaleString('en-US', {
-            timeZone: 'Europe/Paris',
-          }),
+          last_changed_status: currentDate,
         })
         .select()
         .eq('id', id);
@@ -328,6 +329,29 @@ function EditLeadForm({
           setFeedback('a Problem accured when adding the new Order!');
           setIsError(true);
         }
+
+        const { error: errorOrderLog } = await supabase
+          .from('logs')
+          .insert({ user: user.user_metadata.name, action: 'add', entity: 'order', number: phone });
+        if (errorOrderLog) {
+          console.log('oops log: ', errorOrderLog);
+          setFeedback('a Problem accured when adding the new LOG!');
+          setIsError(true);
+        }
+      }
+      const { error: errorLeadLog } = await supabase
+        .from('logs')
+        .insert({
+          user: user.user_metadata.name,
+          action: 'update',
+          entity: 'lead',
+          number: phone,
+          last_status: status,
+        });
+      if (errorLeadLog) {
+        console.log('oops log: ', errorLeadLog);
+        setFeedback('a Problem accured when adding the new LOG!');
+        setIsError(true);
       }
       setUpdateLoading(false);
       setOpen(true);
@@ -339,6 +363,7 @@ function EditLeadForm({
       setUpdateLoading(false);
     }
   };
+
   return (
     <form onSubmit={updateStatus}>
       <Stack spacing={3} style={{ marginTop: 30, maxHeight: '70vh', overflowY: 'scroll', padding: '1rem' }}>

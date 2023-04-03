@@ -703,6 +703,7 @@ export default function TrackingPage() {
                             handleLastChangedTracking={(val) => setLastChangedTracking(val)}
                             histories={histories}
                             trackingState={trackingState}
+                            user={user}
                           />
                         );
                       })}

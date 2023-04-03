@@ -139,6 +139,8 @@ export default function OrderPage() {
   const [feedback, setFeedback] = useState('');
   const [searchInput, setSearchInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [userSession, setUserSession] = useState(null);
+  const [currentUserRole, setCurrentUserRole] = useState('');
   const handleOpenMenu = (event) => {
     setOpen(event.currentTarget);
   };
@@ -247,6 +249,31 @@ export default function OrderPage() {
     };
     fetchOrders();
   }, [rowsPerPage, page, triggerFetch]);
+
+  useEffect(() => {
+    const getSession = async () => {
+      try {
+        const { data, error } = await supabase.auth.getSession();
+        console.log('geooooooo', data.session);
+        if (data && data.session) {
+          setUserSession(data.session);
+
+          const { data: dataFetch, error: errorFetch } = await supabase
+            .from('users')
+            .select('role')
+            .eq('email', data.session.user.email);
+
+          let role = '';
+
+          if (dataFetch && dataFetch[0]) role = dataFetch[0].role;
+          setCurrentUserRole(role);
+        }
+      } catch (error) {
+        console.log('something went wrong ', error);
+      }
+    };
+    getSession();
+  }, []);
 
   const handleSearchInDb = async (e) => {
     if (e.key === 'Enter') {
@@ -535,7 +562,7 @@ export default function OrderPage() {
                             </TableCell>
                             <TableCell align="right">
                               <Stack direction="row" justifyContent="right">
-                                {status === 'initial' && (
+                                {status === 'initial' && currentUserRole === 'admin' && (
                                   <IconButton
                                     size="large"
                                     color="inherit"

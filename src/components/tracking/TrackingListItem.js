@@ -31,6 +31,7 @@ function TrackingListItem({
   handleLastChangedTracking,
   histories,
   trackingState,
+  user,
 }) {
   const [isActive, setIsActive] = useState(false);
   // const styleRow = ;
@@ -84,6 +85,16 @@ function TrackingListItem({
 
       if (error) {
         console.log('error happened', error);
+      }
+      const { error: errorTrackLog } = await supabase.from('logs').insert({
+        user: user.user_metadata.name,
+        action: 'validate',
+        entity: 'order',
+        number: phone,
+        last_status: status,
+      });
+      if (errorTrackLog) {
+        console.log('oops log: ', errorTrackLog);
       }
       handleLastChangedTracking(tracking);
       setIsActive(true);

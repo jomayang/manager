@@ -168,6 +168,17 @@ function CreateOrderForm({ handleTriggerFetch }) {
         setIsError(false);
         setFeedback('A new order added!');
       }
+      const { error: errorLeadLog } = await supabase.from('logs').insert({
+        user: user.user_metadata.name,
+        action: 'add',
+        entity: 'order',
+        number: phone,
+      });
+      if (errorLeadLog) {
+        console.log('oops log: ', errorLeadLog);
+        setFeedback('a Problem accured when adding the new LOG!');
+        setIsError(true);
+      }
       setIsLoading(false);
       setOpen(true);
 
