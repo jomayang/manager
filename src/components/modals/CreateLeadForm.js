@@ -124,7 +124,7 @@ function CreateLeadForm({ handleTriggerFetch }) {
         handleTriggerFetch(Math.random());
       }
       const { error: errorLeadLog } = await supabase.from('logs').insert({
-        user: user.user_metadata.name,
+        user_fullname: user.user_metadata.name,
         action: 'add',
         entity: 'lead',
         number: phone,

@@ -91,7 +91,7 @@ function EditOrderForm({ id, statusAttr, handleTriggerFetch }) {
         setIsError(true);
       }
       const { error: errorLeadLog } = await supabase.from('logs').insert({
-        user: user.user_metadata.name,
+        user_fullname: user.user_metadata.name,
         action: 'update',
         entity: 'order',
         number: currentOrder.phone,
