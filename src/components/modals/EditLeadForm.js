@@ -332,22 +332,20 @@ function EditLeadForm({
 
         const { error: errorOrderLog } = await supabase
           .from('logs')
-          .insert({ user: user.user_metadata.name, action: 'add', entity: 'order', number: phone });
+          .insert({ user_fullname: user.user_metadata.name, action: 'add', entity: 'order', number: phone });
         if (errorOrderLog) {
           console.log('oops log: ', errorOrderLog);
           setFeedback('a Problem accured when adding the new LOG!');
           setIsError(true);
         }
       }
-      const { error: errorLeadLog } = await supabase
-        .from('logs')
-        .insert({
-          user: user.user_metadata.name,
-          action: 'update',
-          entity: 'lead',
-          number: phone,
-          last_status: status,
-        });
+      const { error: errorLeadLog } = await supabase.from('logs').insert({
+        user_fullname: user.user_metadata.name,
+        action: 'update',
+        entity: 'lead',
+        number: phone,
+        last_status: status,
+      });
       if (errorLeadLog) {
         console.log('oops log: ', errorLeadLog);
         setFeedback('a Problem accured when adding the new LOG!');

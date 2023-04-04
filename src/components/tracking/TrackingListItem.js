@@ -87,7 +87,7 @@ function TrackingListItem({
         console.log('error happened', error);
       }
       const { error: errorTrackLog } = await supabase.from('logs').insert({
-        user: user.user_metadata.name,
+        user_fullname: user.user_metadata.name,
         action: 'validate',
         entity: 'order',
         number: phone,
@@ -120,10 +120,13 @@ function TrackingListItem({
         const attempt = histories[tracking].filter((state) => state === 'Sorti en livraison').length;
         console.log('sortie ', tracking, ' -> ', attempt);
         if (attempt === 2) {
+          console.log('tracking', tracking, ' 2 ');
           setIsActive(trackingState[tracking].isHandledOut2);
         } else if (attempt === 3) {
+          console.log('tracking', tracking, ' 3 ', trackingState[tracking].isHandledOut3);
           setIsActive(trackingState[tracking].isHandledOut3);
         } else {
+          console.log('tracking', tracking, ' 1 ');
           setIsActive(trackingState[tracking].isHandledOut);
         }
       } else if (status === 'Tentative échouée') {
