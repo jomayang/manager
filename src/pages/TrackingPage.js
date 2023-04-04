@@ -360,7 +360,7 @@ export default function TrackingPage() {
 
         await pause(1000);
         const data = {
-          extension: `?tracking=${trackingsStr}&page_size=400`,
+          extension: `?tracking=${trackingsStr}&page_size=700`,
         };
         console.log('ext: ', data);
         // if (currentUserId !== '') {
