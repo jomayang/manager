@@ -118,7 +118,7 @@ function TrackingListItem({
         setIsActive(trackingState[tracking].isHandledReceived);
       } else if (status === 'Sorti en livraison') {
         const attempt = histories[tracking].filter((state) => state === 'Sorti en livraison').length;
-
+        console.log('sortie ', tracking, ' -> ', attempt);
         if (attempt === 2) {
           setIsActive(trackingState[tracking].isHandledOut2);
         } else if (attempt === 3) {
