@@ -428,6 +428,8 @@ export default function TrackingPage() {
                   isHandledOut3: item.is_handled_out_3,
                   isHandledReceived: item.is_handled_received,
                   isHandledCenter: item.is_handled_center,
+                  isHandledCenter2: item.is_handled_center_2,
+                  isHandledCenter3: item.is_handled_center_3,
                   isHandledMissed: item.is_handled_missed,
                   isHandledMissed2: item.is_handled_missed_2,
                   isHandledMissed3: item.is_handled_missed_3,

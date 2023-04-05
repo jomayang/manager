@@ -43,13 +43,20 @@ function TrackingListItem({
       let queryObject;
       const attemptOut = histories[tracking].filter((state) => state === 'Sorti en livraison').length;
       const attemptMissed = histories[tracking].filter((state) => state === 'Tentative échouée').length;
+      const attemptCenter = histories[tracking].filter((state) => state === 'Centre').length;
       const currentDate = new Date().toLocaleString('en-US', {
         timeZone: 'Europe/Paris',
       });
 
       switch (status) {
         case 'Centre':
-          queryObject = { is_handled_center: true, last_changed: currentDate };
+          if (attemptCenter === 2) {
+            queryObject = { is_handled_center_2: true, last_changed: currentDate };
+          } else if (attemptCenter === 3) {
+            queryObject = { is_handled_center_3: true, last_changed: currentDate };
+          } else {
+            queryObject = { is_handled_center: true, last_changed: currentDate };
+          }
           break;
         case 'Reçu à Wilaya':
           queryObject = { is_handled_received: true, last_changed: currentDate };
@@ -112,7 +119,20 @@ function TrackingListItem({
       // console.log('*-*>', histories[tracking]);
       console.log('*-**-*-*-*-*-');
       if (status === 'Centre') {
-        setIsActive(trackingState[tracking].isHandledCenter);
+        const attempt = histories[tracking].filter((state) => state === 'Centre').length;
+        // console.log('center ', tracking, ' -> ', attempt);
+        if (attempt === 2) {
+          // console.log('tracking', tracking, ' 2 ');
+          setIsActive(trackingState[tracking].isHandledCenter2);
+        } else if (attempt === 3) {
+          // console.log('tracking', tracking, ' 3 ', trackingState[tracking].isHandledCenter3);
+          setIsActive(trackingState[tracking].isHandledCenter3);
+        } else {
+          // console.log('tracking', tracking, ' 1 ');
+          setIsActive(trackingState[tracking].isHandledCenter);
+        }
+
+        // setIsActive(trackingState[tracking].isHandledCenter);
       } else if (status === 'Reçu à Wilaya') {
         console.log('resuuuult', trackingState[tracking].isHandledReceived);
         setIsActive(trackingState[tracking].isHandledReceived);
