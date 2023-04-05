@@ -128,7 +128,7 @@ const StyledRoot = styled(Toolbar)(({ theme }) => ({
   padding: theme.spacing(0, 1, 0, 3),
 }));
 
-const followupStatusArray = ['Centre', 'Reçu à Wilaya', 'Sorti en livraison', 'Tentative échouée'];
+const followupStatusArray = ['Centre', 'Reçu à Wilaya', 'Sorti en livraison', 'Tentative échouée', 'Livré'];
 
 const StyledSearch = styled(OutlinedInput)(({ theme }) => ({
   width: 240,
@@ -433,6 +433,7 @@ export default function TrackingPage() {
                   isHandledMissed: item.is_handled_missed,
                   isHandledMissed2: item.is_handled_missed_2,
                   isHandledMissed3: item.is_handled_missed_3,
+                  isHandledDelivered: item.is_handled_delivered,
                 },
               }),
             {}

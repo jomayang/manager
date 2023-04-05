@@ -39,11 +39,12 @@ function TrackingListItem({
     try {
       // console.log(' ==> ', tracking);
       // console.log(' ==> ', status);
-      // console.log('==>', histories);
+      console.log('==>', histories);
       let queryObject;
       const attemptOut = histories[tracking].filter((state) => state === 'Sorti en livraison').length;
       const attemptMissed = histories[tracking].filter((state) => state === 'Tentative échouée').length;
       const attemptCenter = histories[tracking].filter((state) => state === 'Centre').length;
+      const attemptReturn = histories[tracking].filter((state) => state === 'Echèc livraison').length;
       const currentDate = new Date().toLocaleString('en-US', {
         timeZone: 'Europe/Paris',
       });
@@ -79,11 +80,26 @@ function TrackingListItem({
             queryObject = { is_handled_missed: true, last_changed: currentDate };
           }
           break;
+        case 'Livré': {
+          // console.log('attempt missed', attemptMissed);
+          // console.log('attempt return', attemptReturn);
+          const level = attemptMissed + attemptReturn;
+          const { error } = await supabase
+            .from('orders')
+            .update({ delivery_attempt: level })
+            .eq('tracking_id', tracking);
+          if (error) {
+            console.log('something went very wrong: ', error);
+          }
+          queryObject = { is_handled_delivered: true, last_changed: currentDate };
+
+          break;
+        }
         default:
           return;
         // break;
       }
-      console.log('query obj', queryObject);
+      // console.log('query obj', queryObject);
       const { data, error } = await supabase.from('followups').update(queryObject).eq('tracking', tracking);
       if (data) {
         console.log('hello');
@@ -110,14 +126,14 @@ function TrackingListItem({
     }
   };
   useEffect(() => {
-    console.log('tracking number', tracking);
+    // console.log('tracking number', tracking);
   }, []);
 
   useEffect(() => {
     if (histories && !historiesLoading && trackingState && trackingState[tracking] && histories[tracking]) {
       // console.log('*-*>', histories);
       // console.log('*-*>', histories[tracking]);
-      console.log('*-**-*-*-*-*-');
+      // console.log('*-**-*-*-*-*-');
       if (status === 'Centre') {
         const attempt = histories[tracking].filter((state) => state === 'Centre').length;
         // console.log('center ', tracking, ' -> ', attempt);
@@ -140,13 +156,13 @@ function TrackingListItem({
         const attempt = histories[tracking].filter((state) => state === 'Sorti en livraison').length;
         console.log('sortie ', tracking, ' -> ', attempt);
         if (attempt === 2) {
-          console.log('tracking', tracking, ' 2 ');
+          // console.log('tracking', tracking, ' 2 ');
           setIsActive(trackingState[tracking].isHandledOut2);
         } else if (attempt === 3) {
-          console.log('tracking', tracking, ' 3 ', trackingState[tracking].isHandledOut3);
+          // console.log('tracking', tracking, ' 3 ', trackingState[tracking].isHandledOut3);
           setIsActive(trackingState[tracking].isHandledOut3);
         } else {
-          console.log('tracking', tracking, ' 1 ');
+          // console.log('tracking', tracking, ' 1 ');
           setIsActive(trackingState[tracking].isHandledOut);
         }
       } else if (status === 'Tentative échouée') {
@@ -161,14 +177,17 @@ function TrackingListItem({
         } else {
           setIsActive(trackingState[tracking].isHandledMissed);
         }
+      } else if (status === 'Livré') {
+        // console.log('livrééé', tracking, trackingState[tracking].isHandledDelivered);
+        setIsActive(trackingState[tracking].isHandledDelivered);
       }
     }
   }, [histories, trackingState]);
   useEffect(() => {
-    console.log('is active', histories);
+    // console.log('is active', histories);
   }, [histories]);
   useEffect(() => {
-    console.log('is active tracking', trackingState);
+    // console.log('is active tracking', trackingState);
   }, [trackingState]);
   return (
     <TableRow
