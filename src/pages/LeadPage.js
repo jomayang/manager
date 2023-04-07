@@ -230,7 +230,7 @@ export default function LeadPage() {
         let count;
         let data;
         let error;
-        if (dataUser.role === 'agent') {
+        if (dataUser.role === 'agent' || dataUser.role === 'agent-associate') {
           if (filterStatus !== '') {
             const {
               count: countFilter,
@@ -262,7 +262,7 @@ export default function LeadPage() {
             data = dataAll;
             error = errorAll;
           }
-        } else if (dataUser.role !== 'agent') {
+        } else if (dataUser.role !== 'agent' && dataUser.role !== 'agent-associate') {
           if (filterStatus !== '') {
             const {
               count: countFilter,

@@ -173,7 +173,7 @@ export default function Router() {
           if (role === 'admin') {
             setRouteState(ADMIN_ROUTES);
             console.log('the role is admin');
-          } else if (role === 'agent') setRouteState(AGENT_ROUTES);
+          } else if (role === 'agent' || role === 'agent-associate') setRouteState(AGENT_ROUTES);
           else if (role === 'tracker') setRouteState(TRACKER_ROUTES);
           else setRouteState(DEFAULT_ROUTES);
         } else setRouteState(DEFAULT_ROUTES);

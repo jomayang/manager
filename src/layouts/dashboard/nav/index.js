@@ -61,7 +61,7 @@ export default function Nav({ openNav, onCloseNav }) {
               console.log('here it is');
               setUserRole('Admin');
               setNavConfig(navAdminConfig);
-            } else if (role === 'agent') {
+            } else if (role === 'agent' || role === 'agent-associate') {
               console.log('here it is not');
               setUserRole('Confirmation Agent');
               setNavConfig(navAgentConfig);

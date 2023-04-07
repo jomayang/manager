@@ -197,7 +197,7 @@ function TrackingListItem({
       role="checkbox"
       selected={selectedLead}
       style={
-        !isActive && ['Centre', 'Reçu à Wilaya', 'Sorti en livraison', 'Tentative échouée'].includes(status)
+        !isActive && ['Centre', 'Reçu à Wilaya', 'Sorti en livraison', 'Tentative échouée', 'Livré'].includes(status)
           ? { background: '#e5eef5' }
           : {}
       }

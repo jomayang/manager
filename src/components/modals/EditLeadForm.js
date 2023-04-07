@@ -339,12 +339,14 @@ function EditLeadForm({
           setIsError(true);
         }
       }
+
       const { error: errorLeadLog } = await supabase.from('logs').insert({
         user_fullname: user.user_metadata.name,
         action: 'update',
         entity: 'lead',
         number: phone,
         last_status: status,
+        attempt: status === 'not-responding' || status === 'unreachable' ? +comment : null,
       });
       if (errorLeadLog) {
         console.log('oops log: ', errorLeadLog);
