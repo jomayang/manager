@@ -254,7 +254,7 @@ function EditLeadForm({
         if (trackersCount !== 0) {
           trackerId = trackers[Math.floor(Math.random() * trackersCount)].id;
         } else {
-          trackerId = 8;
+          throw new Error('Something went wrong');
         }
         const response = await axios({
           url: `https://ecom-api-5wlr.onrender.com/create/`,
