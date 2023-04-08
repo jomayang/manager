@@ -230,6 +230,16 @@ function EditLeadForm({
       if (trackersCount !== 0) {
         trackerId = trackers[Math.floor(Math.random() * trackersCount)].id;
       } else {
+        const { error: errorOrderLog } = await supabase
+          .from('logs')
+          .insert({ user_fullname: user.user_metadata.name, action: 'failed_add', entity: 'order', number: phone });
+        if (errorOrderLog) {
+          console.log('oops log: ', errorOrderLog);
+          setFeedback('a Problem accured when adding the new LOG!');
+          setIsError(true);
+        }
+        setFeedback('a Problem accured when adding the new LOG!');
+        setIsError(true);
         throw new Error('Something went wrong');
       }
       const { data: dataUpdate, error: errorUpdate } = await supabase
