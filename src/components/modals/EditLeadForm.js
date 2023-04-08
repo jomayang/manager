@@ -226,6 +226,12 @@ function EditLeadForm({
       const currentDate = new Date().toLocaleString('en-US', {
         timeZone: 'Europe/Paris',
       });
+      let trackerId;
+      if (trackersCount !== 0) {
+        trackerId = trackers[Math.floor(Math.random() * trackersCount)].id;
+      } else {
+        throw new Error('Something went wrong');
+      }
       const { data: dataUpdate, error: errorUpdate } = await supabase
         .from('leads')
         .update({
@@ -250,12 +256,6 @@ function EditLeadForm({
       }
 
       if (status === 'confirmed') {
-        let trackerId;
-        if (trackersCount !== 0) {
-          trackerId = trackers[Math.floor(Math.random() * trackersCount)].id;
-        } else {
-          throw new Error('Something went wrong');
-        }
         const response = await axios({
           url: `https://ecom-api-5wlr.onrender.com/create/`,
           method: 'post',
