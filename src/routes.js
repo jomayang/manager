@@ -19,6 +19,7 @@ import StatPage from './pages/StatPage';
 // import TrackingPageFake from './pages/TrackingPageFake';
 import TrackingPage from './pages/TrackingPage';
 import TrackingPageOldOne from './pages/TrackingPageOldOne';
+import TrackingPageNew from './pages/TrackingPageNew';
 
 // ----------------------------------------------------------------------
 
@@ -31,8 +32,10 @@ const ADMIN_ROUTES = [
       { path: 'app', element: <DashboardAppPage /> },
       { path: 'leads', element: <LeadPage /> },
       { path: 'orders', element: <OrderPage /> },
-      { path: 'tracking', element: <TrackingPage /> },
+      { path: 'tracking', element: <TrackingPageNew /> },
+      // { path: 'tracking', element: <TrackingPage /> },
       { path: 'tracking2', element: <TrackingPageOldOne /> },
+      { path: 'tracking3', element: <TrackingPageNew /> },
       // { path: 'tracking2', element: <TrackingPageFake /> },
       // { path: 'tracking3', element: <TrackingPageX /> },
 
@@ -97,7 +100,9 @@ const TRACKER_ROUTES = [
       { element: <Navigate to="/dashboard/app" />, index: true },
       { path: 'app', element: <DashboardAppPage /> },
       { path: 'orders', element: <OrderPage /> },
-      { path: 'tracking', element: <TrackingPage /> },
+      { path: 'tracking', element: <TrackingPageNew /> },
+      // { path: 'tracking', element: <TrackingPage /> },
+      { path: 'tracking3', element: <TrackingPageNew /> },
       // { path: 'tracking3', element: <TrackingPageX /> },
       { path: 'tracking2', element: <TrackingPageOldOne /> },
     ],

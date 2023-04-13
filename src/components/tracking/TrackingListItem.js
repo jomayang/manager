@@ -39,7 +39,7 @@ function TrackingListItem({
     try {
       // console.log(' ==> ', tracking);
       // console.log(' ==> ', status);
-      console.log('==>', histories);
+      console.log('==>', histories, histories[tracking], Object.keys(histories).length, tracking);
       let queryObject;
       const attemptOut = histories[tracking].filter((state) => state === 'Sorti en livraison').length;
       const attemptMissed = histories[tracking].filter((state) => state === 'Tentative échouée').length;
