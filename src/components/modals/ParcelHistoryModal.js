@@ -58,7 +58,11 @@ function ParcelHistoryModal({ tracking, status, colors }) {
   const handleOpenModal = async () => {
     handleOpen();
     try {
-      const { data, error } = await supabase.from('histories').select().eq('tracking', tracking);
+      const { data, error } = await supabase
+        .from('histories')
+        .select()
+        .eq('tracking', tracking)
+        .order('created_at', { ascending: false });
       if (data) {
         setHistory(data);
       }
