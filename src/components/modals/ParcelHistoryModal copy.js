@@ -14,6 +14,7 @@ import React, { useEffect, useState } from 'react';
 import Iconify from '../iconify/Iconify';
 import Label from '../label/Label';
 import CreateLeadForm from './CreateLeadForm';
+import supabase from '../../config/SupabaseClient';
 
 const style = {
   position: 'absolute',
@@ -57,17 +58,17 @@ function ParcelHistoryModal({ tracking, status, colors }) {
   const handleOpenModal = async () => {
     handleOpen();
     try {
-      const data = {
-        extension: `?tracking=${tracking}`,
-      };
-
-      const response = await axios({
-        url: `https://ecom-api-5wlr.onrender.com/histories`,
-        method: 'post',
-        headers: { 'Content-Type': 'application/json' },
-        data,
-      });
-      setHistory(response.data.data.data);
+      const { data, error } = await supabase
+        .from('histories')
+        .select()
+        .eq('tracking', tracking)
+        .order('created_at', { ascending: false });
+      if (data) {
+        setHistory(data);
+      }
+      if (error) {
+        console.log(error);
+      }
     } catch (error) {
       console.log(error);
     }
@@ -108,7 +109,7 @@ function ParcelHistoryModal({ tracking, status, colors }) {
                   </p>
                 )}
               </p>
-              <p style={{ margin: 0, fontSize: 16, textAlign: 'center' }}>{history[0].date_status}</p>
+              <p style={{ margin: 0, fontSize: 16, textAlign: 'center' }}>{history[0].created_at}</p>
 
               <hr style={{ border: '1px solid #eee', marginTop: 10, marginBottom: 20 }} />
               <Typography id="modal-modal-title" variant="h6" component="h6" style={{ textAlign: 'center' }}>
@@ -132,7 +133,7 @@ function ParcelHistoryModal({ tracking, status, colors }) {
                           marginBottom: 0,
                         }}
                       >
-                        {hist.date_status.split(' ')[0]}
+                        {hist.created_at.split(' ')[0]}
                       </p>
                       <p
                         style={{
@@ -140,7 +141,7 @@ function ParcelHistoryModal({ tracking, status, colors }) {
                           marginTop: 0,
                         }}
                       >
-                        {hist.date_status.split(' ')[1]}
+                        {hist.created_at.split(' ')[1]}
                       </p>
                     </TimelineOppositeContent>
                     <TimelineSeparator>
