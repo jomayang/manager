@@ -297,8 +297,78 @@ export default function TrackingPageNew() {
   useEffect(() => {
     const fetchParcels = async () => {
       let object;
+
       try {
         setLoading(true);
+        let count;
+        let data;
+        let error;
+        if (currentUserRole === 'tracker') {
+          if (filterStatus !== '') {
+            const {
+              count: countFilter,
+              data: dataFilter,
+              error: errorFilter,
+            } = await supabase
+              .from('parcels')
+              .select('*', { count: 'exact' })
+              .eq('last_status', filterStatus)
+              .eq('tracker_id', currentUserId)
+              .order('date_last_status', { ascending: false })
+              .range(page * rowsPerPage, page * rowsPerPage + rowsPerPage - 1);
+            count = countFilter;
+            data = dataFilter;
+            error = errorFilter;
+          } else {
+            const {
+              count: countAll,
+              data: dataAll,
+              error: errorAll,
+            } = await supabase
+              .from('parcels')
+              .select('*', { count: 'exact' })
+              .eq('tracker_id', currentUserId)
+              .order('date_last_status', { ascending: false })
+              .range(page * rowsPerPage, page * rowsPerPage + rowsPerPage - 1);
+
+            count = countAll;
+            data = dataAll;
+            error = errorAll;
+          }
+        } else if (currentUserRole !== 'tracker') {
+          if (filterStatus !== '') {
+            const {
+              count: countFilter,
+              data: dataFilter,
+              error: errorFilter,
+            } = await supabase
+              .from('parcels')
+              .select('*', { count: 'exact' })
+              .eq('last_status', filterStatus)
+              .order('date_last_status', { ascending: false })
+              .range(page * rowsPerPage, page * rowsPerPage + rowsPerPage - 1);
+            count = countFilter;
+            data = dataFilter;
+            error = errorFilter;
+          } else {
+            const {
+              count: countAll,
+              data: dataAll,
+              error: errorAll,
+            } = await supabase
+              .from('parcels')
+              .select('*', { count: 'exact' })
+              .order('date_last_status', { ascending: false })
+              .range(page * rowsPerPage, page * rowsPerPage + rowsPerPage - 1);
+
+            count = countAll;
+            data = dataAll;
+            error = errorAll;
+          }
+        }
+        // -------------
+        setRowsCount(count);
+        setLeads(data);
       } catch (error) {
         setLoading(false);
         console.log(error);
@@ -307,76 +377,6 @@ export default function TrackingPageNew() {
       }
 
       // ------------------
-
-      let count;
-      let data;
-      let error;
-      if (currentUserRole === 'tracker') {
-        if (filterStatus !== '') {
-          const {
-            count: countFilter,
-            data: dataFilter,
-            error: errorFilter,
-          } = await supabase
-            .from('parcels')
-            .select('*', { count: 'exact' })
-            .eq('last_status', filterStatus)
-            .eq('tracker_id', currentUserId)
-            .order('date_last_status', { ascending: false })
-            .range(page * rowsPerPage, page * rowsPerPage + rowsPerPage - 1);
-          count = countFilter;
-          data = dataFilter;
-          error = errorFilter;
-        } else {
-          const {
-            count: countAll,
-            data: dataAll,
-            error: errorAll,
-          } = await supabase
-            .from('parcels')
-            .select('*', { count: 'exact' })
-            .eq('tracker_id', currentUserId)
-            .order('date_last_status', { ascending: false })
-            .range(page * rowsPerPage, page * rowsPerPage + rowsPerPage - 1);
-
-          count = countAll;
-          data = dataAll;
-          error = errorAll;
-        }
-      } else if (currentUserRole !== 'tracker') {
-        if (filterStatus !== '') {
-          const {
-            count: countFilter,
-            data: dataFilter,
-            error: errorFilter,
-          } = await supabase
-            .from('parcels')
-            .select('*', { count: 'exact' })
-            .eq('last_status', filterStatus)
-            .order('date_last_status', { ascending: false })
-            .range(page * rowsPerPage, page * rowsPerPage + rowsPerPage - 1);
-          count = countFilter;
-          data = dataFilter;
-          error = errorFilter;
-        } else {
-          const {
-            count: countAll,
-            data: dataAll,
-            error: errorAll,
-          } = await supabase
-            .from('parcels')
-            .select('*', { count: 'exact' })
-            .order('date_last_status', { ascending: false })
-            .range(page * rowsPerPage, page * rowsPerPage + rowsPerPage - 1);
-
-          count = countAll;
-          data = dataAll;
-          error = errorAll;
-        }
-      }
-      // -------------
-      setRowsCount(count);
-      setLeads(data);
     };
     fetchParcels();
   }, [page, rowsPerPage, filterStatus, currentUserId, currentUserRole]);
