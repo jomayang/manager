@@ -198,10 +198,10 @@ function EditLeadForm({
             reduction = 150;
           } else if (zone2.includes(wilaya)) {
             homeDeliverFee = fees[wilaya].homeFee + 100;
-            reduction = 250;
+            reduction = 350;
           } else if (zone3.includes(wilaya)) {
             homeDeliverFee = fees[wilaya].homeFee + 100;
-            reduction = 300;
+            reduction = 350;
           } else if (zone4.includes(wilaya)) {
             homeDeliverFee = fees[wilaya].homeFee + 100;
             reduction = 300;
