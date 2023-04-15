@@ -376,10 +376,12 @@ function EditLeadForm({
   };
 
   useEffect(() => {
-    if (productPrice !== 0 && shippingPrice !== 0) {
+    if ((productPrice === 0 || shippingPrice === 0) && status === 'confirmed') {
+      setIsDisabled(true);
+    } else {
       setIsDisabled(false);
     }
-  }, [productPrice, shippingPrice]);
+  }, [productPrice, shippingPrice, status]);
 
   return (
     <form onSubmit={updateStatus}>
