@@ -105,14 +105,16 @@ function applySortFilter(array, comparator, query) {
 }
 
 const StyledRoot = styled(Toolbar)(({ theme }) => ({
-  height: 96,
   display: 'flex',
   justifyContent: 'space-between',
   padding: theme.spacing(0, 1, 0, 3),
+  paddingTop: 18,
+  paddingBottom: 18,
 }));
 
 const StyledSearch = styled(OutlinedInput)(({ theme }) => ({
   width: 240,
+  marginTop: 10,
   transition: theme.transitions.create(['box-shadow', 'width'], {
     easing: theme.transitions.easing.easeInOut,
     duration: theme.transitions.duration.shorter,
@@ -147,6 +149,7 @@ export default function LeadPage() {
   const [rowsCount, setRowsCount] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [filterStatus, setFilterStatus] = useState('');
+  const [filterProduct, setFilterProduct] = useState('');
   const [userSession, setUserSession] = useState(null);
   const [currentUserRole, setCurrentUserRole] = useState('');
   useEffect(() => {
@@ -226,73 +229,33 @@ export default function LeadPage() {
         if (errorUser) {
           console.log('error user: ', errorUser);
         }
-
-        let count;
-        let data;
-        let error;
-        if (dataUser.role === 'agent' || dataUser.role === 'agent-associate') {
-          if (filterStatus !== '') {
-            const {
-              count: countFilter,
-              data: dataFilter,
-              error: errorFilter,
-            } = await supabase
-              .from('leads')
-              .select('*', { count: 'exact' })
-              .eq('status', filterStatus)
-              .eq('agent_id', dataUser.id)
-              .order('created_at', { ascending: false })
-              .range(page * rowsPerPage, page * rowsPerPage + rowsPerPage - 1);
-            count = countFilter;
-            data = dataFilter;
-            error = errorFilter;
-          } else {
-            const {
-              count: countAll,
-              data: dataAll,
-              error: errorAll,
-            } = await supabase
-              .from('leads')
-              .select('*', { count: 'exact' })
-              .eq('agent_id', dataUser.id)
-              .order('created_at', { ascending: false })
-              .range(page * rowsPerPage, page * rowsPerPage + rowsPerPage - 1);
-
-            count = countAll;
-            data = dataAll;
-            error = errorAll;
-          }
-        } else if (dataUser.role !== 'agent' && dataUser.role !== 'agent-associate') {
-          if (filterStatus !== '') {
-            const {
-              count: countFilter,
-              data: dataFilter,
-              error: errorFilter,
-            } = await supabase
-              .from('leads')
-              .select('*', { count: 'exact' })
-              .eq('status', filterStatus)
-              .order('created_at', { ascending: false })
-              .range(page * rowsPerPage, page * rowsPerPage + rowsPerPage - 1);
-            count = countFilter;
-            data = dataFilter;
-            error = errorFilter;
-          } else {
-            const {
-              count: countAll,
-              data: dataAll,
-              error: errorAll,
-            } = await supabase
-              .from('leads')
-              .select('*', { count: 'exact' })
-              .order('created_at', { ascending: false })
-              .range(page * rowsPerPage, page * rowsPerPage + rowsPerPage - 1);
-
-            count = countAll;
-            data = dataAll;
-            error = errorAll;
-          }
+        let product;
+        if (filterProduct === 'oil') {
+          product = ['زيت اللحية'];
+        } else if (filterProduct === 'shoes') {
+          product = ['chaussure_1', 'chaussure_2'];
         }
+        let query = supabase
+          .from('leads')
+          .select('*', { count: 'exact' })
+          // .in('product', product)
+          // .eq('agent_id', dataUser.id)
+          .order('created_at', { ascending: false })
+          .range(page * rowsPerPage, page * rowsPerPage + rowsPerPage - 1);
+        if (filterStatus !== '' && filterProduct !== '') {
+          query = query.eq('status', filterStatus).in('product', product);
+        } else if (filterStatus !== '' && filterProduct === '') {
+          console.log('filter is ', filterStatus);
+          query = query.eq('status', filterStatus);
+        } else if (filterProduct !== '' && filterStatus === '') {
+          query = query.in('product', product);
+        }
+
+        if (dataUser.role === 'agent' || dataUser.role === 'agent-associate') {
+          query = query.eq('agent_id', dataUser.id);
+        }
+        console.log('query  =', query);
+        const { count, data, error } = await query;
 
         // if (dataAuth) {
 
@@ -333,7 +296,7 @@ export default function LeadPage() {
       }
     };
     fetchLeads();
-  }, [rowsPerPage, page, triggerFetch, filterStatus]);
+  }, [rowsPerPage, page, triggerFetch, filterStatus, filterProduct]);
   useEffect(() => {
     const getSession = async () => {
       try {
@@ -567,7 +530,7 @@ export default function LeadPage() {
                     </InputAdornment>
                   }
                 />
-                <FormControl fullWidth style={{ width: 200, marginLeft: 10 }}>
+                <FormControl fullWidth style={{ width: 240, marginLeft: 10, marginTop: 10 }}>
                   <InputLabel>Filter Status</InputLabel>
                   <Select
                     value={filterStatus}
@@ -586,6 +549,21 @@ export default function LeadPage() {
                     <MenuItem value={'busy'}>Busy</MenuItem>
                     <MenuItem value={'reported'}>Reported</MenuItem>
                     <MenuItem value={'other'}>other</MenuItem>
+                  </Select>
+                </FormControl>
+                <FormControl fullWidth style={{ width: 240, marginLeft: 10, marginTop: 10, marginBottom: 10 }}>
+                  <InputLabel>Filter Product</InputLabel>
+                  <Select
+                    value={filterProduct}
+                    label="filter-product"
+                    onChange={(e) => {
+                      setFilterProduct(e.target.value);
+                      setPage(0);
+                    }}
+                  >
+                    <MenuItem value={''}>All</MenuItem>
+                    <MenuItem value={'oil'}>Oil</MenuItem>
+                    <MenuItem value={'shoes'}>Shoes</MenuItem>
                   </Select>
                 </FormControl>
               </div>

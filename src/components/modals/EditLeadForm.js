@@ -67,6 +67,7 @@ function EditLeadForm({
   const [currentAgentId, setCurrentAgentId] = useState();
   const [updateLoading, setUpdateLoading] = useState(false);
   const [estimatedTime, setEstimatedTime] = useState(null);
+  const [isDisabled, setIsDisabled] = useState(true);
   const { user } = useContext(UserContext);
   const handleClose = (event, reason) => {
     if (reason === 'clickaway') {
@@ -374,6 +375,12 @@ function EditLeadForm({
     }
   };
 
+  useEffect(() => {
+    if (productPrice !== 0 && shippingPrice !== 0) {
+      setIsDisabled(false);
+    }
+  }, [productPrice, shippingPrice]);
+
   return (
     <form onSubmit={updateStatus}>
       <Stack spacing={3} style={{ marginTop: 30, maxHeight: '70vh', overflowY: 'scroll', padding: '1rem' }}>
@@ -548,7 +555,14 @@ function EditLeadForm({
           )}
         </Stack>
         <Stack>
-          <LoadingButton loading={updateLoading} type="submit" fullWidth size="large" variant="contained">
+          <LoadingButton
+            loading={updateLoading}
+            disabled={isDisabled}
+            type="submit"
+            fullWidth
+            size="large"
+            variant="contained"
+          >
             Update
           </LoadingButton>
         </Stack>
