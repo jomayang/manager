@@ -281,6 +281,8 @@ export default function LeadPage() {
             status: lead.status,
             wilaya: lead.wilaya,
             createdAt: lead.created_at,
+            color: lead.color,
+            size: lead.size,
           }));
           setRowsCount(count);
           setLeads(fetchedLeads);
@@ -436,6 +438,8 @@ export default function LeadPage() {
             status: lead.status,
             wilaya: lead.wilaya,
             createdAt: lead.created_at,
+            color: lead.color,
+            size: lead.size,
           }));
 
           setRowsCount(count);
@@ -704,6 +708,8 @@ export default function LeadPage() {
                           product,
                           firstName,
                           lastName,
+                          color,
+                          size,
                           createdAt,
                         } = row;
                         const selectedLead = selected.indexOf(id) !== -1;
@@ -771,6 +777,8 @@ export default function LeadPage() {
                                   statusAttr={status}
                                   phoneAttr={phone}
                                   createdAtAttr={createdAt}
+                                  colorAttr={color}
+                                  sizeAttr={size}
                                 />
                               </Stack>
                             </TableCell>

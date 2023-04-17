@@ -59,6 +59,8 @@ function LeadDetailsModal({
   lastNameAttr,
   commentAttr,
   statusAttr,
+  sizeAttr,
+  colorAttr,
   phoneAttr,
   createdAtAttr,
 }) {
@@ -109,7 +111,7 @@ function LeadDetailsModal({
           <hr style={{ border: '1px solid #eee', marginTop: 10, marginBottom: 20 }} />
 
           <Typography id="modal-modal-title" variant="p" component="p">
-            <b>Product:</b> {productAttr}
+            <b>Product:</b> {productAttr} {colorAttr && colorAttr} {sizeAttr && sizeAttr}
           </Typography>
 
           <Typography id="modal-modal-title" variant="p" component="p">
