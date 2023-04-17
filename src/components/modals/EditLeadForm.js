@@ -42,6 +42,8 @@ function EditLeadForm({
   statusAttr,
   phoneAttr,
   handleTriggerFetch,
+  colorAttr,
+  sizeAttr,
 }) {
   const [open, setOpen] = useState(false);
   const [isStopDesk, setIsStopDesk] = useState(false);
@@ -61,6 +63,8 @@ function EditLeadForm({
   const [lastName, setLastName] = useState(lastNameAttr);
   const [phone, setPhone] = useState(phoneAttr);
   const [product, setProduct] = useState(productAttr);
+  const [color, setColor] = useState(colorAttr);
+  const [size, setSize] = useState(sizeAttr);
   const [deliveryFee, setDeliveryFee] = useState(null);
   const [trackers, setTrackers] = useState([]);
   const [trackersCount, setTrackersCount] = useState(0);
@@ -267,6 +271,8 @@ function EditLeadForm({
       }
 
       if (status === 'confirmed') {
+        const productList = `${product}_${color}_${size}`;
+        console.log('product ->', productList);
         const response = await axios({
           url: `https://ecom-api-5wlr.onrender.com/create/`,
           method: 'post',
@@ -278,7 +284,7 @@ function EditLeadForm({
             phone,
             wilaya,
             commune,
-            product,
+            product: productList,
             isStopDesk,
             isFreeShipping: true,
             stopdesk: agency,
@@ -314,6 +320,8 @@ function EditLeadForm({
             wilaya,
             commune,
             product,
+            product_color: color,
+            product_size: size,
             is_stopdesk: isStopDesk,
             is_free_shipping: true,
             stopdesk: agency,
@@ -441,6 +449,24 @@ function EditLeadForm({
                     label="Product"
                     value={product}
                     onChange={(e) => setProduct(e.target.value)}
+                  />
+                </FormControl>
+              </Stack>
+              <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+                <FormControl fullWidth>
+                  <TextField
+                    name="product_color"
+                    label="Product Color"
+                    value={color}
+                    onChange={(e) => setColor(e.target.value)}
+                  />
+                </FormControl>
+                <FormControl fullWidth>
+                  <TextField
+                    name="product_size"
+                    label="Product Size"
+                    value={size}
+                    onChange={(e) => setSize(e.target.value)}
                   />
                 </FormControl>
               </Stack>

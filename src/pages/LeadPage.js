@@ -753,6 +753,8 @@ export default function LeadPage() {
                                 commentAttr={comment}
                                 statusAttr={status}
                                 phoneAttr={phone}
+                                colorAttr={color}
+                                sizeAttr={size}
                                 createdAtAttr={createdAt}
                                 handleTriggerFetch={(val) => setTriggerFetch(val)}
                               />

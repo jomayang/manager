@@ -29,6 +29,8 @@ function EditLeadStatus({
   statusAttr,
   phoneAttr,
   createdAtAttr,
+  colorAttr,
+  sizeAttr,
   handleTriggerFetch,
 }) {
   const [open, setOpen] = useState(false);
@@ -64,6 +66,8 @@ function EditLeadStatus({
             lastNameAttr={lastNameAttr}
             commentAttr={commentAttr}
             statusAttr={statusAttr}
+            colorAttr={colorAttr}
+            sizeAttr={sizeAttr}
             phoneAttr={phoneAttr}
             handleTriggerFetch={handleTriggerFetch}
           />
