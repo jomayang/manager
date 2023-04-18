@@ -91,6 +91,9 @@ export default function StatPage() {
             key: users[item.key],
             value: +((dataDelivered[i].value / item.value) * 100).toFixed(2),
           }));
+          console.log('delivery', dataOrders);
+          console.log('delivery', dataDelivered);
+          console.log(deliveryRate);
           console.log(deliveryRate);
           const drKey = deliveryRate.map((dr) => dr.key);
           const drVal = deliveryRate.map((dr) => dr.value);
@@ -117,6 +120,8 @@ export default function StatPage() {
             key: users[item.key],
             value: +((dataConfirmed[i].value / item.value) * 100).toFixed(2),
           }));
+          console.log('confirmation', dataOrders);
+          console.log('confirmation', dataConfirmed);
 
           setConfirmationRatesByX(confirmationRate);
         }

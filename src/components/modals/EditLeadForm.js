@@ -271,7 +271,17 @@ function EditLeadForm({
       }
 
       if (status === 'confirmed') {
-        const productList = `${product}_${color}_${size}`;
+        let productList;
+        if (color && size) {
+          productList = `${product}_${color}_${size}`;
+        } else if (color && !size) {
+          productList = `${product}_${color}`;
+        } else if (!color && !size) {
+          productList = `${product}_${size}`;
+        } else {
+          productList = product;
+        }
+        // const productList = `${product}_${color}_${size}`;
         console.log('product ->', productList);
         const response = await axios({
           url: `https://ecom-api-5wlr.onrender.com/create/`,
