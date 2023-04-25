@@ -348,10 +348,26 @@ export default function StatPage() {
         const countOrders = dataOrders.map((item) => item.value);
         setDeliveryRatesCountByX(countOrders);
         if (deliveryRatesBy === 'agent' || deliveryRatesBy === 'tracker') {
-          deliveryRate = dataOrders.map((item, i) => ({
-            key: users[item.key],
-            value: +((dataDelivered[i].value / item.value) * 100).toFixed(2),
-          }));
+          console.log('agent', dataOrders, dataDelivered);
+          // deliveryRate = dataOrders.map((item, i) => ({
+          //   key: users[item.key],
+          //   value: +((dataDelivered[i].value / item.value) * 100).toFixed(2),
+          // }));
+
+          deliveryRate = dataOrders.map((item, i) => {
+            const correspondingDeliveredItem = dataDelivered.filter((itemD) => itemD.key === item.key);
+            // console.log('the corresponding item is ', correspondingDeliveredItem);
+            if (correspondingDeliveredItem.length === 0) {
+              return {
+                key: users[item.key],
+                value: 0,
+              };
+            }
+            return {
+              key: users[item.key],
+              value: +((correspondingDeliveredItem[0].value / item.value) * 100).toFixed(2),
+            };
+          });
         } else {
           console.log('or:', dataOrders);
           console.log('dr:', dataDelivered);
@@ -423,14 +439,16 @@ export default function StatPage() {
           date2: formatedToDate,
         });
         if (dataD && dataO) {
+          console.log('result x1');
           dataOrders = dataO;
           dataConfirmed = dataD;
           console.log(dataO);
         }
-      } else if ((confirmationRatesBy === 'agent' && !confirmationRateFromDate) || !confirmationRateToDate) {
+      } else if (confirmationRatesBy === 'agent' && !(confirmationRateFromDate && confirmationRateToDate)) {
         const { data: dataO, error: errorO } = await supabase.rpc('get_leads_by_agent');
         const { data: dataD, error: errorD } = await supabase.rpc('get_confirmed_count_by_agent');
         if (dataD && dataO) {
+          console.log('result x2');
           dataOrders = dataO;
           dataConfirmed = dataD;
         }
@@ -444,18 +462,20 @@ export default function StatPage() {
           date2: formatedToDate,
         });
         if (dataD && dataO) {
+          console.log('result 1 ===> ', dataD, dataO);
           dataOrders = dataO;
           dataConfirmed = dataD;
         }
-      } else if ((confirmationRatesBy === 'product' && !confirmationRateFromDate) || !confirmationRateToDate) {
+      } else if (confirmationRatesBy === 'product' && !(confirmationRateFromDate && confirmationRateToDate)) {
         const { data: dataO, error: errorO } = await supabase.rpc('get_leads_by_product');
         const { data: dataD, error: errorD } = await supabase.rpc('get_confirmed_count_by_product');
         if (dataD && dataO) {
+          console.log('result 2 ===> ', dataD, dataO);
           dataOrders = dataO;
           dataConfirmed = dataD;
         }
       }
-      console.log('data order', dataOrders);
+      console.log('data order ->', dataOrders, dataConfirmed, confirmationRatesBy);
       if (dataOrders && dataConfirmed) {
         let confirmationRate;
         if (confirmationRatesBy === 'agent') {

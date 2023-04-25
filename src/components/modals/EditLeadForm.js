@@ -276,7 +276,7 @@ function EditLeadForm({
           productList = `${product}_${color}_${size}`;
         } else if (color && !size) {
           productList = `${product}_${color}`;
-        } else if (!color && !size) {
+        } else if (!color && size) {
           productList = `${product}_${size}`;
         } else {
           productList = product;
