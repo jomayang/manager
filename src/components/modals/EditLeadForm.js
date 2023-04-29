@@ -72,6 +72,7 @@ function EditLeadForm({
   const [updateLoading, setUpdateLoading] = useState(false);
   const [estimatedTime, setEstimatedTime] = useState(null);
   const [isDisabled, setIsDisabled] = useState(true);
+  const [productQty, setProductQty] = useState(null);
   const { user } = useContext(UserContext);
   const handleClose = (event, reason) => {
     if (reason === 'clickaway') {
@@ -223,7 +224,7 @@ function EditLeadForm({
       }
     }
   }, [wilaya, isStopDesk, commune]);
-
+  useEffect(() => console.log('product qty ==> ', productQty), [productQty]);
   const updateStatus = async (e) => {
     e.preventDefault();
     try {
@@ -343,7 +344,15 @@ function EditLeadForm({
             agent_id: currentAgentId,
           })
           .select();
+        const { data: dataProduct, errorProduct } = await supabase.rpc('decrement_qty', { name: product, color, size });
 
+        if (dataProduct) {
+          console.log('data product', dataProduct);
+        }
+
+        if (errorProduct) {
+          console.log('error product', errorProduct);
+        }
         if (dataInsert) {
           console.log('inserted: ', dataInsert);
         }
@@ -400,6 +409,30 @@ function EditLeadForm({
       setIsDisabled(false);
     }
   }, [productPrice, shippingPrice, status]);
+
+  useEffect(() => {
+    const getQty = async () => {
+      if (product) {
+        const { data, error } = await supabase
+          .from('products')
+          .select('quantity')
+          .eq('name', product)
+          .eq('size', size)
+          .eq('color', color)
+          .single();
+
+        if (data) {
+          setProductQty(data.quantity);
+        }
+
+        if (error) {
+          setProductQty(null);
+          // console.log('something went wrong', error);
+        }
+      }
+    };
+    getQty();
+  }, [product, size, color]);
 
   return (
     <form onSubmit={updateStatus}>
@@ -571,6 +604,13 @@ function EditLeadForm({
                 </FormControl>
               </Stack>
               <Stack>
+                <Typography variant="p" component="p" style={{ fontSize: '13px', marginBottom: 8, color: '#666' }}>
+                  {productQty && (
+                    <span>
+                      Stock remaining: <b>{productQty}</b>
+                    </span>
+                  )}
+                </Typography>
                 <Typography variant="p" component="p" style={{ fontSize: '13px', marginBottom: 8, color: '#666' }}>
                   {deliveryFee && (
                     <span>
