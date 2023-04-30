@@ -1,5 +1,6 @@
 import {
   Button,
+  ButtonGroup,
   FormControl,
   FormControlLabel,
   FormGroup,
@@ -73,6 +74,8 @@ function EditLeadForm({
   const [estimatedTime, setEstimatedTime] = useState(null);
   const [isDisabled, setIsDisabled] = useState(true);
   const [productQty, setProductQty] = useState(null);
+  const [qty, setQty] = useState(1);
+
   const { user } = useContext(UserContext);
   const handleClose = (event, reason) => {
     if (reason === 'clickaway') {
@@ -333,6 +336,7 @@ function EditLeadForm({
             product,
             product_color: color,
             product_size: size,
+            product_qty: qty,
             is_stopdesk: isStopDesk,
             is_free_shipping: true,
             stopdesk: agency,
@@ -344,7 +348,13 @@ function EditLeadForm({
             agent_id: currentAgentId,
           })
           .select();
-        const { data: dataProduct, errorProduct } = await supabase.rpc('decrement_qty', { name: product, color, size });
+        console.log('name ->', product, 'color -> ', color, ' size -> ', size, ' qty -> ', qty);
+        const { data: dataProduct, errorProduct } = await supabase.rpc('decrement_stock', {
+          qty_in: qty,
+          name_in: product,
+          color_in: color,
+          size_in: size,
+        });
 
         if (dataProduct) {
           console.log('data product', dataProduct);
@@ -493,6 +503,31 @@ function EditLeadForm({
                     value={product}
                     onChange={(e) => setProduct(e.target.value)}
                   />
+                </FormControl>
+                <FormControl fullWidth>
+                  <ButtonGroup variant="outlined" aria-label="outlined button group">
+                    <Button
+                      size="large"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        if (qty > 0) setQty(qty - 1);
+                      }}
+                    >
+                      -
+                    </Button>
+                    <Button size="large" disabled>
+                      {qty}
+                    </Button>
+                    <Button
+                      size="large"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        if (qty > 0) setQty(qty + 1);
+                      }}
+                    >
+                      +
+                    </Button>
+                  </ButtonGroup>
                 </FormControl>
               </Stack>
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
