@@ -533,8 +533,8 @@ function EditLeadForm({
 
   const handleInventoryCheck = async (index) => {
     const { product } = productList[index];
-    const { color } = productList[index];
-    const { size } = productList[index];
+    const color = productList[index].color || '';
+    const size = productList[index].size || '';
 
     console.log('product', product, color, size);
     const { data: dataItem, error: errorItem } = await supabase
