@@ -82,6 +82,7 @@ function EditLeadForm({
   const [productQty, setProductQty] = useState(null);
   const [remaining, setRemaining] = useState(null);
   const [selectedItem, setSelectedItem] = useState(null);
+  const [accurateDeliveryFee, setAccurateDeliveryFee] = useState(null);
   const [qty, setQty] = useState(1);
 
   const [productList, setProductList] = useState([
@@ -204,6 +205,7 @@ function EditLeadForm({
         if (isStopDesk) {
           console.log('fee: ', fees[wilaya].deskFee);
           setDeliveryFee(fees[wilaya].deskFee);
+          setAccurateDeliveryFee(fees[wilaya].deskFee);
         } else {
           console.log('fee: ', fees[wilaya].homeFee);
           // const communeFee = associatedCommune[0].fee;
@@ -233,6 +235,12 @@ function EditLeadForm({
             reduction = 100;
           }
           setDeliveryFee(homeDeliverFee - reduction);
+          const homeDeliveryFee = fees[wilaya].homeFee;
+          console.log('bzz', communesList[wilaya]);
+          const communeData = communesList[wilaya].filter((com) => com.value === commune);
+          const communeExtraFee = communeData[0].fee;
+          if (homeDeliveryFee && communeExtraFee) setAccurateDeliveryFee(homeDeliveryFee + communeExtraFee);
+          console.log('home delivery fee ', homeDeliveryFee, communeData, communeExtraFee);
         }
         // }
         // }
@@ -368,7 +376,7 @@ function EditLeadForm({
             product_price: productPrice,
             shipping_price: shippingPrice,
             tracking_id: response.data[`order_${trackerId}`].tracking,
-            delivery_fees: deliveryFee,
+            delivery_fees: accurateDeliveryFee,
             tracker_id: trackerId,
             agent_id: currentAgentId,
           })
@@ -532,9 +540,7 @@ function EditLeadForm({
   };
 
   const handleInventoryCheck = async (index) => {
-    const { product } = productList[index];
-    const { color } = productList[index];
-    const { size } = productList[index];
+    const { product, color, size } = productList[index];
 
     console.log('product', product, color, size);
     const { data: dataItem, error: errorItem } = await supabase

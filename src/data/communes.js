@@ -392,7 +392,7 @@ export const communesList = {
     { fee: 300, isDeliverable: true, value: 'Bedjene', label: 'Bedjene - بجن' },
     { fee: 0, isDeliverable: true, value: 'Bekkaria', label: 'Bekkaria - بكارية' },
     { fee: 100, isDeliverable: true, value: 'Bir Dheb', label: 'Bir Dheheb - بئر الذهب' },
-    { fee: 0, isDeliverable: true, value: 'Bir el Ater', label: 'Bir El Ater - بئر العاتر' },
+    { fee: 0, isDeliverable: false, value: 'Bir el Ater', label: 'Bir El Ater - بئر العاتر' },
     { fee: 100, isDeliverable: true, value: 'Bir Mokkadem', label: 'Bir Mokkadem - بئر المقدم' },
     { fee: 200, isDeliverable: true, value: 'Boukhadra', label: 'Boukhadra - بوخضرة' },
     { fee: 0, isDeliverable: true, value: 'Boulhaf Dir', label: 'Boulhaf Dyr - بولحاف الدين' },
