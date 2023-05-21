@@ -237,10 +237,15 @@ function EditLeadForm({
           setDeliveryFee(homeDeliverFee - reduction);
           const homeDeliveryFee = fees[wilaya].homeFee;
           console.log('bzz', communesList[wilaya]);
-          const communeData = communesList[wilaya].filter((com) => com.value === commune);
-          const communeExtraFee = communeData[0].fee;
-          if (homeDeliveryFee && communeExtraFee) setAccurateDeliveryFee(homeDeliveryFee + communeExtraFee);
-          console.log('home delivery fee ', homeDeliveryFee, communeData, communeExtraFee);
+
+          if (homeDeliveryFee && commune) {
+            const communeData = communesList[wilaya].filter((com) => com.value === commune);
+            console.log('dd', communeData[0]); //
+            const communeExtraFee = communeData[0] ? communeData[0].fee : 0;
+            console.log('dd', communeExtraFee); //
+            setAccurateDeliveryFee(homeDeliveryFee + communeExtraFee);
+            // console.log('home delivery fee ', homeDeliveryFee, communeData, communeExtraFee);
+          }
         }
         // }
         // }
@@ -465,10 +470,10 @@ function EditLeadForm({
           setFeedback('a Problem accured when adding the new LOG!');
           setIsError(true);
         }
-        setUpdateLoading(false);
-        setOpen(true);
-        handleTriggerFetch(Math.random());
       }
+      setUpdateLoading(false);
+      setOpen(true);
+      handleTriggerFetch(Math.random());
     } catch (error) {
       console.log('something went wrong: ', error);
       setFeedback('a Problem accured!');
