@@ -77,6 +77,7 @@ export const communesStopdesk = {
     { value: 'Tizi Ouzou', label: 'Tizi ouzou - تيزي وزو' },
     { value: 'Tizi Gheniff', label: 'Tizi Ghenif - تيزي غنيف' },
     { value: 'Azazga', label: 'Azazga - عزازقة' },
+    { value: 'Draâ Ben Khedda', label: 'Draa Ben Khedda - ذراع بن خدة' },
   ],
   'El Tarf': [
     { value: 'El Tarf', label: 'El Tarf - الطارف' },
@@ -118,6 +119,7 @@ export const communesStopdesk = {
     { value: 'Ghardaïa', label: 'Ghardaia - غرداية' },
     { value: 'El Menia', label: 'El Meniaa - المنيعة' },
     { value: 'Metlili', label: 'Metlili - منليلي' },
+    { value: 'El Guerrara', label: 'El Guerrara - القرارة' },
   ],
   Alger: [
     { value: 'Alger Centre', label: 'Alger Centre - الجزائر' },
@@ -128,6 +130,8 @@ export const communesStopdesk = {
     { value: 'Zeralda', label: 'Zeralda - زرالدة' },
     { value: 'Cheraga', label: 'Cheraga - الشراقة' },
     { value: 'Draria', label: 'Draria - الدرارية' },
+    { value: 'Birtouta', label: 'Bir Touta - بئر توتة' },
+    { value: 'Hussein Dey', label: 'Hussein Dey - حسين داي' },
   ],
   Tamanrasset: [
     { value: 'Tamanrasset', label: 'Tamanrasset - تامنغست' },

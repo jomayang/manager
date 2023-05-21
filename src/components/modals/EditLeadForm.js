@@ -1,10 +1,13 @@
 import {
+  Box,
   Button,
   ButtonGroup,
+  Chip,
   FormControl,
   FormControlLabel,
   FormGroup,
   FormHelperText,
+  IconButton,
   InputAdornment,
   InputLabel,
   MenuItem,
@@ -15,6 +18,9 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
+import InventoryIcon from '@mui/icons-material/Inventory';
+import { Add } from '@mui/icons-material';
 import React, { forwardRef, useContext, useEffect, useState } from 'react';
 import MuiAlert from '@mui/material/Alert';
 import { LoadingButton } from '@mui/lab';
@@ -74,7 +80,11 @@ function EditLeadForm({
   const [estimatedTime, setEstimatedTime] = useState(null);
   const [isDisabled, setIsDisabled] = useState(true);
   const [productQty, setProductQty] = useState(null);
+  const [remaining, setRemaining] = useState(null);
+  const [selectedItem, setSelectedItem] = useState(null);
   const [qty, setQty] = useState(1);
+
+  const [productList, setProductList] = useState([{ product: '', color: '', size: '', qty: 1 }]);
 
   const { user } = useContext(UserContext);
   const handleClose = (event, reason) => {
@@ -275,18 +285,33 @@ function EditLeadForm({
       }
 
       if (status === 'confirmed') {
-        let productList;
-        if (color && size) {
-          productList = `${product}_${color}_${size}`;
-        } else if (color && !size) {
-          productList = `${product}_${color}`;
-        } else if (!color && size) {
-          productList = `${product}_${size}`;
-        } else {
-          productList = product;
-        }
-        // const productList = `${product}_${color}_${size}`;
-        console.log('product ->', productList);
+        const itemsList = productList.map((productItem) => {
+          if (productItem.color && productItem.size) {
+            return `${productItem.product}_${productItem.color}_${productItem.size}x${productItem.qty}`;
+          }
+          if (productItem.color && !productItem.size) {
+            return `${productItem.product}_${productItem.color}x${productItem.qty}`;
+          }
+          if (!productItem.color && productItem.size) {
+            return `${productItem.product}_${productItem.size}x${productItem.qty}`;
+          }
+          return `${productItem.product}x${productItem.qty}`;
+        });
+
+        const prodList = itemsList.join(',');
+
+        // if (color && size) {
+        //   prodList = `${product}_${color}_${size}`;
+        // } else if (color && !size) {
+        //   prodList = `${product}_${color}`;
+        // } else if (!color && size) {
+        //   prodList = `${product}_${size}`;
+        // } else {
+        //   prodList = product;
+        // }
+        // const prodList = `${product}_${color}_${size}`;
+        console.log('product ->', prodList, productList[0].product);
+
         const response = await axios({
           url: `https://ecom-api-5wlr.onrender.com/create/`,
           method: 'post',
@@ -298,7 +323,7 @@ function EditLeadForm({
             phone,
             wilaya,
             commune,
-            product: productList,
+            product: prodList,
             isStopDesk,
             isFreeShipping: true,
             stopdesk: agency,
@@ -307,6 +332,7 @@ function EditLeadForm({
           },
         });
         console.log('added to yal ', response.data);
+
         const { data: dataTracker, error: errorTracker } = await supabase
           .from('followups')
           .insert({
@@ -333,10 +359,7 @@ function EditLeadForm({
             phone,
             wilaya,
             commune,
-            product,
-            product_color: color,
-            product_size: size,
-            product_qty: qty,
+            product: productList[0].product,
             is_stopdesk: isStopDesk,
             is_free_shipping: true,
             stopdesk: agency,
@@ -348,26 +371,58 @@ function EditLeadForm({
             agent_id: currentAgentId,
           })
           .select();
-        console.log('name ->', product, 'color -> ', color, ' size -> ', size, ' qty -> ', qty);
-        const { data: dataProduct, errorProduct } = await supabase.rpc('decrement_stock', {
-          qty_in: qty,
-          name_in: product,
-          color_in: color,
-          size_in: size,
+
+        productList.forEach(async (productItem) => {
+          // 1 - Get item_id where product = productItem.product and color = productItem.color and size = productItem.size
+          const { data: dataItems, error: errorItems } = await supabase
+            .from('items')
+            .select('id')
+            .eq('product', productItem.product)
+            .eq('color', productItem.color)
+            .eq('size', productItem.size)
+            .single();
+
+          const itemId = dataItems.id;
+          console.log('items ', dataItems, dataInsert);
+          // 2 - Add order_item order_id = dataInsert.id item_id = item_id
+          const { data: dataOrderItem, error: errorOrderItem } = await supabase
+            .from('order_item')
+            .insert({ order_id: dataInsert[0].id, item_id: itemId, qty: productItem.qty });
+          console.log('qantity', productItem.qty, itemId);
+          // 3 - decrease inventory with productItem.qty where item_id = item_id
+          const { data: dataInventory, errorInventory } = await supabase.rpc('decrement_inventory', {
+            qty_in: productItem.qty,
+            item_id_in: itemId,
+          });
+
+          if (dataOrderItem && dataInventory) {
+            console.log('order item inventory');
+          }
+          if (errorOrderItem || errorInventory) {
+            console.log('something went wrong', errorOrderItem, errorInventory);
+          }
         });
 
-        if (dataProduct) {
-          console.log('data product', dataProduct);
-        }
+        // console.log('name ->', product, 'color -> ', color, ' size -> ', size, ' qty -> ', qty);
+        // const { data: dataProduct, errorProduct } = await supabase.rpc('decrement_stock', {
+        //   qty_in: qty,
+        //   name_in: product,
+        //   color_in: color,
+        //   size_in: size,
+        // });
 
-        if (errorProduct) {
-          console.log('error product', errorProduct);
-        }
+        // if (dataProduct) {
+        //   console.log('data product', dataProduct);
+        // }
+
+        // if (errorProduct) {
+        //   console.log('error product', errorProduct);
+        // }
         if (dataInsert) {
           console.log('inserted: ', dataInsert);
         }
 
-        if (dataInsert && dataUpdate) {
+        if (dataInsert /* && dataUpdate */) {
           setFeedback('the order has been confirmed!');
           setIsError(false);
         }
@@ -386,24 +441,24 @@ function EditLeadForm({
           setFeedback('a Problem accured when adding the new LOG!');
           setIsError(true);
         }
-      }
 
-      const { error: errorLeadLog } = await supabase.from('logs').insert({
-        user_fullname: user.user_metadata.name,
-        action: 'update',
-        entity: 'lead',
-        number: phone,
-        last_status: status,
-        attempt: status === 'not-responding' || status === 'unreachable' ? +comment : null,
-      });
-      if (errorLeadLog) {
-        console.log('oops log: ', errorLeadLog);
-        setFeedback('a Problem accured when adding the new LOG!');
-        setIsError(true);
+        const { error: errorLeadLog } = await supabase.from('logs').insert({
+          user_fullname: user.user_metadata.name,
+          action: 'update',
+          entity: 'lead',
+          number: phone,
+          last_status: status,
+          attempt: status === 'not-responding' || status === 'unreachable' ? +comment : null,
+        });
+        if (errorLeadLog) {
+          console.log('oops log: ', errorLeadLog);
+          setFeedback('a Problem accured when adding the new LOG!');
+          setIsError(true);
+        }
+        setUpdateLoading(false);
+        setOpen(true);
+        handleTriggerFetch(Math.random());
       }
-      setUpdateLoading(false);
-      setOpen(true);
-      handleTriggerFetch(Math.random());
     } catch (error) {
       console.log('something went wrong: ', error);
       setFeedback('a Problem accured!');
@@ -420,29 +475,91 @@ function EditLeadForm({
     }
   }, [productPrice, shippingPrice, status]);
 
-  useEffect(() => {
-    const getQty = async () => {
-      if (product) {
-        const { data, error } = await supabase
-          .from('products')
-          .select('quantity')
-          .eq('name', product)
-          .eq('size', size)
-          .eq('color', color)
-          .single();
+  // useEffect(() => {
+  //   const getQty = async () => {
+  //     if (product) {
+  //       const { data, error } = await supabase
+  //         .from('products')
+  //         .select('quantity')
+  //         .eq('name', product)
+  //         .eq('size', size)
+  //         .eq('color', color)
+  //         .single();
 
-        if (data) {
-          setProductQty(data.quantity);
-        }
+  //       if (data) {
+  //         setProductQty(data.quantity);
+  //       }
 
-        if (error) {
-          setProductQty(null);
-          // console.log('something went wrong', error);
-        }
-      }
-    };
-    getQty();
-  }, [product, size, color]);
+  //       if (error) {
+  //         setProductQty(null);
+  //         // console.log('something went wrong', error);
+  //       }
+  //     }
+  //   };
+  //   getQty();
+  // }, [product, size, color]);
+
+  const handleProductAdd = () => {
+    setProductList([...productList, { product: '', color: '', size: '', qty: 1 }]);
+    console.log('product list', productList);
+  };
+
+  const handleProductRemove = (index) => {
+    const pList = [...productList];
+    pList.splice(index, 1);
+    setProductList(pList);
+  };
+
+  const handleProductChange = (e, index) => {
+    const { name, value } = e.target;
+    const pList = [...productList];
+    pList[index][name] = value;
+    setProductList(pList);
+  };
+
+  const handleIncreaseQty = (index) => {
+    const pList = [...productList];
+    pList[index].qty += 1;
+    setProductList(pList);
+  };
+
+  const handleDecreaseQty = (index) => {
+    const pList = [...productList];
+    pList[index].qty -= 1;
+    setProductList(pList);
+  };
+
+  const handleInventoryCheck = async (index) => {
+    const { product } = productList[index];
+    const { color } = productList[index];
+    const { size } = productList[index];
+
+    console.log('product', product, color, size);
+    const { data: dataItem, error: errorItem } = await supabase
+      .from('items')
+      .select()
+      .eq('product', product)
+      .eq('color', color)
+      .eq('size', size)
+      .single();
+
+    if (dataItem) {
+      console.log('some', dataItem);
+      const itemId = dataItem.id;
+      const { data: dataInventory, error: errorInventory } = await supabase
+        .from('inventory')
+        .select()
+        .eq('item_id', itemId)
+        .single();
+
+      setRemaining(`${dataInventory.quantity}`);
+      setSelectedItem(`${product} ${color} ${size}`);
+      console.log('quantity remaining is ', dataInventory);
+    }
+    if (errorItem) {
+      console.log('something went wrong', errorItem);
+    }
+  };
 
   return (
     <form onSubmit={updateStatus}>
@@ -496,58 +613,101 @@ function EditLeadForm({
                     onChange={(e) => setPhone(e.target.value)}
                   />
                 </FormControl>
-                <FormControl fullWidth>
-                  <TextField
-                    name="product"
-                    label="Product"
-                    value={product}
-                    onChange={(e) => setProduct(e.target.value)}
-                  />
-                </FormControl>
-                <FormControl fullWidth>
-                  <ButtonGroup variant="outlined" aria-label="outlined button group">
-                    <Button
-                      size="large"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        if (qty > 0) setQty(qty - 1);
-                      }}
-                    >
-                      -
-                    </Button>
-                    <Button size="large" disabled>
-                      {qty}
-                    </Button>
-                    <Button
-                      size="large"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        if (qty > 0) setQty(qty + 1);
-                      }}
-                    >
-                      +
-                    </Button>
-                  </ButtonGroup>
-                </FormControl>
               </Stack>
-              <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-                <FormControl fullWidth>
-                  <TextField
-                    name="product_color"
-                    label="Product Color"
-                    value={color}
-                    onChange={(e) => setColor(e.target.value)}
-                  />
-                </FormControl>
-                <FormControl fullWidth>
-                  <TextField
-                    name="product_size"
-                    label="Product Size"
-                    value={size}
-                    onChange={(e) => setSize(e.target.value)}
-                  />
-                </FormControl>
-              </Stack>
+              {/* {productList.map((productItem, i) => (
+
+              ))} */}
+              <Box sx={{ background: '#fafafa', padding: '1rem' }}>
+                {productList.map((productItem, i) => (
+                  <>
+                    <Box sx={{ marginBottom: '1.5rem' }}>
+                      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} marginBottom={1}>
+                        <FormControl fullWidth>
+                          <TextField
+                            name="product"
+                            label="Product"
+                            value={productItem.product}
+                            size="small"
+                            onChange={(e) => handleProductChange(e, i)}
+                          />
+                        </FormControl>
+                        <FormControl fullWidth>
+                          <TextField
+                            name="color"
+                            label="Product Color"
+                            value={productItem.color}
+                            size="small"
+                            onChange={(e) => handleProductChange(e, i)}
+                          />
+                        </FormControl>
+                        <FormControl fullWidth>
+                          <TextField
+                            name="size"
+                            label="Product Size"
+                            value={productItem.size}
+                            size="small"
+                            onChange={(e) => handleProductChange(e, i)}
+                          />
+                        </FormControl>
+                      </Stack>
+                      <Stack justifyContent="end" direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+                        <FormControl>
+                          <ButtonGroup variant="outlined" aria-label="outlined button group">
+                            <Button
+                              size="small"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                if (productItem.qty > 0) handleDecreaseQty(i);
+                              }}
+                            >
+                              -
+                            </Button>
+                            <Button size="small" disabled>
+                              {productItem.qty}
+                            </Button>
+                            <Button
+                              size="small"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                if (productItem.qty > 0) handleIncreaseQty(i);
+                              }}
+                            >
+                              +
+                            </Button>
+                          </ButtonGroup>
+                        </FormControl>
+                        <IconButton
+                          onClick={() => handleInventoryCheck(i)}
+                          aria-label="Check inventory"
+                          color="primary"
+                          size="small"
+                        >
+                          <InventoryIcon />
+                        </IconButton>
+                        <IconButton
+                          onClick={() => handleProductRemove(i)}
+                          aria-label="delete"
+                          color="primary"
+                          size="small"
+                        >
+                          <DeleteIcon />
+                        </IconButton>
+                      </Stack>
+                    </Box>
+                    {productList.length - 1 === i && productList.length < 4 && (
+                      <Button startIcon={<Add />} onClick={handleProductAdd}>
+                        {' '}
+                        Add Item
+                      </Button>
+                    )}
+                  </>
+                ))}
+                {remaining && (
+                  <MuiAlert severity="info">
+                    <b>{selectedItem}</b> remaining in stock <Chip label={remaining} color="info" size="small" />
+                  </MuiAlert>
+                )}
+              </Box>
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
                 <FormControl fullWidth>
                   <InputLabel>Wilaya</InputLabel>
@@ -589,9 +749,12 @@ function EditLeadForm({
                   <FormControl>
                     <InputLabel>Agency</InputLabel>
                     <Select value={agency} label="Agency" onChange={(e) => setAgency(e.target.value)}>
-                      {agencies[commune] && (
-                        <MenuItem value={agencies[commune].value}>{agencies[commune].label}</MenuItem>
-                      )}
+                      {agencies[commune] &&
+                        agencies[commune].map((com, key) => (
+                          <MenuItem key={key} value={com.value}>
+                            {com.label}
+                          </MenuItem>
+                        ))}
                     </Select>
                   </FormControl>
                 ) : (

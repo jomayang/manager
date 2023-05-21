@@ -300,6 +300,42 @@ export default function OrderPage() {
       });
       console.log('done');
       const { error: errorFollowup } = await supabase.from('followups').delete().eq('tracking', trackingId);
+      // 1 - Get order_item (item_id, qty) on order_id
+      // 2 - For each order_item
+      // --> Increase inventory with qty on item_id
+      // --> Remove order_item
+      // 3 - Remove order
+      const { data: dataOrder, error: errorOrder } = await supabase
+        .from('orders')
+        .select('id')
+        .eq('tracking_id', trackingId)
+        .single();
+
+      if (dataOrder) {
+        const { data: dataOrderItem, error: errorOrderItem } = await supabase
+          .from('order_item')
+          .select()
+          .eq('order_id', dataOrder.id);
+
+        if (dataOrderItem) {
+          dataOrderItem.forEach(async (orderItem) => {
+            console.log('order item', orderItem);
+            const { item_id: itemId, qty } = orderItem;
+            console.log('item id ', itemId, 'quantity', qty);
+            const { data: dataInventory, error: errorInventory } = await supabase.rpc('increment_inventory', {
+              qty_in: qty,
+              item_id_in: itemId,
+            });
+          });
+        }
+
+        const { error: errorOrderItemRemove } = await supabase.from('order_item').delete().eq('order_id', dataOrder.id);
+
+        if (errorOrderItemRemove) {
+          console.log('could not delete order item', errorOrderItemRemove);
+        }
+      }
+
       const { error } = await supabase.from('orders').delete().eq('tracking_id', trackingId);
 
       if (error || errorFollowup) {
