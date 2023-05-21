@@ -84,7 +84,9 @@ function EditLeadForm({
   const [selectedItem, setSelectedItem] = useState(null);
   const [qty, setQty] = useState(1);
 
-  const [productList, setProductList] = useState([{ product: '', color: '', size: '', qty: 1 }]);
+  const [productList, setProductList] = useState([
+    { product: productAttr, color: colorAttr, size: `${sizeAttr || ''}`, qty: 1 },
+  ]);
 
   const { user } = useContext(UserContext);
   const handleClose = (event, reason) => {
