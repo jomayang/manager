@@ -70,8 +70,8 @@ function EditLeadForm({
   const [lastName, setLastName] = useState(lastNameAttr);
   const [phone, setPhone] = useState(phoneAttr);
   const [product, setProduct] = useState(productAttr);
-  const [color, setColor] = useState(colorAttr);
-  const [size, setSize] = useState(sizeAttr);
+  const [color, setColor] = useState(colorAttr || '');
+  const [size, setSize] = useState(sizeAttr || '');
   const [deliveryFee, setDeliveryFee] = useState(null);
   const [trackers, setTrackers] = useState([]);
   const [trackersCount, setTrackersCount] = useState(0);
@@ -85,7 +85,7 @@ function EditLeadForm({
   const [qty, setQty] = useState(1);
 
   const [productList, setProductList] = useState([
-    { product: productAttr, color: colorAttr, size: `${sizeAttr || ''}`, qty: 1 },
+    { product: productAttr, color: colorAttr || '', size: `${sizeAttr || ''}`, qty: 1 },
   ]);
 
   const { user } = useContext(UserContext);
@@ -533,8 +533,8 @@ function EditLeadForm({
 
   const handleInventoryCheck = async (index) => {
     const { product } = productList[index];
-    const color = productList[index].color || '';
-    const size = productList[index].size || '';
+    const { color } = productList[index];
+    const { size } = productList[index];
 
     console.log('product', product, color, size);
     const { data: dataItem, error: errorItem } = await supabase
