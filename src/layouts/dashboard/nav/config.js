@@ -78,3 +78,11 @@ export const navTrackerConfig = [
     icon: icon('ic_calendar'),
   },
 ];
+
+export const navDmConfig = [
+  {
+    title: 'Parcels',
+    path: '/dashboard/parcels',
+    icon: icon('ic_invoice'),
+  },
+];

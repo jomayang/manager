@@ -20,6 +20,7 @@ import StatPage from './pages/StatPage';
 import TrackingPage from './pages/TrackingPage';
 import TrackingPageOldOne from './pages/TrackingPageOldOne';
 import TrackingPageNew from './pages/TrackingPageNew';
+import ParcelPage from './pages/ParcelPage';
 
 // ----------------------------------------------------------------------
 
@@ -124,6 +125,33 @@ const TRACKER_ROUTES = [
     element: <Navigate to="/404" replace />,
   },
 ];
+const DM_ROUTES = [
+  {
+    path: '/dashboard',
+    element: <DashboardLayout />,
+    children: [
+      { element: <Navigate to="/dashboard/app" />, index: true },
+      { path: 'app', element: <DashboardAppPage /> },
+      { path: 'parcels', element: <ParcelPage /> },
+    ],
+  },
+  {
+    path: 'login',
+    element: <LoginPage />,
+  },
+  {
+    element: <SimpleLayout />,
+    children: [
+      { element: <Navigate to="/dashboard/tracking" />, index: true },
+      { path: '404', element: <Page404 /> },
+      { path: '*', element: <Navigate to="/404" /> },
+    ],
+  },
+  {
+    path: '*',
+    element: <Navigate to="/404" replace />,
+  },
+];
 
 const DEFAULT_ROUTES = [
   {
@@ -178,6 +206,8 @@ export default function Router() {
           if (role === 'admin') {
             setRouteState(ADMIN_ROUTES);
             console.log('the role is admin');
+          } else if (role === 'dm') {
+            setRouteState(DM_ROUTES);
           } else if (role === 'agent' || role === 'agent-associate') setRouteState(AGENT_ROUTES);
           else if (role === 'tracker') setRouteState(TRACKER_ROUTES);
           else setRouteState(DEFAULT_ROUTES);

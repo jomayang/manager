@@ -82,6 +82,7 @@ function EditLeadForm({
   const [productQty, setProductQty] = useState(null);
   const [remaining, setRemaining] = useState(null);
   const [selectedItem, setSelectedItem] = useState(null);
+  const [isYalidine, setIsYalidine] = useState(true);
   const [accurateDeliveryFee, setAccurateDeliveryFee] = useState(null);
   const [qty, setQty] = useState(1);
 
@@ -326,66 +327,96 @@ function EditLeadForm({
         // }
         // const prodList = `${product}_${color}_${size}`;
         console.log('product ->', prodList, productList[0].product);
+        let dataInsert;
+        let errorInsert;
+        if (isYalidine) {
+          const response = await axios({
+            url: `https://ecom-api-5wlr.onrender.com/create/`,
+            method: 'post',
+            headers: { 'Content-Type': 'application/json' },
+            data: {
+              firstName,
+              lastName,
+              address,
+              phone,
+              wilaya,
+              commune,
+              product: prodList,
+              isStopDesk,
+              isFreeShipping: true,
+              stopdesk: agency,
+              orderId: trackerId,
+              price: productPrice + shippingPrice,
+            },
+          });
+          console.log('added to yal ', response.data);
 
-        const response = await axios({
-          url: `https://ecom-api-5wlr.onrender.com/create/`,
-          method: 'post',
-          headers: { 'Content-Type': 'application/json' },
-          data: {
-            firstName,
-            lastName,
-            address,
-            phone,
-            wilaya,
-            commune,
-            product: prodList,
-            isStopDesk,
-            isFreeShipping: true,
-            stopdesk: agency,
-            orderId: trackerId,
-            price: productPrice + shippingPrice,
-          },
-        });
-        console.log('added to yal ', response.data);
-
-        const { data: dataTracker, error: errorTracker } = await supabase
-          .from('followups')
-          .insert({
-            tracking: response.data[`order_${trackerId}`].tracking,
-            is_handled_out: false,
-            is_handled_missed: false,
-            is_handled_center: false,
-            is_handled_received: false,
-            tracker_id: trackerId,
-          })
-          .select();
-        if (dataTracker) {
-          console.log('created data tracker', dataTracker);
+          const { data: dataTracker, error: errorTracker } = await supabase
+            .from('followups')
+            .insert({
+              tracking: response.data[`order_${trackerId}`].tracking,
+              is_handled_out: false,
+              is_handled_missed: false,
+              is_handled_center: false,
+              is_handled_received: false,
+              tracker_id: trackerId,
+            })
+            .select();
+          if (dataTracker) {
+            console.log('created data tracker', dataTracker);
+          }
+          if (errorTracker) {
+            console.log('something went wrog creating tracekr', errorTracker);
+          }
+          const { data, error } = await supabase
+            .from('orders')
+            .insert({
+              first_name: firstName,
+              last_name: lastName,
+              address,
+              phone,
+              wilaya,
+              commune,
+              product: productList[0].product,
+              is_stopdesk: isStopDesk,
+              is_free_shipping: true,
+              stopdesk: agency,
+              product_price: productPrice,
+              shipping_price: shippingPrice,
+              tracking_id: response.data[`order_${trackerId}`].tracking,
+              delivery_fees: accurateDeliveryFee,
+              tracker_id: trackerId,
+              agent_id: currentAgentId,
+            })
+            .select();
+          dataInsert = data;
+          errorInsert = error;
+        } else {
+          const { data, error } = await supabase
+            .from('orders')
+            .insert({
+              first_name: firstName,
+              last_name: lastName,
+              address,
+              phone,
+              wilaya,
+              commune,
+              product: productList[0].product,
+              is_stopdesk: isStopDesk,
+              is_free_shipping: true,
+              stopdesk: agency,
+              product_price: productPrice,
+              shipping_price: shippingPrice,
+              tracking_id: '',
+              delivery_fees: 250,
+              tracker_id: trackerId,
+              agent_id: currentAgentId,
+              is_auto_delivered: true,
+            })
+            .select();
+          dataInsert = data;
+          errorInsert = error;
         }
-        if (errorTracker) {
-          console.log('something went wrog creating tracekr', errorTracker);
-        }
-        const { data: dataInsert, error: errorInsert } = await supabase
-          .from('orders')
-          .insert({
-            first_name: firstName,
-            last_name: lastName,
-            address,
-            phone,
-            wilaya,
-            commune,
-            product: productList[0].product,
-            is_stopdesk: isStopDesk,
-            is_free_shipping: true,
-            stopdesk: agency,
-            product_price: productPrice,
-            shipping_price: shippingPrice,
-            tracking_id: response.data[`order_${trackerId}`].tracking,
-            delivery_fees: accurateDeliveryFee,
-            tracker_id: trackerId,
-            agent_id: currentAgentId,
-          })
-          .select();
 
         productList.forEach(async (productItem) => {
           // 1 - Get item_id where product = productItem.product and color = productItem.color and size = productItem.size
@@ -528,7 +559,7 @@ function EditLeadForm({
   const handleProductChange = (e, index) => {
     const { name, value } = e.target;
     const pList = [...productList];
-    pList[index][name] = value;
+    pList[index][name] = value.toLowerCase();
     setProductList(pList);
   };
 
@@ -627,6 +658,21 @@ function EditLeadForm({
                   />
                 </FormControl>
               </Stack>
+              <Stack>
+                <FormGroup>
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        checked={isYalidine}
+                        onChange={(e) => setIsYalidine(e.target.checked)}
+                        inputProps={{ 'aria-label': 'controlled' }}
+                      />
+                    }
+                    label="Yalidine"
+                  />
+                </FormGroup>
+              </Stack>
+
               {/* {productList.map((productItem, i) => (
 
               ))} */}

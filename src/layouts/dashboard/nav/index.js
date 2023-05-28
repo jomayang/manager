@@ -13,7 +13,7 @@ import Logo from '../../../components/logo';
 import Scrollbar from '../../../components/scrollbar';
 import NavSection from '../../../components/nav-section';
 //
-import { navAdminConfig, navTrackerConfig, navAgentConfig } from './config';
+import { navAdminConfig, navTrackerConfig, navAgentConfig, navDmConfig } from './config';
 import supabase from '../../../config/SupabaseClient';
 import { UserContext } from '../../../context/UserContext';
 
@@ -65,6 +65,9 @@ export default function Nav({ openNav, onCloseNav }) {
               console.log('here it is not');
               setUserRole('Confirmation Agent');
               setNavConfig(navAgentConfig);
+            } else if (role === 'dm') {
+              setUserRole('Delivery Man');
+              setNavConfig(navDmConfig);
             } else if (role === 'tracker') {
               setUserRole('Tracking Agent');
               setNavConfig(navTrackerConfig);
