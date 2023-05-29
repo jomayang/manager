@@ -233,7 +233,7 @@ export default function LeadPage() {
         if (filterProduct === 'oil') {
           product = ['زيت اللحية'];
         } else if (filterProduct === 'shoes') {
-          product = ['chaussure_1', 'chaussure_2'];
+          product = ['chaussure_1', 'chaussure_2', 'chaussure_3'];
         } else if (filterProduct === 'outfit') {
           product = ['outfit'];
         }
