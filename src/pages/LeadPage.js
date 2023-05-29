@@ -234,6 +234,8 @@ export default function LeadPage() {
           product = ['زيت اللحية'];
         } else if (filterProduct === 'shoes') {
           product = ['chaussure_1', 'chaussure_2'];
+        } else if (filterProduct === 'outfit') {
+          product = ['outfit'];
         }
         let query = supabase
           .from('leads')
@@ -568,6 +570,7 @@ export default function LeadPage() {
                     <MenuItem value={''}>All</MenuItem>
                     <MenuItem value={'oil'}>Oil</MenuItem>
                     <MenuItem value={'shoes'}>Shoes</MenuItem>
+                    <MenuItem value={'outfit'}>Outfit</MenuItem>
                   </Select>
                 </FormControl>
               </div>

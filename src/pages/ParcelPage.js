@@ -293,7 +293,34 @@ export default function ParcelPage() {
       }
     }
   };
+  const addModels = async () => {
+    const models = ['white', 'black'];
+    // const models = ['marron-tabac', 'bleu-nuit', 'noir', 'marron', 'marron-kaki'];
+    // const sizes = ['39', '40', '41', '42', '43', '44'];
+    const sizes = ['m', 'l', 'xl', 'xxl', '3xl'];
+    models.forEach(async (model) => {
+      sizes.forEach(async (size) => {
+        const { data: dataInsertItem, error: errorInsertItem } = await supabase
+          .from('items')
+          .insert({ product: 'outfit', color: model, size })
+          .select()
+          .single();
+        if (dataInsertItem) {
+          const { data, error } = await supabase
+            .from('inventory')
+            .insert({ item_id: dataInsertItem.id, quantity: 10 })
+            .select();
 
+          if (error) {
+            console.log('something went wrong with adding inventory');
+          }
+        }
+        if (errorInsertItem) {
+          console.log('something went wrong adding the item', errorInsertItem);
+        }
+      });
+    });
+  };
   return (
     <>
       <Helmet>
@@ -305,6 +332,7 @@ export default function ParcelPage() {
           <Typography variant="h4" gutterBottom>
             Parcels
           </Typography>
+          {/* <button onClick={addModels}>add</button> */}
           {/* <CreateOrderModal handleTriggerFetch={(val) => setTriggerFetch(val)} /> */}
         </Stack>
 
