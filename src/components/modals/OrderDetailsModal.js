@@ -14,6 +14,7 @@ import React, { useEffect, useState } from 'react';
 import Iconify from '../iconify/Iconify';
 import Label from '../label/Label';
 import CreateLeadForm from './CreateLeadForm';
+import supabase from '../../config/SupabaseClient';
 
 const style = {
   position: 'absolute',
@@ -74,6 +75,17 @@ function OrderDetailsModal({
   const handleOpenModal = async () => {
     handleOpen();
   };
+
+  /* useEffect(() => {
+    const init = async () => {
+      const {data, error} = await supabase
+      .from('orders')
+      .select('firstname, lastname, order_item(id), items(*)')
+      .eq('order_item.order_id', id)
+      .eq('order_item.item_id')
+    } 
+    init();
+  }, []); */
 
   return (
     <div>

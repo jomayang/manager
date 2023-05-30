@@ -59,6 +59,12 @@ export const navAdminConfig = [
     path: '/dashboard/backup',
     icon: icon('ic_folder'),
   },
+
+  {
+    title: 'Audit',
+    path: '/dashboard/audit',
+    icon: icon('ic_lock'),
+  },
 ];
 
 export const navTrackerConfig = [

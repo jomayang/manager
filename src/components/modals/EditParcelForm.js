@@ -133,7 +133,7 @@ function EditParcelForm({ id, statusAttr, handleTriggerFetch }) {
                 <MenuItem value={'delivered'}>Delivered</MenuItem>
               </Select>
             </FormControl>
-            {['missed-attempt', 'returned'].includes(status) && (
+            {['missed-attempt'].includes(status) && (
               <>
                 <FormControl>
                   <InputLabel>Reason</InputLabel>
