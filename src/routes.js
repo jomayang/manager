@@ -22,6 +22,7 @@ import TrackingPageOldOne from './pages/TrackingPageOldOne';
 import TrackingPageNew from './pages/TrackingPageNew';
 import ParcelPage from './pages/ParcelPage';
 import AuditPage from './pages/AuditPage';
+import InventoryPage from './pages/InventoryPage';
 
 // ----------------------------------------------------------------------
 
@@ -39,6 +40,7 @@ const ADMIN_ROUTES = [
       { path: 'tracking2', element: <TrackingPageOldOne /> },
       { path: 'tracking3', element: <TrackingPageNew /> },
       { path: 'audit', element: <AuditPage /> },
+      { path: 'inventory', element: <InventoryPage /> },
       // { path: 'tracking2', element: <TrackingPageFake /> },
       // { path: 'tracking3', element: <TrackingPageX /> },
 

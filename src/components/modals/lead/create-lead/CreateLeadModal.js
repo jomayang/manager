@@ -1,7 +1,7 @@
-import { Box, Button, IconButton, Modal, Typography } from '@mui/material';
+import { Box, Modal, Button, Typography } from '@mui/material';
 import React, { useState } from 'react';
-import Iconify from '../iconify/Iconify';
-import EditOrderForm from './EditOrderForm';
+import Iconify from '../../../iconify/Iconify';
+import CreateLeadForm from './CreateLeadForm';
 
 const style = {
   position: 'absolute',
@@ -17,16 +17,16 @@ const style = {
   p: 4,
 };
 
-function EditOrderStatus({ id, statusAttr, handleTriggerFetch }) {
+function CreateLeadModal({ handleTriggerFetch }) {
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
   return (
     <div>
-      <IconButton size="large" color="secondary" onClick={handleOpen}>
-        <Iconify icon="eva:edit-2-outline" />
-      </IconButton>
+      <Button onClick={handleOpen} variant="contained" startIcon={<Iconify icon="eva:plus-fill" />}>
+        New Lead
+      </Button>
       <Modal
         open={open}
         onClose={handleClose}
@@ -34,15 +34,14 @@ function EditOrderStatus({ id, statusAttr, handleTriggerFetch }) {
         aria-describedby="modal-modal-description"
       >
         <Box sx={style}>
-          <Typography id="modal-modal-title" variant="h5" component="h5" style={{ textAlign: 'center' }}>
-            Edit lead status
+          <Typography id="modal-modal-title" variant="h3" component="h2" style={{ textAlign: 'center' }}>
+            Add new lead
           </Typography>
-          <EditOrderForm id={id} statusAttr={statusAttr} handleTriggerFetch={handleTriggerFetch} />
-          {/* <CreateOrderForm /> */}
+          <CreateLeadForm handleTriggerFetch={handleTriggerFetch} />
         </Box>
       </Modal>
     </div>
   );
 }
 
-export default EditOrderStatus;
+export default CreateLeadModal;

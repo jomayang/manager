@@ -35,9 +35,9 @@ import Scrollbar from '../components/scrollbar';
 import supabase from '../config/SupabaseClient';
 import USERLIST from '../_mock/user';
 import { LeadListHead } from '../sections/@dashboard/lead';
-import CreateLeadModal from '../components/modals/CreateLeadModal';
-import EditLeadStatus from '../components/modals/EditLeadStatus';
-import EditRoleModal from '../components/modals/EditRoleModal';
+import CreateLeadModal from '../components/modals/lead/create-lead/CreateLeadModal';
+import EditLeadStatus from '../components/modals/lead/edit-lead/EditLeadStatus';
+import EditRoleModal from '../components/modals/role/edit-role/EditRoleModal';
 import UserListHead from '../sections/@dashboard/user/UserListHead';
 
 // ----------------------------------------------------------------------

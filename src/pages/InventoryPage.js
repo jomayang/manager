@@ -1,7 +1,7 @@
 import { Helmet } from 'react-helmet-async';
-import { create, filter } from 'lodash';
+import { filter } from 'lodash';
 import { sentenceCase } from 'change-case';
-import { useEffect, useState, forwardRef, useContext } from 'react';
+import { forwardRef, useEffect, useState } from 'react';
 // @mui
 import {
   Card,
@@ -9,7 +9,6 @@ import {
   Stack,
   Paper,
   Avatar,
-  Button,
   Popover,
   Checkbox,
   TableRow,
@@ -21,14 +20,17 @@ import {
   IconButton,
   TableContainer,
   TablePagination,
-  styled,
-  OutlinedInput,
-  alpha,
   Tooltip,
   InputAdornment,
+  styled,
+  OutlinedInput,
   Toolbar,
+  alpha,
   Snackbar,
   Skeleton,
+  FormControl,
+  InputLabel,
+  Select,
 } from '@mui/material';
 import MuiAlert from '@mui/material/Alert';
 // components
@@ -36,37 +38,39 @@ import axios from 'axios';
 import Label from '../components/label';
 import Iconify from '../components/iconify';
 import Scrollbar from '../components/scrollbar';
+import supabase from '../config/SupabaseClient';
 // sections
-import { UserListHead, UserListToolbar } from '../sections/@dashboard/user';
 // mock
 import USERLIST from '../_mock/user';
-import { OrderListHead, OrderListToolbar } from '../sections/@dashboard/order';
-import CreateOrderModal from '../components/modals/order/create-order/CreateOrderModal';
-import supabase from '../config/SupabaseClient';
-import OrderDetailsModal from '../components/modals/order/order-details/OrderDetailsModal';
-import EditOrderStatus from '../components/modals/order/edit-order/EditOrderStatus';
-import { UserContext } from '../context/UserContext';
-import EditParcelStatus from '../components/modals/parcel/edit-parcel/EditParcelStatus';
-import ParcelHistoryCustomModal from '../components/modals/parcel/parcel-history-custom/ParcelHistoryCustomModal';
-
+import { LeadListHead } from '../sections/@dashboard/lead';
+import CreateLeadModal from '../components/modals/lead/create-lead/CreateLeadModal';
+import EditLeadStatus from '../components/modals/lead/edit-lead/EditLeadStatus';
+import ImportLeadsModal from '../components/modals/lead/import-leads/ImportLeadsModal';
+import LeadDetailsModal from '../components/modals/lead/lead-details/LeadDetailsModal';
+import { missedLeads } from '../data/missedLeads';
 // ----------------------------------------------------------------------
+
 const Alert = forwardRef((props, ref) => <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />);
 
 const TABLE_HEAD = [
-  { id: 'name', label: 'Name', alignRight: false },
-  { id: 'phone', label: 'Phone', alignRight: false },
-  { id: 'wilaya', label: 'wilaya', alignRight: false },
-  { id: 'commune', label: 'Commune', alignRight: false },
-  { id: 'status', label: 'Status', alignRight: false },
+  { id: 'product', label: 'Product', alignRight: false },
+  { id: 'color', label: 'Color', alignRight: false },
+  { id: 'size', label: 'Size', alignRight: false },
+  { id: 'stock', label: 'Stock', alignRight: false },
+  // { id: 'status', label: 'Status', alignRight: false },
   { id: '', alignRight: false },
   { id: '' },
 ];
 
 const statusColors = {
   initial: 'info',
-  processing: 'warning',
-  returned: 'error',
-  delivered: 'success',
+  canceled: 'error',
+  confirmed: 'success',
+  'not-responding': 'warning',
+  unreachable: 'warning',
+  busy: 'warning',
+  reported: 'secondary',
+  other: 'secondary',
 };
 
 // ----------------------------------------------------------------------
@@ -95,19 +99,22 @@ function applySortFilter(array, comparator, query) {
     return a[1] - b[1];
   });
   if (query) {
-    return filter(array, (_order) => _order.fullName.toLowerCase().indexOf(query.toLowerCase()) !== -1);
+    return filter(array, (_user) => _user.name.toLowerCase().indexOf(query.toLowerCase()) !== -1);
   }
   return stabilizedThis.map((el) => el[0]);
 }
+
 const StyledRoot = styled(Toolbar)(({ theme }) => ({
-  height: 96,
   display: 'flex',
   justifyContent: 'space-between',
   padding: theme.spacing(0, 1, 0, 3),
+  paddingTop: 18,
+  paddingBottom: 18,
 }));
 
 const StyledSearch = styled(OutlinedInput)(({ theme }) => ({
   width: 240,
+  marginTop: 10,
   transition: theme.transitions.create(['box-shadow', 'width'], {
     easing: theme.transitions.easing.easeInOut,
     duration: theme.transitions.duration.shorter,
@@ -122,7 +129,7 @@ const StyledSearch = styled(OutlinedInput)(({ theme }) => ({
   },
 }));
 
-export default function ParcelPage() {
+export default function InventoryPage() {
   const [open, setOpen] = useState(null);
 
   const [page, setPage] = useState(0);
@@ -130,25 +137,31 @@ export default function ParcelPage() {
   const [order, setOrder] = useState('asc');
 
   const [selected, setSelected] = useState([]);
-
+  const [triggerFetch, setTriggerFetch] = useState();
   const [orderBy, setOrderBy] = useState('name');
 
   const [filterName, setFilterName] = useState('');
-  const [rowsCount, setRowsCount] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(50);
-  const [orders, setOrders] = useState([]);
-  const [triggerFetch, setTriggerFetch] = useState();
   const [isError, setIsError] = useState(false);
   const [feedback, setFeedback] = useState('');
+  const [rowsPerPage, setRowsPerPage] = useState(50);
+  const [leads, setLeads] = useState([]);
   const [searchInput, setSearchInput] = useState('');
+  const [rowsCount, setRowsCount] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
-  const { user } = useContext(UserContext);
-  const handleOpenMenu = (event) => {
-    setOpen(event.currentTarget);
-  };
+  const [filterStatus, setFilterStatus] = useState('');
+  const [filterProduct, setFilterProduct] = useState('');
+  const [userSession, setUserSession] = useState(null);
+  const [currentUserRole, setCurrentUserRole] = useState('');
+  useEffect(() => {
+    console.log(selected);
+  }, [selected]);
 
-  const handleCloseMenu = () => {
-    setOpen(null);
+  const handleClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    setOpen(false);
   };
 
   const handleRequestSort = (event, property) => {
@@ -159,19 +172,11 @@ export default function ParcelPage() {
 
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
-      const newSelecteds = orders.map((n) => n.fullName);
+      const newSelecteds = leads.map((n) => n.name);
       setSelected(newSelecteds);
       return;
     }
     setSelected([]);
-  };
-
-  const handleClose = (event, reason) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-
-    setOpen(false);
   };
 
   const handleClick = (event, name) => {
@@ -203,88 +208,125 @@ export default function ParcelPage() {
     setFilterName(event.target.value);
   };
 
-  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - orders.length) : 0;
-  const filteredOrders = applySortFilter(orders, getComparator(order, orderBy), filterName);
+  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - leads.length) : 0;
 
-  const isNotFound = !filteredOrders.length && !!filterName;
+  const filteredLeads = applySortFilter(leads, getComparator(order, orderBy), filterName);
+
+  const isNotFound = !filteredLeads.length && !!filterName;
 
   useEffect(() => {
-    const fetchOrders = async () => {
+    const fetchLeads = async () => {
       try {
         setIsLoading(true);
-        const { count, data, error } = await supabase
-          .from('orders')
-          .select('*', { count: 'exact' })
-          .order('created_at', { ascending: false })
-          .eq('is_auto_delivered', true)
-          .range(page * rowsPerPage, page * rowsPerPage + rowsPerPage - 1);
-        console.log([page * rowsPerPage, page * rowsPerPage + rowsPerPage - 1]);
-        if (data) {
-          const fetchedOrders = data.map((order) => ({
-            id: order.id,
-            fullName: `${order.first_name} ${order.last_name}`,
-            firstName: order.first_name,
-            lastName: order.last_name,
-            phone: order.phone,
-            commune: order.commune,
-            wilaya: order.wilaya,
-            status: order.status,
-            trackingId: order.tracking_id,
-            product: order.product,
-            shippingPrice: order.shipping_price,
-            productPrice: order.product_price,
-            stopdesk: order.stopdesk,
-            isStopdesk: order.is_stopdesk,
-            createdAt: order.created_at,
-          }));
-          setRowsCount(count);
-          setOrders(fetchedOrders);
+        const { data: dataAuth, error: errorAuth } = await supabase.auth.getSession();
+        const { email } = dataAuth.session.user;
+        const { data: dataUser, error: errorUser } = await supabase.from('users').select().eq('email', email).single();
+
+        if (dataUser) {
+          console.log('data user: ', dataUser);
         }
 
+        if (errorUser) {
+          console.log('error user: ', errorUser);
+        }
+
+        const { count, data, error } = await supabase
+          .from('inventory')
+          .select(
+            `
+          *,
+          items(
+            *
+          )
+        `,
+            { count: 'exact' }
+          )
+          .range(page * rowsPerPage, page * rowsPerPage + rowsPerPage - 1);
+
+        if (data) {
+          const fetchedInventory = data.map((row) => ({
+            id: row.id,
+            product: row.items.product,
+            color: row.items.color,
+            size: row.items.size,
+            quantity: row.quantity,
+          }));
+
+          setRowsCount(count);
+          setLeads(fetchedInventory);
+          console.log('data is join', fetchedInventory);
+        }
         if (error) {
           console.log('something went wrong', error);
         }
+
         setIsLoading(false);
       } catch (error) {
         console.log('something was wrong', error);
         setIsLoading(false);
       }
     };
-    fetchOrders();
-  }, [rowsPerPage, page, triggerFetch]);
+    fetchLeads();
+  }, [rowsPerPage, page, triggerFetch, filterStatus, filterProduct]);
+  useEffect(() => {
+    const getSession = async () => {
+      try {
+        const { data, error } = await supabase.auth.getSession();
+        console.log('geooooooo', data.session);
+        if (data && data.session) {
+          setUserSession(data.session);
+
+          const { data: dataFetch, error: errorFetch } = await supabase
+            .from('users')
+            .select('role')
+            .eq('email', data.session.user.email);
+
+          let role = '';
+
+          if (dataFetch && dataFetch[0]) role = dataFetch[0].role;
+          setCurrentUserRole(role);
+        }
+      } catch (error) {
+        console.log('something went wrong ', error);
+      }
+    };
+    getSession();
+  }, []);
 
   const handleSearchInDb = async (e) => {
     if (e.key === 'Enter') {
       try {
         setIsLoading(true);
         const { count, data, error } = await supabase
-          .from('orders')
+          .from('leads')
           .select('*', { count: 'exact' })
           .like('phone', `%${searchInput}%`)
-          .eq('is_auto_delivered', true)
           .order('created_at', { ascending: false })
           .range(page * rowsPerPage, page * rowsPerPage + rowsPerPage - 1);
 
         if (data) {
-          const fetchedOrders = data.map((order) => ({
-            id: order.id,
-            fullName: `${order.first_name} ${order.last_name}`,
-            firstName: order.first_name,
-            lastName: order.last_name,
-            phone: order.phone,
-            commune: order.commune,
-            wilaya: order.wilaya,
-            status: order.status,
-            trackingId: order.tracking_id,
-            product: order.product,
-            shippingPrice: order.shipping_price,
-            productPrice: order.product_price,
-            stopdesk: order.stopdesk,
-            isStopdesk: order.is_stopdesk,
-            createdAt: order.created_at,
+          const fetchedLeads = data.map((lead) => ({
+            id: lead.id,
+            fullName: `${lead.first_name} ${lead.last_name}`,
+            firstName: lead.first_name,
+            lastName: lead.last_name,
+            phone: lead.phone,
+            commune: lead.commune,
+            product: lead.product,
+            address: lead.address,
+            comment: lead.comment,
+            status: lead.status,
+            wilaya: lead.wilaya,
+            createdAt: lead.created_at,
+            color: lead.color,
+            size: lead.size,
           }));
+
           setRowsCount(count);
-          setOrders(fetchedOrders);
+          setLeads(fetchedLeads);
+        }
+        if (error) {
+          console.log(error);
         }
         setIsLoading(false);
       } catch (error) {
@@ -293,51 +335,45 @@ export default function ParcelPage() {
       }
     }
   };
-  const addModels = async () => {
-    const models = ['white', 'black'];
-    // const models = ['marron-tabac', 'bleu-nuit', 'noir', 'marron', 'marron-kaki'];
-    // const sizes = ['39', '40', '41', '42', '43', '44'];
-    const sizes = ['m', 'l', 'xl', 'xxl', '3xl'];
-    models.forEach(async (model) => {
-      sizes.forEach(async (size) => {
-        const { data: dataInsertItem, error: errorInsertItem } = await supabase
-          .from('items')
-          .insert({ product: 'outfit', color: model, size })
-          .select()
-          .single();
-        if (dataInsertItem) {
-          const { data, error } = await supabase
-            .from('inventory')
-            .insert({ item_id: dataInsertItem.id, quantity: 10 })
-            .select();
 
-          if (error) {
-            console.log('something went wrong with adding inventory');
-          }
-        }
-        if (errorInsertItem) {
-          console.log('something went wrong adding the item', errorInsertItem);
-        }
-      });
-    });
+  const handleDeleteLead = async (id) => {
+    try {
+      const { error } = await supabase.from('leads').delete().eq('id', id);
+
+      if (error) {
+        setFeedback('a Problem accured when removing the lead');
+        setIsError(true);
+      } else {
+        setFeedback('Lead removed successfully!');
+        setIsError(false);
+        setTriggerFetch(Math.random());
+      }
+      setOpen(true);
+    } catch (error) {
+      console.log(error);
+      setFeedback('a Problem accured!');
+      setIsError(true);
+      setOpen(true);
+    }
   };
+
   return (
     <>
       <Helmet>
-        <title> Orders </title>
+        <title> Inventory </title>
       </Helmet>
 
       <Container>
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
           <Typography variant="h4" gutterBottom>
-            Parcels
+            Inventory
           </Typography>
-          {/* <button onClick={addModels}>add</button> */}
-          {/* <CreateOrderModal handleTriggerFetch={(val) => setTriggerFetch(val)} /> */}
+          <Stack direction="row">
+            <CreateLeadModal handleTriggerFetch={(val) => setTriggerFetch(val)} />
+          </Stack>
         </Stack>
 
         <Card>
-          {/* <OrderListToolbar numSelected={selected.length} filterName={filterName} onFilterName={handleFilterByName} /> */}
           <StyledRoot
             sx={{
               ...(selected.length > 0 && {
@@ -352,17 +388,56 @@ export default function ParcelPage() {
               </Typography>
             ) : (
               // <form onSubmit={handleSearchInDb}>
-              <StyledSearch
-                value={searchInput}
-                onChange={(e) => setSearchInput(e.target.value)}
-                onKeyDown={handleSearchInDb}
-                placeholder="Search parcel..."
-                startAdornment={
-                  <InputAdornment position="start">
-                    <Iconify icon="eva:search-fill" sx={{ color: 'text.disabled', width: 20, height: 20 }} />
-                  </InputAdornment>
-                }
-              />
+              <div>
+                <StyledSearch
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value)}
+                  onKeyDown={handleSearchInDb}
+                  placeholder="Search lead..."
+                  startAdornment={
+                    <InputAdornment position="start">
+                      <Iconify icon="eva:search-fill" sx={{ color: 'text.disabled', width: 20, height: 20 }} />
+                    </InputAdornment>
+                  }
+                />
+                <FormControl fullWidth style={{ width: 240, marginLeft: 10, marginTop: 10 }}>
+                  <InputLabel>Filter Status</InputLabel>
+                  <Select
+                    value={filterStatus}
+                    label="filter-status"
+                    onChange={(e) => {
+                      setFilterStatus(e.target.value);
+                      setPage(0);
+                    }}
+                  >
+                    <MenuItem value={''}>All</MenuItem>
+                    <MenuItem value={'initial'}>Initial</MenuItem>
+                    <MenuItem value={'confirmed'}>Confirmed</MenuItem>
+                    <MenuItem value={'not-responding'}>Not Responding</MenuItem>
+                    <MenuItem value={'unreachable'}>Unreachable</MenuItem>
+                    <MenuItem value={'canceled'}>Canceled</MenuItem>
+                    <MenuItem value={'busy'}>Busy</MenuItem>
+                    <MenuItem value={'reported'}>Reported</MenuItem>
+                    <MenuItem value={'other'}>other</MenuItem>
+                  </Select>
+                </FormControl>
+                <FormControl fullWidth style={{ width: 240, marginLeft: 10, marginTop: 10, marginBottom: 10 }}>
+                  <InputLabel>Filter Product</InputLabel>
+                  <Select
+                    value={filterProduct}
+                    label="filter-product"
+                    onChange={(e) => {
+                      setFilterProduct(e.target.value);
+                      setPage(0);
+                    }}
+                  >
+                    <MenuItem value={''}>All</MenuItem>
+                    <MenuItem value={'oil'}>Oil</MenuItem>
+                    <MenuItem value={'shoes'}>Shoes</MenuItem>
+                    <MenuItem value={'outfit'}>Outfit</MenuItem>
+                  </Select>
+                </FormControl>
+              </div>
               // <button
               // </form>
             )}
@@ -381,14 +456,15 @@ export default function ParcelPage() {
               </Tooltip>
             )}
           </StyledRoot>
+
           <Scrollbar>
             <TableContainer sx={{ minWidth: 800 }}>
               <Table>
-                <OrderListHead
+                <LeadListHead
                   order={order}
                   orderBy={orderBy}
                   headLabel={TABLE_HEAD}
-                  rowCount={orders.length}
+                  rowCount={leads.length}
                   numSelected={selected.length}
                   onRequestSort={handleRequestSort}
                   onSelectAllClick={handleSelectAllClick}
@@ -486,75 +562,75 @@ export default function ParcelPage() {
                     </>
                   ) : (
                     <>
-                      {filteredOrders.map((row) => {
-                        const {
-                          id,
-                          fullName,
-                          phone,
-                          wilaya,
-                          commune,
-                          status,
-                          trackingId,
-                          product,
-                          shippingPrice,
-                          productPrice,
-                          stopdesk,
-                          isStopdesk,
-                          createdAt,
-                        } = row;
-                        const selectedOrder = selected.indexOf(id) !== -1;
+                      {filteredLeads.map((row) => {
+                        const { id, product, color, size, quantity } = row;
+                        const selectedLead = selected.indexOf(id) !== -1;
 
                         return (
-                          <TableRow hover key={id} tabIndex={-1} role="checkbox" selected={selectedOrder}>
+                          <TableRow hover key={id + page} tabIndex={-1} role="checkbox" selected={selectedLead}>
                             <TableCell padding="checkbox">
-                              <Checkbox checked={selectedOrder} onChange={(event) => handleClick(event, id)} />
+                              <Checkbox checked={selectedLead} onChange={(event) => handleClick(event, id)} />
                             </TableCell>
 
                             <TableCell component="th" scope="row" padding="none">
                               <Stack direction="row" alignItems="center" spacing={2}>
-                                <Avatar
-                                  alt={fullName}
-                                  src={`https://api.dicebear.com/5.x/fun-emoji/svg?seed=${fullName}`}
-                                />
+                                <Avatar alt={id} src={`https://api.dicebear.com/5.x/fun-emoji/svg?seed=${id}`} />
                                 <Typography variant="subtitle2" noWrap>
-                                  {fullName}
+                                  {product}
                                 </Typography>
                               </Stack>
                             </TableCell>
 
-                            <TableCell align="left">{phone}</TableCell>
+                            <TableCell align="left">{color}</TableCell>
 
-                            <TableCell align="left">{wilaya}</TableCell>
+                            <TableCell align="left">{size}</TableCell>
 
-                            <TableCell align="left">{commune}</TableCell>
+                            <TableCell align="left">{quantity}</TableCell>
 
-                            <TableCell align="left">
-                              <Label color={statusColors[status]}>{status}</Label>
-                            </TableCell>
+                            {/* <TableCell align="left">
+                              <Label color={statusColors[status]}>{sentenceCase(status)}</Label>
+                            </TableCell> */}
                             <TableCell align="right">
-                              <EditParcelStatus
+                              {/* <EditLeadStatus
                                 id={id}
+                                communeAttr={commune}
+                                wilayaAttr={wilaya}
+                                addressAttr={address}
+                                productAttr={product}
+                                firstNameAttr={firstName}
+                                lastNameAttr={lastName}
+                                commentAttr={comment}
                                 statusAttr={status}
+                                phoneAttr={phone}
+                                colorAttr={color}
+                                sizeAttr={size}
+                                createdAtAttr={createdAt}
                                 handleTriggerFetch={(val) => setTriggerFetch(val)}
-                              />
+                              /> */}
                             </TableCell>
+
                             <TableCell align="right">
-                              <Stack direction="row" justifyContent="right">
-                                <ParcelHistoryCustomModal id={id} status={status} />
-                                <OrderDetailsModal
-                                  fullNameAttr={fullName}
+                              <Stack direction="row">
+                                {currentUserRole === 'admin' && (
+                                  <IconButton size="large" color="inherit" onClick={() => handleDeleteLead(id)}>
+                                    <Iconify icon={'eva:trash-2-outline'} />
+                                  </IconButton>
+                                )}
+                                {/* <LeadDetailsModal
                                   id={id}
-                                  phoneAttr={phone}
                                   communeAttr={commune}
                                   wilayaAttr={wilaya}
-                                  statusAttr={status}
-                                  isStopDeskAttr={isStopdesk}
-                                  stopdeskAttr={stopdesk}
+                                  addressAttr={address}
                                   productAttr={product}
-                                  shippingPriceAttr={shippingPrice}
-                                  productPriceAttr={productPrice}
+                                  firstNameAttr={firstName}
+                                  lastNameAttr={lastName}
+                                  commentAttr={comment}
+                                  statusAttr={status}
+                                  phoneAttr={phone}
                                   createdAtAttr={createdAt}
-                                />
+                                  colorAttr={color}
+                                  sizeAttr={size}
+                                /> */}
                               </Stack>
                             </TableCell>
                           </TableRow>
@@ -608,6 +684,7 @@ export default function ParcelPage() {
           />
         </Card>
       </Container>
+
       <Snackbar
         open={open}
         autoHideDuration={6000}

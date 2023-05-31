@@ -3,8 +3,8 @@ import React, { useEffect, useState } from 'react';
 import Label from '../label/Label';
 import supabase from '../../config/SupabaseClient';
 import Iconify from '../iconify/Iconify';
-import ParcelDetailsModal from '../modals/ParcelDetailsModal';
-import ParcelHistoryModal from '../modals/ParcelHistoryModal';
+import ParcelDetailsModal from '../modals/parcel/parcel-details/ParcelDetailsModal';
+import ParcelHistoryModal from '../modals/parcel/parcel-history/ParcelHistoryModal';
 
 function TrackingListItem({
   id,

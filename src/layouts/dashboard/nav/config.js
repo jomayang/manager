@@ -55,6 +55,11 @@ export const navAdminConfig = [
     icon: icon('ic_user'),
   },
   {
+    title: 'Inventory',
+    path: '/dashboard/inventory',
+    icon: icon('ic_ecommerce'),
+  },
+  {
     title: 'Backup',
     path: '/dashboard/backup',
     icon: icon('ic_folder'),

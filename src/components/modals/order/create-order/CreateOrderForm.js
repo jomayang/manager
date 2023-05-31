@@ -20,13 +20,13 @@ import React, { forwardRef, useContext, useEffect, useState } from 'react';
 import MuiAlert, { AlertProps } from '@mui/material/Alert';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
-import supabase from '../../config/SupabaseClient';
-import { wilayas } from '../../data/wilayas';
-import { agencies } from '../../data/agencies';
-import { fees } from '../../data/fees';
-import { communesList } from '../../data/communes';
-import { communesStopdesk } from '../../data/communesStopdesk';
-import { UserContext } from '../../context/UserContext';
+import supabase from '../../../../config/SupabaseClient';
+import { wilayas } from '../../../../data/wilayas';
+import { agencies } from '../../../../data/agencies';
+import { fees } from '../../../../data/fees';
+import { communesList } from '../../../../data/communes';
+import { communesStopdesk } from '../../../../data/communesStopdesk';
+import { UserContext } from '../../../../context/UserContext';
 
 const Alert = forwardRef((props, ref) => {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;

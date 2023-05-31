@@ -8,13 +8,13 @@ import {
   timelineOppositeContentClasses,
   TimelineSeparator,
 } from '@mui/lab';
-import { Box, Modal, Button, Typography, IconButton } from '@mui/material';
+import { Box, Modal, Button, Typography } from '@mui/material';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import Iconify from '../iconify/Iconify';
-import Label from '../label/Label';
-import CreateLeadForm from './CreateLeadForm';
-import supabase from '../../config/SupabaseClient';
+import Iconify from '../../../iconify/Iconify';
+import Label from '../../../label/Label';
+import CreateLeadForm from '../../lead/create-lead/CreateLeadForm';
+import supabase from '../../../../config/SupabaseClient';
 
 const style = {
   position: 'absolute',
@@ -49,7 +49,7 @@ const statusColors = {
   'Echange échoué': 'error',
 };
 
-function ParcelHistoryCustomModal({ id, status, colors }) {
+function ParcelHistoryModal({ tracking, status, colors }) {
   const [open, setOpen] = useState(false);
   const [history, setHistory] = useState(null);
   const handleOpen = () => setOpen(true);
@@ -59,12 +59,11 @@ function ParcelHistoryCustomModal({ id, status, colors }) {
     handleOpen();
     try {
       const { data, error } = await supabase
-        .from('status')
+        .from('histories')
         .select()
-        .eq('order_id', id)
+        .eq('tracking', tracking)
         .order('created_at', { ascending: false });
       if (data) {
-        console.log('data is clear: ', data);
         setHistory(data);
       }
       if (error) {
@@ -77,9 +76,15 @@ function ParcelHistoryCustomModal({ id, status, colors }) {
 
   return (
     <div>
-      <IconButton size="large" color="inherit" aria-label="Done" onClick={handleOpenModal}>
-        <Iconify icon="eva:archive-outline" />
-      </IconButton>
+      {statusColors[status] ? (
+        <Label onClick={handleOpenModal} variant="filled" style={{ cursor: 'pointer' }} color={colors[status]}>
+          {status}{' '}
+        </Label>
+      ) : (
+        <Label onClick={handleOpenModal} variant="filled" style={{ cursor: 'pointer' }}>
+          {status}{' '}
+        </Label>
+      )}
 
       <Modal
         open={open}
@@ -89,7 +94,7 @@ function ParcelHistoryCustomModal({ id, status, colors }) {
       >
         <Box sx={style}>
           <Typography id="modal-modal-title" variant="h4" component="h4" style={{ textAlign: 'center' }}>
-            Parcel Followup
+            Parcel Followup <Label>{tracking}</Label>
           </Typography>
           <hr style={{ border: '1px solid #eee', marginTop: 10, marginBottom: 20 }} />
           {history && (
@@ -97,10 +102,14 @@ function ParcelHistoryCustomModal({ id, status, colors }) {
               <Typography id="modal-modal-title" variant="h6" component="h6" style={{ textAlign: 'center' }}>
                 {history[0].status}
               </Typography>
-
-              <p style={{ margin: 0, fontSize: 16, textAlign: 'center' }}>
-                {history[0].created_at.split('T')[0]} {history[0].created_at.split('T')[1].slice(0, 8)}
+              <p style={{ textAlign: 'center' }}>
+                {history[0].status !== 'Prêt à expédier' && history[0].status !== 'En préparation' && (
+                  <p style={{ margin: 0, fontSize: 16 }}>
+                    {history[0].wilaya_name}, {history[0].commune_name}, {history[0].center_name}
+                  </p>
+                )}
               </p>
+              <p style={{ margin: 0, fontSize: 16, textAlign: 'center' }}>{history[0].created_at}</p>
 
               <hr style={{ border: '1px solid #eee', marginTop: 10, marginBottom: 20 }} />
               <Typography id="modal-modal-title" variant="h6" component="h6" style={{ textAlign: 'center' }}>
@@ -124,7 +133,7 @@ function ParcelHistoryCustomModal({ id, status, colors }) {
                           marginBottom: 0,
                         }}
                       >
-                        {hist.created_at.split('T')[0]}
+                        {hist.created_at.split(' ')[0]}
                       </p>
                       <p
                         style={{
@@ -132,7 +141,7 @@ function ParcelHistoryCustomModal({ id, status, colors }) {
                           marginTop: 0,
                         }}
                       >
-                        {hist.created_at.split('T')[1].slice(0, 8)}
+                        {hist.created_at.split(' ')[1]}
                       </p>
                     </TimelineOppositeContent>
                     <TimelineSeparator>
@@ -144,7 +153,11 @@ function ParcelHistoryCustomModal({ id, status, colors }) {
                         {hist.status} {hist.reason && <span>({hist.reason})</span>}
                       </p>
                       {/* <p style={{ margin: 0, fontSize: 12 }}>{hist.reason}</p> */}
-                      <p style={{ margin: 0, fontSize: 12, color: '#999' }}>{hist.comment}</p>
+                      {hist.status !== 'Prêt à expédier' && hist.status !== 'En préparation' && (
+                        <p style={{ margin: 0, fontSize: 12, color: '#999' }}>
+                          {hist.wilaya_name}, {hist.commune_name}, {hist.center_name}
+                        </p>
+                      )}
                     </TimelineContent>
                   </TimelineItem>
                 ))}
@@ -158,4 +171,4 @@ function ParcelHistoryCustomModal({ id, status, colors }) {
   );
 }
 
-export default ParcelHistoryCustomModal;
+export default ParcelHistoryModal;

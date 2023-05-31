@@ -38,9 +38,9 @@ import supabase from '../config/SupabaseClient';
 // mock
 import USERLIST from '../_mock/user';
 import { LeadListHead } from '../sections/@dashboard/lead';
-import CreateLeadModal from '../components/modals/CreateLeadModal';
-import EditLeadStatus from '../components/modals/EditLeadStatus';
-import ImportLeadsModal from '../components/modals/ImportLeadsModal';
+import CreateLeadModal from '../components/modals/lead/create-lead/CreateLeadModal';
+import EditLeadStatus from '../components/modals/lead/edit-lead/EditLeadStatus';
+import ImportLeadsModal from '../components/modals/lead/import-leads/ImportLeadsModal';
 
 // ----------------------------------------------------------------------
 
@@ -127,6 +127,69 @@ export default function AuditPage() {
             );
           });
           setLogs(genLogs);
+        }
+        if (error) {
+          console.log('something went wrong', error);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    getLogs();
+  }, []);
+
+  useEffect(() => {
+    const getLogs = async () => {
+      try {
+        const { data, error } = await supabase.from('inventory').select(`
+            *,
+            items(
+              *
+            )
+          `);
+
+        if (data) {
+          const newData = data.map((row) => ({
+            product: row.items.product,
+            color: row.items.color,
+            size: row.items.size,
+            quantity: row.quantity,
+          }));
+          console.log('data is join', newData);
+        }
+        if (error) {
+          console.log('something went wrong', error);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    getLogs();
+  }, []);
+
+  useEffect(() => {
+    const getLogs = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('order_item')
+          .select(
+            `
+            qty,
+            items(
+              *
+            )
+          `
+          )
+          .eq('order_id', 2352);
+
+        if (data) {
+          const newData = data.map((row) => ({
+            product: row.items.product,
+            color: row.items.color,
+            size: row.items.size,
+            quantity: row.qty,
+          }));
+          console.log('data is join order', newData);
         }
         if (error) {
           console.log('something went wrong', error);

@@ -3,9 +3,9 @@ import React, { forwardRef, useEffect, useRef, useState } from 'react';
 import { LoadingButton } from '@mui/lab';
 import Papa from 'papaparse';
 import MuiAlert, { AlertProps } from '@mui/material/Alert';
-import supabase from '../../config/SupabaseClient';
-import Iconify from '../iconify/Iconify';
-import CreateLeadForm from './CreateLeadForm';
+import supabase from '../../../../config/SupabaseClient';
+import Iconify from '../../../iconify/Iconify';
+import CreateLeadForm from '../create-lead/CreateLeadForm';
 
 const style = {
   position: 'absolute',

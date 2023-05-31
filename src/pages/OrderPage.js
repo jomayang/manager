@@ -41,10 +41,10 @@ import { UserListHead, UserListToolbar } from '../sections/@dashboard/user';
 // mock
 import USERLIST from '../_mock/user';
 import { OrderListHead, OrderListToolbar } from '../sections/@dashboard/order';
-import CreateOrderModal from '../components/modals/CreateOrderModal';
+import CreateOrderModal from '../components/modals/order/create-order/CreateOrderModal';
 import supabase from '../config/SupabaseClient';
-import OrderDetailsModal from '../components/modals/OrderDetailsModal';
-import EditOrderStatus from '../components/modals/EditOrderStatus';
+import OrderDetailsModal from '../components/modals/order/order-details/OrderDetailsModal';
+import EditOrderStatus from '../components/modals/order/edit-order/EditOrderStatus';
 import { UserContext } from '../context/UserContext';
 
 // ----------------------------------------------------------------------

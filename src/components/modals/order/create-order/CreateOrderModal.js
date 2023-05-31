@@ -1,7 +1,7 @@
 import { Box, Modal, Button, Typography } from '@mui/material';
 import React, { useState } from 'react';
-import Iconify from '../iconify/Iconify';
-import CreateLeadForm from './CreateLeadForm';
+import Iconify from '../../../iconify/Iconify';
+import CreateLeadForm from '../../lead/create-lead/CreateLeadForm';
 import CreateOrderForm from './CreateOrderForm';
 
 const style = {

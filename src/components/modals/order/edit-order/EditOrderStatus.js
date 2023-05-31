@@ -1,7 +1,7 @@
 import { Box, Button, IconButton, Modal, Typography } from '@mui/material';
 import React, { useState } from 'react';
-import Iconify from '../iconify/Iconify';
-import EditLeadForm from './EditLeadForm';
+import Iconify from '../../../iconify/Iconify';
+import EditOrderForm from './EditOrderForm';
 
 const style = {
   position: 'absolute',
@@ -17,22 +17,7 @@ const style = {
   p: 4,
 };
 
-function EditLeadStatus({
-  id,
-  communeAttr,
-  wilayaAttr,
-  addressAttr,
-  productAttr,
-  firstNameAttr,
-  lastNameAttr,
-  commentAttr,
-  statusAttr,
-  phoneAttr,
-  createdAtAttr,
-  colorAttr,
-  sizeAttr,
-  handleTriggerFetch,
-}) {
+function EditOrderStatus({ id, statusAttr, handleTriggerFetch }) {
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -52,25 +37,7 @@ function EditLeadStatus({
           <Typography id="modal-modal-title" variant="h5" component="h5" style={{ textAlign: 'center' }}>
             Edit lead status
           </Typography>
-          <Typography id="modal-modal-title" variant="p" component="p" style={{ textAlign: 'center', color: '#777' }}>
-            {new Date(createdAtAttr).toLocaleString()}
-          </Typography>
-
-          <EditLeadForm
-            id={id}
-            communeAttr={communeAttr}
-            wilayaAttr={wilayaAttr}
-            addressAttr={addressAttr}
-            productAttr={productAttr}
-            firstNameAttr={firstNameAttr}
-            lastNameAttr={lastNameAttr}
-            commentAttr={commentAttr}
-            statusAttr={statusAttr}
-            colorAttr={colorAttr}
-            sizeAttr={sizeAttr}
-            phoneAttr={phoneAttr}
-            handleTriggerFetch={handleTriggerFetch}
-          />
+          <EditOrderForm id={id} statusAttr={statusAttr} handleTriggerFetch={handleTriggerFetch} />
           {/* <CreateOrderForm /> */}
         </Box>
       </Modal>
@@ -78,4 +45,4 @@ function EditLeadStatus({
   );
 }
 
-export default EditLeadStatus;
+export default EditOrderStatus;

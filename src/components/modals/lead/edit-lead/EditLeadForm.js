@@ -11,10 +11,17 @@ import {
   InputAdornment,
   InputLabel,
   MenuItem,
+  Paper,
   Select,
   Snackbar,
   Stack,
   Switch,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
   TextField,
   Typography,
 } from '@mui/material';
@@ -26,14 +33,14 @@ import MuiAlert from '@mui/material/Alert';
 import { LoadingButton } from '@mui/lab';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
-import { agencies } from '../../data/agencies';
-import supabase from '../../config/SupabaseClient';
-import { wilayas } from '../../data/wilayas';
-import { communesList } from '../../data/communes';
-import { communesStopdesk } from '../../data/communesStopdesk';
-import { fees } from '../../data/fees';
-import { UserContext } from '../../context/UserContext';
-import { zone0, zone1, zone2, zone3, zone4, zone5, zone6 } from '../../data/comFees';
+import { agencies } from '../../../../data/agencies';
+import supabase from '../../../../config/SupabaseClient';
+import { wilayas } from '../../../../data/wilayas';
+import { communesList } from '../../../../data/communes';
+import { communesStopdesk } from '../../../../data/communesStopdesk';
+import { fees } from '../../../../data/fees';
+import { UserContext } from '../../../../context/UserContext';
+import { zone0, zone1, zone2, zone3, zone4, zone5, zone6 } from '../../../../data/comFees';
 
 const Alert = forwardRef((props, ref) => <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />);
 
@@ -84,6 +91,7 @@ function EditLeadForm({
   const [selectedItem, setSelectedItem] = useState(null);
   const [isYalidine, setIsYalidine] = useState(true);
   const [accurateDeliveryFee, setAccurateDeliveryFee] = useState(null);
+  const [relevantItems, setRelevantItems] = useState([]);
   const [qty, setQty] = useState(1);
 
   const [productList, setProductList] = useState([
@@ -598,6 +606,33 @@ function EditLeadForm({
 
       setRemaining(`${dataInventory.quantity}`);
       setSelectedItem(`${product} ${color} ${size}`);
+
+      if (dataInventory.quantity === 0) {
+        const { data: dataRelatedInventory, error: errorRelatedInventory } = await supabase.from('inventory').select(
+          `
+          *,
+          items(
+            *
+          )
+        `
+        );
+
+        if (dataRelatedInventory) {
+          const fetchedInventory = dataRelatedInventory.map((row) => ({
+            id: row.id,
+            product: row.items.product,
+            color: row.items.color,
+            size: row.items.size,
+            quantity: row.quantity,
+          }));
+
+          const filteredInventory = fetchedInventory.filter((item) => item.size === size && item.quantity !== 0);
+          setRelevantItems(filteredInventory);
+          console.log('filtered inventory', filteredInventory);
+        }
+      } else {
+        setRelevantItems([]);
+      }
       console.log('quantity remaining is ', dataInventory);
     }
     if (errorItem) {
@@ -765,6 +800,32 @@ function EditLeadForm({
                   <MuiAlert severity="info">
                     <b>{selectedItem}</b> remaining in stock <Chip label={remaining} color="info" size="small" />
                   </MuiAlert>
+                )}
+                {relevantItems.length !== 0 && (
+                  <TableContainer style={{ marginTop: 10 }} component={Paper}>
+                    <Table size="small" aria-label="a dense table">
+                      <TableHead>
+                        <TableRow>
+                          <TableCell align="right">Product</TableCell>
+                          <TableCell align="right">Color</TableCell>
+                          <TableCell align="right">Size</TableCell>
+                          <TableCell align="right">Quantity</TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {relevantItems.map((row) => (
+                          <TableRow key={Math.random()} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                            <TableCell component="th" scope="row">
+                              {row.product}
+                            </TableCell>
+                            <TableCell align="right">{row.color}</TableCell>
+                            <TableCell align="right">{row.size}</TableCell>
+                            <TableCell align="right">{row.quantity}</TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
                 )}
               </Box>
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>

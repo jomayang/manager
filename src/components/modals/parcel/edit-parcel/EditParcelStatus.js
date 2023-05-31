@@ -1,7 +1,7 @@
-import { Box, Modal, Button, Typography } from '@mui/material';
+import { Box, Button, IconButton, Modal, Typography } from '@mui/material';
 import React, { useState } from 'react';
-import Iconify from '../iconify/Iconify';
-import CreateLeadForm from './CreateLeadForm';
+import Iconify from '../../../iconify/Iconify';
+import EditParcelForm from './EditParcelForm';
 
 const style = {
   position: 'absolute',
@@ -17,16 +17,16 @@ const style = {
   p: 4,
 };
 
-function CreateLeadModal({ handleTriggerFetch }) {
+function EditParcelStatus({ id, statusAttr, handleTriggerFetch }) {
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
   return (
     <div>
-      <Button onClick={handleOpen} variant="contained" startIcon={<Iconify icon="eva:plus-fill" />}>
-        New Lead
-      </Button>
+      <IconButton size="large" color="secondary" onClick={handleOpen}>
+        <Iconify icon="eva:edit-2-outline" />
+      </IconButton>
       <Modal
         open={open}
         onClose={handleClose}
@@ -34,14 +34,15 @@ function CreateLeadModal({ handleTriggerFetch }) {
         aria-describedby="modal-modal-description"
       >
         <Box sx={style}>
-          <Typography id="modal-modal-title" variant="h3" component="h2" style={{ textAlign: 'center' }}>
-            Add new lead
+          <Typography id="modal-modal-title" variant="h5" component="h5" style={{ textAlign: 'center' }}>
+            Edit parcel status
           </Typography>
-          <CreateLeadForm handleTriggerFetch={handleTriggerFetch} />
+          <EditParcelForm id={id} statusAttr={statusAttr} handleTriggerFetch={handleTriggerFetch} />
+          {/* <CreateOrderForm /> */}
         </Box>
       </Modal>
     </div>
   );
 }
 
-export default CreateLeadModal;
+export default EditParcelStatus;

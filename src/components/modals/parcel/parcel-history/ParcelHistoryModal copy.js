@@ -11,10 +11,10 @@ import {
 import { Box, Modal, Button, Typography } from '@mui/material';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import Iconify from '../iconify/Iconify';
-import Label from '../label/Label';
-import CreateLeadForm from './CreateLeadForm';
-import supabase from '../../config/SupabaseClient';
+import Iconify from '../../../iconify/Iconify';
+import Label from '../../../label/Label';
+import CreateLeadForm from '../../lead/create-lead/CreateLeadForm';
+import supabase from '../../../../config/SupabaseClient';
 
 const style = {
   position: 'absolute',

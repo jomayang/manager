@@ -38,9 +38,9 @@ import supabase from '../config/SupabaseClient';
 // mock
 import USERLIST from '../_mock/user';
 import { LeadListHead } from '../sections/@dashboard/lead';
-import CreateLeadModal from '../components/modals/CreateLeadModal';
-import EditLeadStatus from '../components/modals/EditLeadStatus';
-import ImportLeadsModal from '../components/modals/ImportLeadsModal';
+import CreateLeadModal from '../components/modals/lead/create-lead/CreateLeadModal';
+import EditLeadStatus from '../components/modals/lead/edit-lead/EditLeadStatus';
+import ImportLeadsModal from '../components/modals/lead/import-leads/ImportLeadsModal';
 
 // ----------------------------------------------------------------------
 

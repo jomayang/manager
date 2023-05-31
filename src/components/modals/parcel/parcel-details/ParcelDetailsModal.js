@@ -11,10 +11,10 @@ import {
 import { Box, Modal, Button, Typography, IconButton } from '@mui/material';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import Iconify from '../iconify/Iconify';
-import Label from '../label/Label';
-import CreateLeadForm from './CreateLeadForm';
-import supabase from '../../config/SupabaseClient';
+import Iconify from '../../../iconify/Iconify';
+import Label from '../../../label/Label';
+import CreateLeadForm from '../../lead/create-lead/CreateLeadForm';
+import supabase from '../../../../config/SupabaseClient';
 
 const style = {
   position: 'absolute',
@@ -50,47 +50,61 @@ const statusColors = {
   'Echange échoué': 'error',
 };
 
-function OrderDetailsModal({
+function ParcelDetailsModal({
   id,
-  communeAttr,
-  wilayaAttr,
-  addressAttr,
-  productAttr,
-  firstNameAttr,
-  lastNameAttr,
-  fullNameAttr,
-  statusAttr,
-  isStopDeskAttr,
-  stopdeskAttr,
-  productPriceAttr,
-  shippingPriceAttr,
-  phoneAttr,
-  createdAtAttr,
+  tracking,
+  fullName,
+  phone,
+  departure,
+  destination,
+  product,
+  price,
+  deliveryFees,
+  creationDate,
+  expeditionDate,
 }) {
   const [open, setOpen] = useState(false);
+  const [agent, setAgent] = useState();
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
   const handleOpenModal = async () => {
     handleOpen();
-  };
-
-  /* useEffect(() => {
-    const init = async () => {
-      const {data, error} = await supabase
+    console.log('gooo');
+    const { data: dataOrder, error: errorOrder } = await supabase
       .from('orders')
-      .select('firstname, lastname, order_item(id), items(*)')
-      .eq('order_item.order_id', id)
-      .eq('order_item.item_id')
-    } 
-    init();
-  }, []); */
+      .select('agent_id')
+      .eq('tracking_id', tracking)
+      .single();
+
+    if (dataOrder) {
+      console.log('the data ----->>> ', dataOrder);
+
+      const { data: dataUser, error: errorUser } = await supabase
+        .from('users')
+        .select('name')
+        .eq('id', dataOrder.agent_id)
+        .single();
+      if (dataUser) {
+        console.log('the corresponding user: ', dataUser);
+        setAgent(dataUser.name);
+      }
+
+      if (errorUser) {
+        console.log(errorUser);
+      }
+    }
+
+    if (errorOrder) {
+      console.log(errorOrder);
+    }
+  };
 
   return (
     <div>
-      <IconButton size="large" color="inherit" onClick={handleOpen}>
-        <Iconify icon="eva:eye-outline" />
+      <IconButton aria-label="Done" onClick={handleOpenModal}>
+        <Iconify icon="eva:plus-circle-outline" />
       </IconButton>
 
       <Modal
@@ -101,66 +115,50 @@ function OrderDetailsModal({
       >
         <Box sx={style}>
           <Typography id="modal-modal-title" variant="h4" component="h4" style={{ textAlign: 'center' }}>
-            Order Details
+            Parcel Details <Label>{tracking}</Label>
           </Typography>
           <hr style={{ border: '1px solid #eee', marginTop: 10, marginBottom: 20 }} />
           <Typography id="modal-modal-title" variant="p" component="p">
-            <b>Creation date:</b> {new Date(createdAtAttr).toLocaleString('en-US')}
+            <b>Creation date:</b> {creationDate}
           </Typography>
-          <Typography id="modal-modal-title" variant="p" component="p">
-            <b>Customer:</b> {fullNameAttr}
-          </Typography>
-          <Typography id="modal-modal-title" variant="p" component="p">
-            <b>Phone number:</b> {phoneAttr}
-          </Typography>
-          <Typography id="modal-modal-title" variant="p" component="p">
-            <b>Status:</b> {statusAttr}
-          </Typography>
-
-          <Typography id="modal-modal-title" variant="p" component="p">
-            <b>Delivery Type:</b> {isStopDeskAttr ? 'Stopdesk' : 'Home delivery'}
-          </Typography>
+          {expeditionDate && (
+            <Typography id="modal-modal-title" variant="p" component="p">
+              <b>Expedition date:</b> {expeditionDate}
+            </Typography>
+          )}
+          {agent && (
+            <Typography id="modal-modal-title" variant="p" component="p">
+              <b>Agent:</b> {agent}
+            </Typography>
+          )}
 
           <hr style={{ border: '1px solid #eee', marginTop: 10, marginBottom: 20 }} />
-
           <Typography id="modal-modal-title" variant="p" component="p">
-            <b>Product:</b> {productAttr}
+            <b>Customer:</b> {fullName}
           </Typography>
-
           <Typography id="modal-modal-title" variant="p" component="p">
-            <b>Wilaya:</b> {wilayaAttr}
+            <b>phone number:</b> {phone}
           </Typography>
-          {communeAttr && (
-            <Typography id="modal-modal-title" variant="p" component="p">
-              <b>Commune:</b> {communeAttr}
-            </Typography>
-          )}
-          {stopdeskAttr && (
-            <Typography id="modal-modal-title" variant="p" component="p">
-              <b>Agency:</b> {stopdeskAttr}
-            </Typography>
-          )}
-
-          {addressAttr && (
-            <Typography id="modal-modal-title" variant="p" component="p">
-              <b>Address:</b> {addressAttr}
-            </Typography>
-          )}
-
-          {shippingPriceAttr && (
-            <Typography id="modal-modal-title" variant="p" component="p">
-              <b>Shipping price:</b> {shippingPriceAttr}
-            </Typography>
-          )}
-          {productPriceAttr && (
-            <Typography id="modal-modal-title" variant="p" component="p">
-              <b>product price:</b> {productPriceAttr}
-            </Typography>
-          )}
+          <Typography id="modal-modal-title" variant="p" component="p">
+            <b>Path:</b> {departure}{' '}
+            <Label color="info" variant="filled">
+              to
+            </Label>{' '}
+            {destination}
+          </Typography>
+          <Typography id="modal-modal-title" variant="p" component="p">
+            <b>Product:</b> {product}
+          </Typography>
+          <Typography id="modal-modal-title" variant="p" component="p">
+            <b>Price:</b> {price}
+          </Typography>
+          <Typography id="modal-modal-title" variant="p" component="p">
+            <b>Delivery fee:</b> {deliveryFees}
+          </Typography>
         </Box>
       </Modal>
     </div>
   );
 }
 
-export default OrderDetailsModal;
+export default ParcelDetailsModal;

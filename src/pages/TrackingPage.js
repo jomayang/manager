@@ -45,10 +45,10 @@ import supabase from '../config/SupabaseClient';
 // mock
 import USERLIST from '../_mock/user';
 import { LeadListHead } from '../sections/@dashboard/lead';
-import CreateLeadModal from '../components/modals/CreateLeadModal';
-import EditLeadStatus from '../components/modals/EditLeadStatus';
-import ParcelHistoryModal from '../components/modals/ParcelHistoryModal';
-import ParcelDetailsModal from '../components/modals/ParcelDetailsModal';
+import CreateLeadModal from '../components/modals/lead/create-lead/CreateLeadModal';
+import EditLeadStatus from '../components/modals/lead/edit-lead/EditLeadStatus';
+import ParcelHistoryModal from '../components/modals/parcel/parcel-history/ParcelHistoryModal';
+import ParcelDetailsModal from '../components/modals/parcel/parcel-details/ParcelDetailsModal';
 import { UserContext } from '../context/UserContext';
 import { histResponse } from '../data/histResponse';
 import { parcelsResponse } from '../data/parcelsResponse';

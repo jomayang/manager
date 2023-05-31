@@ -26,10 +26,10 @@ import axios from 'axios';
 import React, { useEffect, forwardRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Stack } from '@mui/system';
-import Iconify from '../iconify/Iconify';
-import Label from '../label/Label';
-import CreateLeadForm from './CreateLeadForm';
-import supabase from '../../config/SupabaseClient';
+import Iconify from '../../../iconify/Iconify';
+import Label from '../../../label/Label';
+import CreateLeadForm from '../../lead/create-lead/CreateLeadForm';
+import supabase from '../../../../config/SupabaseClient';
 
 const style = {
   position: 'absolute',

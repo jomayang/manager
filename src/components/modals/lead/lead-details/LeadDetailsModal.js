@@ -11,9 +11,9 @@ import {
 import { Box, Modal, Button, Typography, IconButton } from '@mui/material';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import Iconify from '../iconify/Iconify';
-import Label from '../label/Label';
-import CreateLeadForm from './CreateLeadForm';
+import Iconify from '../../../iconify/Iconify';
+import Label from '../../../label/Label';
+import CreateLeadForm from '../create-lead/CreateLeadForm';
 
 const style = {
   position: 'absolute',
