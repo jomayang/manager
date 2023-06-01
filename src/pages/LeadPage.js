@@ -280,6 +280,7 @@ export default function LeadPage() {
             product: lead.product,
             address: lead.address,
             comment: lead.comment,
+            agentId: lead.agent_id,
             status: lead.status,
             wilaya: lead.wilaya,
             createdAt: lead.created_at,
@@ -440,6 +441,7 @@ export default function LeadPage() {
             status: lead.status,
             wilaya: lead.wilaya,
             createdAt: lead.created_at,
+            agentId: lead.agent_id,
             color: lead.color,
             size: lead.size,
           }));
@@ -712,6 +714,7 @@ export default function LeadPage() {
                           firstName,
                           lastName,
                           color,
+                          agentId,
                           size,
                           createdAt,
                         } = row;
@@ -779,6 +782,7 @@ export default function LeadPage() {
                                   firstNameAttr={firstName}
                                   lastNameAttr={lastName}
                                   commentAttr={comment}
+                                  agentIdAttr={agentId}
                                   statusAttr={status}
                                   phoneAttr={phone}
                                   createdAtAttr={createdAt}

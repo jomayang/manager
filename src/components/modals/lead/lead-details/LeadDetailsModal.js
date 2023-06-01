@@ -61,6 +61,7 @@ function LeadDetailsModal({
   statusAttr,
   sizeAttr,
   colorAttr,
+  agentIdAttr,
   phoneAttr,
   createdAtAttr,
 }) {
@@ -68,7 +69,10 @@ function LeadDetailsModal({
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
-
+  const agents = {
+    a17: 'Gherzouli Lina',
+    a23: 'Benfedda Rahma',
+  };
   const handleOpenModal = async () => {
     handleOpen();
   };
@@ -126,6 +130,11 @@ function LeadDetailsModal({
           {addressAttr && (
             <Typography id="modal-modal-title" variant="p" component="p">
               <b>Address:</b> {addressAttr}
+            </Typography>
+          )}
+          {agentIdAttr && (
+            <Typography id="modal-modal-title" variant="p" component="p">
+              <b>Agent:</b> {agents[`a${agentIdAttr}`]}
             </Typography>
           )}
         </Box>

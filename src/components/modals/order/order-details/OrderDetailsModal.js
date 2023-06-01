@@ -8,7 +8,20 @@ import {
   timelineOppositeContentClasses,
   TimelineSeparator,
 } from '@mui/lab';
-import { Box, Modal, Button, Typography, IconButton } from '@mui/material';
+import {
+  Box,
+  Modal,
+  Button,
+  Typography,
+  IconButton,
+  TableContainer,
+  Table,
+  TableHead,
+  Paper,
+  TableRow,
+  TableCell,
+  TableBody,
+} from '@mui/material';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import Iconify from '../../../iconify/Iconify';
@@ -68,28 +81,42 @@ function OrderDetailsModal({
   createdAtAttr,
 }) {
   const [open, setOpen] = useState(false);
-
+  const [relevantItems, setRelevantItems] = useState([]);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
   const handleOpenModal = async () => {
     handleOpen();
-  };
 
-  /* useEffect(() => {
-    const init = async () => {
-      const {data, error} = await supabase
-      .from('orders')
-      .select('firstname, lastname, order_item(id), items(*)')
-      .eq('order_item.order_id', id)
-      .eq('order_item.item_id')
-    } 
-    init();
-  }, []); */
+    const { data: dataRelatedInventory, error: errorRelatedInventory } = await supabase
+      .from('order_item')
+      .select(
+        `
+        *,
+        items(
+          *
+        )
+      `
+      )
+      .eq('order_id', id);
+
+    if (dataRelatedInventory) {
+      const fetchedInventory = dataRelatedInventory.map((row) => ({
+        id: row.id,
+        product: row.items.product,
+        color: row.items.color,
+        size: row.items.size,
+        quantity: row.qty,
+      }));
+
+      setRelevantItems(fetchedInventory);
+      console.log('filtered inventory', fetchedInventory);
+    }
+  };
 
   return (
     <div>
-      <IconButton size="large" color="inherit" onClick={handleOpen}>
+      <IconButton size="large" color="inherit" onClick={handleOpenModal}>
         <Iconify icon="eva:eye-outline" />
       </IconButton>
 
@@ -156,6 +183,32 @@ function OrderDetailsModal({
             <Typography id="modal-modal-title" variant="p" component="p">
               <b>product price:</b> {productPriceAttr}
             </Typography>
+          )}
+          {relevantItems.length !== 0 && (
+            <TableContainer style={{ marginTop: 10 }} component={Paper}>
+              <Table size="small" aria-label="a dense table">
+                <TableHead>
+                  <TableRow>
+                    <TableCell align="right">Product</TableCell>
+                    <TableCell align="right">Color</TableCell>
+                    <TableCell align="right">Size</TableCell>
+                    <TableCell align="right">Quantity</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {relevantItems.map((row) => (
+                    <TableRow key={Math.random()} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                      <TableCell component="th" scope="row">
+                        {row.product}
+                      </TableCell>
+                      <TableCell align="right">{row.color}</TableCell>
+                      <TableCell align="right">{row.size}</TableCell>
+                      <TableCell align="right">{row.quantity}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
           )}
         </Box>
       </Modal>
