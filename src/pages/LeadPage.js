@@ -572,7 +572,7 @@ export default function LeadPage() {
                     <MenuItem value={''}>All</MenuItem>
                     <MenuItem value={'oil'}>Oil</MenuItem>
                     <MenuItem value={'shoes'}>Shoes</MenuItem>
-                    <MenuItem value={'outfit'}>Outfit</MenuItem>
+                    <MenuItem value={'ensemble'}>Ensemble</MenuItem>
                   </Select>
                 </FormControl>
               </div>
