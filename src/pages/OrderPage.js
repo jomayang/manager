@@ -395,6 +395,38 @@ export default function OrderPage() {
     }
   };
 
+  const handleDeleteOrderAuto = async (id, phone) => {
+    try {
+      const { error } = await supabase.from('orders').delete().eq('id', id);
+
+      if (error) {
+        setFeedback('a Problem accured when removing the lead');
+        setIsError(true);
+      } else {
+        const { error: errorLeadLog } = await supabase.from('logs').insert({
+          user: user.user_metadata.name,
+          action: 'delete',
+          entity: 'order',
+          number: phone,
+        });
+        if (errorLeadLog) {
+          console.log('oops log: ', errorLeadLog);
+          setFeedback('a Problem accured when adding the new LOG!');
+          setIsError(true);
+        }
+        setFeedback('Lead removed successfully!');
+        setIsError(false);
+        setTriggerFetch(Math.random());
+      }
+      setOpen(true);
+    } catch (error) {
+      console.log(error);
+      setFeedback('a Problem accured!');
+      setIsError(true);
+      setOpen(true);
+    }
+  };
+
   const handleExpedition = async (id, phone) => {
     try {
       console.log('orderId', id);
@@ -650,13 +682,25 @@ export default function OrderPage() {
                             <TableCell align="right">
                               <Stack direction="row" justifyContent="right">
                                 {status === 'initial' && (
-                                  <IconButton
-                                    size="large"
-                                    color="inherit"
-                                    onClick={() => handleDeleteOrder(trackingId, phone)}
-                                  >
-                                    <Iconify icon={'eva:trash-2-outline'} />
-                                  </IconButton>
+                                  <>
+                                    {isAutoDelivered ? (
+                                      <IconButton
+                                        size="large"
+                                        color="inherit"
+                                        onClick={() => handleDeleteOrderAuto(id, phone)}
+                                      >
+                                        <Iconify icon={'eva:trash-2-outline'} />
+                                      </IconButton>
+                                    ) : (
+                                      <IconButton
+                                        size="large"
+                                        color="inherit"
+                                        onClick={() => handleDeleteOrder(trackingId, phone)}
+                                      >
+                                        <Iconify icon={'eva:trash-2-outline'} />
+                                      </IconButton>
+                                    )}
+                                  </>
                                 )}
 
                                 {currentUserRole === 'admin' && isAutoDelivered && (
