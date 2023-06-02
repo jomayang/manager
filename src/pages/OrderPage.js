@@ -29,8 +29,10 @@ import {
   Toolbar,
   Snackbar,
   Skeleton,
+  Box,
 } from '@mui/material';
 import MuiAlert from '@mui/material/Alert';
+import { PDFDownloadLink } from '@react-pdf/renderer';
 // components
 import axios from 'axios';
 import Label from '../components/label';
@@ -46,6 +48,8 @@ import supabase from '../config/SupabaseClient';
 import OrderDetailsModal from '../components/modals/order/order-details/OrderDetailsModal';
 import EditOrderStatus from '../components/modals/order/edit-order/EditOrderStatus';
 import { UserContext } from '../context/UserContext';
+import ParcelHistoryCustomModal from '../components/modals/parcel/parcel-history-custom/ParcelHistoryCustomModal';
+import { DeliverySlip } from '../components/pdf/delivery-slip';
 
 // ----------------------------------------------------------------------
 const Alert = forwardRef((props, ref) => <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />);
@@ -141,6 +145,7 @@ export default function OrderPage() {
   const [searchInput, setSearchInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { user } = useContext(UserContext);
+  const [currentUserRole, setCurrentUserRole] = useState();
   const handleOpenMenu = (event) => {
     setOpen(event.currentTarget);
   };
@@ -233,6 +238,7 @@ export default function OrderPage() {
             stopdesk: order.stopdesk,
             isStopdesk: order.is_stopdesk,
             createdAt: order.created_at,
+            isAutoDelivered: order.is_auto_delivered,
           }));
           setRowsCount(count);
           setOrders(fetchedOrders);
@@ -249,6 +255,28 @@ export default function OrderPage() {
     };
     fetchOrders();
   }, [rowsPerPage, page, triggerFetch]);
+
+  useEffect(() => {
+    const getSession = async () => {
+      try {
+        const { data, error } = await supabase.auth.getSession();
+        if (data && data.session) {
+          const { data: dataFetch, error: errorFetch } = await supabase
+            .from('users')
+            .select('role')
+            .eq('email', data.session.user.email);
+
+          let role = '';
+
+          if (dataFetch && dataFetch[0]) role = dataFetch[0].role;
+          setCurrentUserRole(role);
+        }
+      } catch (error) {
+        console.log('something went wrong ', error);
+      }
+    };
+    getSession();
+  }, []);
 
   const handleSearchInDb = async (e) => {
     if (e.key === 'Enter') {
@@ -277,6 +305,7 @@ export default function OrderPage() {
             stopdesk: order.stopdesk,
             isStopdesk: order.is_stopdesk,
             createdAt: order.created_at,
+            isAutoDelivered: order.is_auto_delivered,
           }));
           setRowsCount(count);
           setOrders(fetchedOrders);
@@ -366,6 +395,31 @@ export default function OrderPage() {
     }
   };
 
+  const handleExpedition = async (id, phone) => {
+    try {
+      console.log('orderId', id);
+
+      const { error: errorOrder } = await supabase.from('orders').update({ status: 'processing' }).eq('id', id);
+      const { data: dataCreateStatus, error: errorCreateStatus } = await supabase
+        .from('status')
+        .insert({ order_id: id, status: 'processing' })
+        .select()
+        .single();
+
+      if (errorOrder) {
+        setFeedback('Could not change order status');
+        setIsError(true);
+      } else {
+        setFeedback('order status changed successfully');
+        setIsError(false);
+        setTriggerFetch(Math.random());
+      }
+    } catch (error) {
+      setFeedback('Could not change order status');
+      setIsError(true);
+    }
+  };
+
   return (
     <>
       <Helmet>
@@ -377,7 +431,17 @@ export default function OrderPage() {
           <Typography variant="h4" gutterBottom>
             Orders
           </Typography>
-          <CreateOrderModal handleTriggerFetch={(val) => setTriggerFetch(val)} />
+          <Stack direction="row" spacing={2}>
+            {currentUserRole === 'admin' && (
+              <PDFDownloadLink document={<DeliverySlip />} fileName="Ecomeast-delivery-slip">
+                <Button color="warning" variant="contained" startIcon={<Iconify icon="eva:printer-outline" />}>
+                  Print
+                </Button>
+              </PDFDownloadLink>
+            )}
+
+            <CreateOrderModal handleTriggerFetch={(val) => setTriggerFetch(val)} />
+          </Stack>{' '}
         </Stack>
 
         <Card>
@@ -544,6 +608,7 @@ export default function OrderPage() {
                           productPrice,
                           stopdesk,
                           isStopdesk,
+                          isAutoDelivered,
                           createdAt,
                         } = row;
                         const selectedOrder = selected.indexOf(id) !== -1;
@@ -594,6 +659,10 @@ export default function OrderPage() {
                                   </IconButton>
                                 )}
 
+                                {currentUserRole === 'admin' && isAutoDelivered && (
+                                  <ParcelHistoryCustomModal id={id} status={status} />
+                                )}
+
                                 <OrderDetailsModal
                                   fullNameAttr={fullName}
                                   id={id}
@@ -608,6 +677,12 @@ export default function OrderPage() {
                                   productPriceAttr={productPrice}
                                   createdAtAttr={createdAt}
                                 />
+
+                                {currentUserRole === 'admin' && status === 'initial' && isAutoDelivered && (
+                                  <IconButton size="large" color="inherit" onClick={() => handleExpedition(id, phone)}>
+                                    <Iconify icon={'eva:checkmark-square-2-outline'} />
+                                  </IconButton>
+                                )}
                               </Stack>
                             </TableCell>
                           </TableRow>

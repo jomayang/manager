@@ -31,6 +31,7 @@ import {
   Skeleton,
 } from '@mui/material';
 import MuiAlert from '@mui/material/Alert';
+import { PDFDownloadLink, PDFViewer } from '@react-pdf/renderer';
 // components
 import axios from 'axios';
 import Label from '../components/label';
@@ -48,6 +49,7 @@ import EditOrderStatus from '../components/modals/order/edit-order/EditOrderStat
 import { UserContext } from '../context/UserContext';
 import EditParcelStatus from '../components/modals/parcel/edit-parcel/EditParcelStatus';
 import ParcelHistoryCustomModal from '../components/modals/parcel/parcel-history-custom/ParcelHistoryCustomModal';
+import { DeliverySlip } from '../components/pdf/delivery-slip';
 
 // ----------------------------------------------------------------------
 const Alert = forwardRef((props, ref) => <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />);
@@ -332,6 +334,12 @@ export default function ParcelPage() {
           <Typography variant="h4" gutterBottom>
             Parcels
           </Typography>
+          <PDFDownloadLink document={<DeliverySlip />} fileName="Ecomeast-delivery-slip">
+            <Button variant="contained" startIcon={<Iconify icon="eva:printer-outline" />}>
+              Print
+            </Button>
+          </PDFDownloadLink>
+
           {/* <button onClick={addModels}>add</button> */}
           {/* <CreateOrderModal handleTriggerFetch={(val) => setTriggerFetch(val)} /> */}
         </Stack>

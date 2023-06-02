@@ -92,6 +92,11 @@ export const navTrackerConfig = [
 
 export const navDmConfig = [
   {
+    title: 'order',
+    path: '/dashboard/orders',
+    icon: icon('ic_invoice'),
+  },
+  {
     title: 'Parcels',
     path: '/dashboard/parcels',
     icon: icon('ic_invoice'),

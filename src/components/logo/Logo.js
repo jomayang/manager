@@ -31,18 +31,14 @@ const Logo = forwardRef(({ disabledLink = false, sx, ...other }, ref) => {
       ref={ref}
       component="div"
       sx={{
-        width: 96,
-        height: 96,
-        alignItems: 'center',
+        height: 64,
         display: 'inline-flex',
-        marginLeft: 'auto',
-        marginRight: 'auto',
         ...sx,
       }}
       {...other}
     >
       <Box>
-        <img src="/favicon/android-chrome-192x192.png" alt="logo" />
+        <img src="/logo-clean.png" height={54} alt="logo" />
       </Box>
     </Box>
   );

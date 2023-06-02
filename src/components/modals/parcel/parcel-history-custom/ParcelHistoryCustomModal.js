@@ -115,39 +115,40 @@ function ParcelHistoryCustomModal({ id, status, colors }) {
                   maxHeight: '450px',
                 }}
               >
-                {history.map((hist, i) => (
-                  <TimelineItem key={i}>
-                    <TimelineOppositeContent color="textSecondary">
-                      <p
-                        style={{
-                          fontSize: 12,
-                          marginBottom: 0,
-                        }}
-                      >
-                        {hist.created_at.split('T')[0]}
-                      </p>
-                      <p
-                        style={{
-                          fontSize: 16,
-                          marginTop: 0,
-                        }}
-                      >
-                        {hist.created_at.split('T')[1].slice(0, 8)}
-                      </p>
-                    </TimelineOppositeContent>
-                    <TimelineSeparator>
-                      {i === 0 ? <TimelineDot color="primary" /> : <TimelineDot />}
-                      <TimelineConnector />
-                    </TimelineSeparator>
-                    <TimelineContent>
-                      <p style={{ margin: 0 }}>
-                        {hist.status} {hist.reason && <span>({hist.reason})</span>}
-                      </p>
-                      {/* <p style={{ margin: 0, fontSize: 12 }}>{hist.reason}</p> */}
-                      <p style={{ margin: 0, fontSize: 12, color: '#999' }}>{hist.comment}</p>
-                    </TimelineContent>
-                  </TimelineItem>
-                ))}
+                {history &&
+                  history.map((hist, i) => (
+                    <TimelineItem key={i}>
+                      <TimelineOppositeContent color="textSecondary">
+                        <p
+                          style={{
+                            fontSize: 12,
+                            marginBottom: 0,
+                          }}
+                        >
+                          {hist.created_at.split('T')[0]}
+                        </p>
+                        <p
+                          style={{
+                            fontSize: 16,
+                            marginTop: 0,
+                          }}
+                        >
+                          {hist.created_at.split('T')[1].slice(0, 8)}
+                        </p>
+                      </TimelineOppositeContent>
+                      <TimelineSeparator>
+                        {i === 0 ? <TimelineDot color="primary" /> : <TimelineDot />}
+                        <TimelineConnector />
+                      </TimelineSeparator>
+                      <TimelineContent>
+                        <p style={{ margin: 0 }}>
+                          {hist.status} {hist.reason && <span>({hist.reason})</span>}
+                        </p>
+                        {/* <p style={{ margin: 0, fontSize: 12 }}>{hist.reason}</p> */}
+                        <p style={{ margin: 0, fontSize: 12, color: '#999' }}>{hist.comment}</p>
+                      </TimelineContent>
+                    </TimelineItem>
+                  ))}
               </Timeline>
             </>
           )}

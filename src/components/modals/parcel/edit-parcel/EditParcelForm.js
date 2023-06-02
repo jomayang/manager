@@ -127,7 +127,7 @@ function EditParcelForm({ id, statusAttr, handleTriggerFetch }) {
             <FormControl>
               <InputLabel>Status</InputLabel>
               <Select value={status} label="Status" onChange={(e) => setStatus(e.target.value)}>
-                <MenuItem value={'initial'}>Initial</MenuItem>
+                <MenuItem value={'processing'}>Processing</MenuItem>
                 <MenuItem value={'missed-attempt'}>Missed Attempt</MenuItem>
                 <MenuItem value={'returned'}>Returned</MenuItem>
                 <MenuItem value={'delivered'}>Delivered</MenuItem>

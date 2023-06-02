@@ -137,6 +137,7 @@ const DM_ROUTES = [
       { element: <Navigate to="/dashboard/app" />, index: true },
       { path: 'app', element: <DashboardAppPage /> },
       { path: 'parcels', element: <ParcelPage /> },
+      { path: 'orders', element: <OrderPage /> },
     ],
   },
   {

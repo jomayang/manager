@@ -486,30 +486,30 @@ function EditLeadForm({
           setFeedback('a Problem accured when adding the new Order!');
           setIsError(true);
         }
-
-        const { error: errorOrderLog } = await supabase
-          .from('logs')
-          .insert({ user_fullname: user.user_metadata.name, action: 'add', entity: 'order', number: phone });
-        if (errorOrderLog) {
-          console.log('oops log: ', errorOrderLog);
-          setFeedback('a Problem accured when adding the new LOG!');
-          setIsError(true);
-        }
-
-        const { error: errorLeadLog } = await supabase.from('logs').insert({
-          user_fullname: user.user_metadata.name,
-          action: 'update',
-          entity: 'lead',
-          number: phone,
-          last_status: status,
-          attempt: status === 'not-responding' || status === 'unreachable' ? +comment : null,
-        });
-        if (errorLeadLog) {
-          console.log('oops log: ', errorLeadLog);
-          setFeedback('a Problem accured when adding the new LOG!');
-          setIsError(true);
-        }
       }
+      const { error: errorOrderLog } = await supabase
+        .from('logs')
+        .insert({ user_fullname: user.user_metadata.name, action: 'add', entity: 'order', number: phone });
+      if (errorOrderLog) {
+        console.log('oops log: ', errorOrderLog);
+        setFeedback('a Problem accured when adding the new LOG!');
+        setIsError(true);
+      }
+
+      const { error: errorLeadLog } = await supabase.from('logs').insert({
+        user_fullname: user.user_metadata.name,
+        action: 'update',
+        entity: 'lead',
+        number: phone,
+        last_status: status,
+        attempt: status === 'not-responding' || status === 'unreachable' ? +comment : null,
+      });
+      if (errorLeadLog) {
+        console.log('oops log: ', errorLeadLog);
+        setFeedback('a Problem accured when adding the new LOG!');
+        setIsError(true);
+      }
+
       setUpdateLoading(false);
       setOpen(true);
       handleTriggerFetch(Math.random());
