@@ -48,6 +48,8 @@ import EditLeadStatus from '../components/modals/lead/edit-lead/EditLeadStatus';
 import ImportLeadsModal from '../components/modals/lead/import-leads/ImportLeadsModal';
 import LeadDetailsModal from '../components/modals/lead/lead-details/LeadDetailsModal';
 import { missedLeads } from '../data/missedLeads';
+import EditInventoryStatus from '../components/modals/inventory/edit-inventory/EditInventoryStatus';
+import CreateItemModal from '../components/modals/inventory/create-item/CreateItemModal';
 // ----------------------------------------------------------------------
 
 const Alert = forwardRef((props, ref) => <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />);
@@ -143,7 +145,7 @@ export default function InventoryPage() {
   const [filterName, setFilterName] = useState('');
   const [isError, setIsError] = useState(false);
   const [feedback, setFeedback] = useState('');
-  const [rowsPerPage, setRowsPerPage] = useState(50);
+  const [rowsPerPage, setRowsPerPage] = useState(100);
   const [leads, setLeads] = useState([]);
   const [searchInput, setSearchInput] = useState('');
   const [rowsCount, setRowsCount] = useState(0);
@@ -151,6 +153,7 @@ export default function InventoryPage() {
   const [filterStatus, setFilterStatus] = useState('');
   const [filterProduct, setFilterProduct] = useState('');
   const [userSession, setUserSession] = useState(null);
+
   const [currentUserRole, setCurrentUserRole] = useState('');
   useEffect(() => {
     console.log(selected);
@@ -246,9 +249,11 @@ export default function InventoryPage() {
         if (data) {
           const fetchedInventory = data.map((row) => ({
             id: row.id,
+            itemId: row.items.id,
             product: row.items.product,
             color: row.items.color,
             size: row.items.size,
+            thumbnail: row.items.thumbnail,
             quantity: row.quantity,
           }));
 
@@ -336,15 +341,15 @@ export default function InventoryPage() {
     }
   };
 
-  const handleDeleteLead = async (id) => {
+  const handleDeleteItem = async (id) => {
     try {
-      const { error } = await supabase.from('leads').delete().eq('id', id);
+      const { error } = await supabase.from('items').delete().eq('id', id);
 
       if (error) {
-        setFeedback('a Problem accured when removing the lead');
+        setFeedback('a Problem accured when removing the item');
         setIsError(true);
       } else {
-        setFeedback('Lead removed successfully!');
+        setFeedback('Item removed successfully!');
         setIsError(false);
         setTriggerFetch(Math.random());
       }
@@ -369,7 +374,7 @@ export default function InventoryPage() {
             Inventory
           </Typography>
           <Stack direction="row">
-            <CreateLeadModal handleTriggerFetch={(val) => setTriggerFetch(val)} />
+            <CreateItemModal handleTriggerFetch={(val) => setTriggerFetch(val)} />
           </Stack>
         </Stack>
 
@@ -393,14 +398,14 @@ export default function InventoryPage() {
                   value={searchInput}
                   onChange={(e) => setSearchInput(e.target.value)}
                   onKeyDown={handleSearchInDb}
-                  placeholder="Search lead..."
+                  placeholder="Search product..."
                   startAdornment={
                     <InputAdornment position="start">
                       <Iconify icon="eva:search-fill" sx={{ color: 'text.disabled', width: 20, height: 20 }} />
                     </InputAdornment>
                   }
                 />
-                <FormControl fullWidth style={{ width: 240, marginLeft: 10, marginTop: 10 }}>
+                {/* <FormControl fullWidth style={{ width: 240, marginLeft: 10, marginTop: 10 }}>
                   <InputLabel>Filter Status</InputLabel>
                   <Select
                     value={filterStatus}
@@ -436,7 +441,7 @@ export default function InventoryPage() {
                     <MenuItem value={'shoes'}>Shoes</MenuItem>
                     <MenuItem value={'outfit'}>Outfit</MenuItem>
                   </Select>
-                </FormControl>
+                </FormControl> */}
               </div>
               // <button
               // </form>
@@ -563,7 +568,7 @@ export default function InventoryPage() {
                   ) : (
                     <>
                       {filteredLeads.map((row) => {
-                        const { id, product, color, size, quantity } = row;
+                        const { id, product, thumbnail, color, itemId, size, quantity } = row;
                         const selectedLead = selected.indexOf(id) !== -1;
 
                         return (
@@ -591,28 +596,22 @@ export default function InventoryPage() {
                               <Label color={statusColors[status]}>{sentenceCase(status)}</Label>
                             </TableCell> */}
                             <TableCell align="right">
-                              {/* <EditLeadStatus
+                              <EditInventoryStatus
                                 id={id}
-                                communeAttr={commune}
-                                wilayaAttr={wilaya}
-                                addressAttr={address}
-                                productAttr={product}
-                                firstNameAttr={firstName}
-                                lastNameAttr={lastName}
-                                commentAttr={comment}
-                                statusAttr={status}
-                                phoneAttr={phone}
-                                colorAttr={color}
-                                sizeAttr={size}
-                                createdAtAttr={createdAt}
+                                itemIdAttr={itemId}
+                                itemColorAttr={color}
+                                itemSizeAttr={size}
+                                itemProductAttr={product}
+                                inventoryAttr={quantity}
+                                thumbnailAttr={thumbnail}
                                 handleTriggerFetch={(val) => setTriggerFetch(val)}
-                              /> */}
+                              />
                             </TableCell>
 
                             <TableCell align="right">
                               <Stack direction="row">
                                 {currentUserRole === 'admin' && (
-                                  <IconButton size="large" color="inherit" onClick={() => handleDeleteLead(id)}>
+                                  <IconButton size="large" color="inherit" onClick={() => handleDeleteItem(itemId)}>
                                     <Iconify icon={'eva:trash-2-outline'} />
                                   </IconButton>
                                 )}
