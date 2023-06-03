@@ -320,6 +320,7 @@ export default function OrderPage() {
 
   const handleDeleteOrder = async (trackingId, phone) => {
     try {
+      alert('are you sure about deleting the order?');
       console.log('tracking is', trackingId);
       const response = await axios({
         url: `https://ecom-api-5wlr.onrender.com/delete/`,
@@ -397,6 +398,7 @@ export default function OrderPage() {
 
   const handleDeleteOrderAuto = async (id, phone) => {
     try {
+      alert('are you sure about deleting the order?');
       const { error } = await supabase.from('orders').delete().eq('id', id);
 
       if (error) {

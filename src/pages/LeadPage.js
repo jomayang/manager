@@ -462,6 +462,7 @@ export default function LeadPage() {
 
   const handleDeleteLead = async (id) => {
     try {
+      alert('are you sure about deleting the lead?');
       const { error } = await supabase.from('leads').delete().eq('id', id);
 
       if (error) {

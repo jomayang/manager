@@ -343,6 +343,7 @@ export default function InventoryPage() {
 
   const handleDeleteItem = async (id) => {
     try {
+      alert('are you sure about deleting the item?');
       const { error } = await supabase.from('items').delete().eq('id', id);
 
       if (error) {
