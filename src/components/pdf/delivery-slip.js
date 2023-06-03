@@ -33,7 +33,7 @@ const styles = StyleSheet.create({
 
 function generateHashFromString(inputString) {
   const hash = SHA1(inputString).toString(enc.Hex);
-  const alphanumericHash = hash.replace(/\W/g, '').substring(0, 6);
+  const alphanumericHash = hash.replace(/\W/g, '').substring(0, 6).toUpperCase();
   return alphanumericHash;
 }
 
@@ -135,15 +135,13 @@ export const DeliverySlip = () => {
                 </View>
                 <View style={{ display: 'flex', flexDirection: 'row', marginTop: 10, justifyContent: 'center' }}>
                   <Image
-                    src={`http://bwipjs-api.metafloor.com/?bcid=code128&text=ECT-${generateHashFromString(
-                      order.id.toString()
-                    )}`}
-                    style={{ height: 24, width: 128 }}
+                    src={`https://barcodeapi.org/api/128/ECT-${generateHashFromString(order.id.toString())}`}
+                    style={{ height: 48, width: 128 }}
                   />
                 </View>
-                <View style={{ display: 'flex', flexDirection: 'row', marginTop: 5, justifyContent: 'center' }}>
+                {/* <View style={{ display: 'flex', flexDirection: 'row', marginTop: 5, justifyContent: 'center' }}>
                   <Text style={{ fontSize: 14 }}>ECT-{generateHashFromString(order.id.toString()).toUpperCase()}</Text>
-                </View>
+                </View> */}
                 <View style={{ position: 'relative' }}>
                   <Image src="/table-slip.png" style={{ width: '100%' }} />
                   <Text style={{ position: 'absolute', top: 20, right: 10, bottom: 0, fontSize: 9 }}>
