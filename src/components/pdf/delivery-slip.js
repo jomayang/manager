@@ -151,6 +151,9 @@ export const DeliverySlip = () => {
                     {products && products[order.id]}
                   </Text>
                 </View>
+                <View>
+                  <Text style={styles.text}>Service client: 0660994741</Text>
+                </View>
               </View>
             </View>
           ))}

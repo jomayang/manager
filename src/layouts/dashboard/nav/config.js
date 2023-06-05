@@ -66,6 +66,11 @@ export const navAdminConfig = [
   },
 
   {
+    title: 'Parcels',
+    path: '/dashboard/parcels',
+    icon: icon('ic_invoice'),
+  },
+  {
     title: 'Audit',
     path: '/dashboard/audit',
     icon: icon('ic_lock'),

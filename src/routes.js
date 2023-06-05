@@ -36,6 +36,7 @@ const ADMIN_ROUTES = [
       { path: 'leads', element: <LeadPage /> },
       { path: 'orders', element: <OrderPage /> },
       { path: 'tracking', element: <TrackingPageNew /> },
+      { path: 'parcels', element: <ParcelPage /> },
       // { path: 'tracking', element: <TrackingPage /> },
       { path: 'tracking2', element: <TrackingPageOldOne /> },
       { path: 'tracking3', element: <TrackingPageNew /> },
