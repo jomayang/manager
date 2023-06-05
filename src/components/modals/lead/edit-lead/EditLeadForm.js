@@ -523,6 +523,59 @@ function EditLeadForm({
       setUpdateLoading(false);
     }
   };
+  useEffect(() => {
+    const getProducts = async () => {
+      const { data, error } = await supabase.rpc('get_available_products');
+
+      if (data) {
+        // console.log('available products', data);
+        const availableProductsTemp = data.map((prod) => prod.key);
+        console.log('available Products', availableProductsTemp);
+        setAvailableProducts(availableProductsTemp);
+      }
+    };
+    getProducts();
+  }, []);
+
+  useEffect(() => {
+    const getColors = async () => {
+      const { data: dataColor, error: errorColor } = await supabase.rpc('get_available_colors_in_product', {
+        product_in: productList[productList.length - 1].product,
+      });
+      if (dataColor) {
+        // console.log('available colors', dataColor);
+        const availableProductsTemp = dataColor.map((prod) => prod.key);
+        console.log('available colors', availableProductsTemp);
+        setAvailableColors(availableProductsTemp);
+      }
+      const { data: dataSize, error: errorSize } = await supabase.rpc('get_available_sizes_in_product', {
+        product_in: productList[productList.length - 1].product,
+        color_in: productList[productList.length - 1].color,
+      });
+      if (dataSize) {
+        // console.log('available sizes', dataSize);
+        const availableProductsTemp = dataSize.map((prod) => prod.key);
+        console.log('available sizes', availableProductsTemp);
+        setAvailableSizes(availableProductsTemp);
+      }
+    };
+    getColors();
+  }, [productList]);
+
+  useEffect(() => {
+    const getColors = async () => {
+      const { data, error } = await supabase.rpc('get_available_sizes_in_product', {
+        product_in: productList[productList.length - 1].product,
+        color_in: productList[productList.length - 1].color,
+      });
+      if (data) {
+        console.log('available sizes', data);
+        const availableProductsTemp = data.map((prod) => prod.key);
+        console.log('av', availableProductsTemp);
+      }
+    };
+    getColors();
+  }, []);
 
   useEffect(() => {
     if ((productPrice === 0 || shippingPrice === 0) && status === 'confirmed') {
@@ -718,35 +771,85 @@ function EditLeadForm({
                 {productList.map((productItem, i) => (
                   <>
                     <Box sx={{ marginBottom: '1.5rem' }}>
-                      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} marginBottom={1}>
-                        <FormControl fullWidth>
-                          <TextField
-                            name="product"
-                            label="Product"
-                            value={productItem.product}
-                            size="small"
-                            onChange={(e) => handleProductChange(e, i)}
-                          />
-                        </FormControl>
-                        <FormControl fullWidth>
-                          <TextField
-                            name="color"
-                            label="Product Color"
-                            value={productItem.color}
-                            size="small"
-                            onChange={(e) => handleProductChange(e, i)}
-                          />
-                        </FormControl>
-                        <FormControl fullWidth>
-                          <TextField
-                            name="size"
-                            label="Product Size"
-                            value={productItem.size}
-                            size="small"
-                            onChange={(e) => handleProductChange(e, i)}
-                          />
-                        </FormControl>
-                      </Stack>
+                      {productList.length - 1 === i ? (
+                        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} marginBottom={1}>
+                          <FormControl fullWidth>
+                            <InputLabel>Product</InputLabel>
+                            <Select
+                              value={productItem.product}
+                              label="Product"
+                              name="product"
+                              onChange={(e) => handleProductChange(e, i)}
+                            >
+                              {availableProducts.map((prod, ix) => (
+                                <MenuItem key={ix} value={prod}>
+                                  {prod}
+                                </MenuItem>
+                              ))}
+                            </Select>
+                          </FormControl>
+                          <FormControl fullWidth>
+                            <InputLabel>Color</InputLabel>
+                            <Select
+                              value={productItem.color}
+                              label="Color"
+                              name="color"
+                              onChange={(e) => handleProductChange(e, i)}
+                            >
+                              {availableColors.map((color, ix) => (
+                                <MenuItem key={ix} value={color}>
+                                  {color}
+                                </MenuItem>
+                              ))}
+                            </Select>
+                          </FormControl>
+                          <FormControl fullWidth>
+                            <InputLabel>Size</InputLabel>
+                            <Select
+                              value={productItem.size}
+                              label="Size"
+                              name="size"
+                              onChange={(e) => handleProductChange(e, i)}
+                            >
+                              {availableSizes.map((size, ix) => (
+                                <MenuItem key={ix} value={size}>
+                                  {size}
+                                </MenuItem>
+                              ))}
+                            </Select>
+                          </FormControl>
+                        </Stack>
+                      ) : (
+                        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} marginBottom={1}>
+                          <FormControl fullWidth>
+                            <TextField
+                              name="product"
+                              label="Product"
+                              value={productItem.product}
+                              size="small"
+                              onChange={(e) => handleProductChange(e, i)}
+                            />
+                          </FormControl>
+                          <FormControl fullWidth>
+                            <TextField
+                              name="color"
+                              label="Product Color"
+                              value={productItem.color}
+                              size="small"
+                              onChange={(e) => handleProductChange(e, i)}
+                            />
+                          </FormControl>
+                          <FormControl fullWidth>
+                            <TextField
+                              name="size"
+                              label="Product Size"
+                              value={productItem.size}
+                              size="small"
+                              onChange={(e) => handleProductChange(e, i)}
+                            />
+                          </FormControl>
+                        </Stack>
+                      )}
                       <Stack justifyContent="end" direction={{ xs: 'column', sm: 'row' }} spacing={2}>
                         <FormControl>
                           <ButtonGroup variant="outlined" aria-label="outlined button group">
