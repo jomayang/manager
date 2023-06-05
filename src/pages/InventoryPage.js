@@ -233,29 +233,28 @@ export default function InventoryPage() {
           console.log('error user: ', errorUser);
         }
 
-        const { count, data, error } = await supabase
-          .from('inventory')
-          .select(
-            `
-          *,
-          items(
-            *
-          )
-        `,
-            { count: 'exact' }
-          )
-          .range(page * rowsPerPage, page * rowsPerPage + rowsPerPage - 1);
-
+        const { count, data, error } = await supabase.rpc('get_items_inventory').select('*', { count: 'exact' });
+        // .range(page * rowsPerPage, page * rowsPerPage + rowsPerPage - 1);
+        console.log('couuuunt:', count);
         if (data) {
           const fetchedInventory = data.map((row) => ({
             id: row.id,
-            itemId: row.items.id,
-            product: row.items.product,
-            color: row.items.color,
-            size: row.items.size,
-            thumbnail: row.items.thumbnail,
+            itemId: row.id,
+            product: row.product,
+            color: row.color,
+            size: row.size,
+            thumbnail: row.thumbnail,
             quantity: row.quantity,
           }));
+          // const fetchedInventory = data.map((row) => ({
+          //   id: row.id,
+          //   itemId: row.items.id,
+          //   product: row.items.product,
+          //   color: row.items.color,
+          //   size: row.items.size,
+          //   thumbnail: row.items.thumbnail,
+          //   quantity: row.quantity,
+          // }));
 
           setRowsCount(count);
           setLeads(fetchedInventory);

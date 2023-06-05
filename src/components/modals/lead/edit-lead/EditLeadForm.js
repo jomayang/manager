@@ -93,6 +93,9 @@ function EditLeadForm({
   const [accurateDeliveryFee, setAccurateDeliveryFee] = useState(null);
   const [relevantItems, setRelevantItems] = useState([]);
   const [qty, setQty] = useState(1);
+  const [availableProducts, setAvailableProducts] = useState([]);
+  const [availableColors, setAvailableColors] = useState([]);
+  const [availableSizes, setAvailableSizes] = useState([]);
 
   const [productList, setProductList] = useState([
     { product: productAttr, color: colorAttr || '', size: `${sizeAttr || ''}`, qty: 1 },

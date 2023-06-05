@@ -92,15 +92,22 @@ function EditInventoryForm({
         .update({ quantity: inventory })
         .eq('item_id', currentItemId);
 
-      if (dataUpdate) {
-        console.log('--->', dataUpdate);
-
+      const { data: dataUpdateItem, error: errorUpdateItem } = await supabase
+        .from('items')
+        .update({
+          product: currentItemProduct,
+          color: currentItemColor,
+          size: currentItemSize,
+          thumbnail: currentItemThumbnail,
+        })
+        .eq('id', itemIdAttr);
+      if (dataUpdateItem && dataUpdate) {
+        console.log('updated');
         setFeedback('inventory updated successfully!');
         setIsError(false);
       }
-
-      if (errorUpdate) {
-        console.log(errorUpdate);
+      if (errorUpdateItem || errorUpdate) {
+        console.log('error updating', errorUpdateItem, errorUpdate);
         setFeedback('a Problem accured when updating the inventory!');
         setIsError(true);
       }
