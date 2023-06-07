@@ -356,9 +356,18 @@ export default function OrderPage() {
               qty_in: qty,
               item_id_in: itemId,
             });
+
+            if (dataInventory) {
+              console.log('stock added');
+            }
+            if (errorInventory) {
+              console.log('stock did not increase', errorInventory);
+            }
           });
         }
-
+        if (errorOrderItem) {
+          console.log('something went wrong', errorOrderItem);
+        }
         const { error: errorOrderItemRemove } = await supabase.from('order_item').delete().eq('order_id', dataOrder.id);
 
         if (errorOrderItemRemove) {
@@ -373,7 +382,7 @@ export default function OrderPage() {
         setIsError(true);
       } else {
         const { error: errorLeadLog } = await supabase.from('logs').insert({
-          user: user.user_metadata.name,
+          user_fullname: user.user_metadata.name,
           action: 'delete',
           entity: 'order',
           number: phone,
@@ -399,6 +408,41 @@ export default function OrderPage() {
   const handleDeleteOrderAuto = async (id, phone) => {
     try {
       alert('are you sure about deleting the order?');
+      const { data: dataOrder, error: errorOrder } = await supabase.from('orders').select('id').eq('id', id).single();
+
+      if (dataOrder) {
+        const { data: dataOrderItem, error: errorOrderItem } = await supabase
+          .from('order_item')
+          .select()
+          .eq('order_id', dataOrder.id);
+
+        if (dataOrderItem) {
+          dataOrderItem.forEach(async (orderItem) => {
+            console.log('order item', orderItem);
+            const { item_id: itemId, qty } = orderItem;
+            console.log('item id ', itemId, 'quantity', qty);
+            const { data: dataInventory, error: errorInventory } = await supabase.rpc('increment_inventory', {
+              qty_in: qty,
+              item_id_in: itemId,
+            });
+
+            if (dataInventory) {
+              console.log('stock added');
+            }
+            if (errorInventory) {
+              console.log('stock did not increase', errorInventory);
+            }
+          });
+        }
+        if (errorOrderItem) {
+          console.log('something went wrong', errorOrderItem);
+        }
+        const { error: errorOrderItemRemove } = await supabase.from('order_item').delete().eq('order_id', dataOrder.id);
+
+        if (errorOrderItemRemove) {
+          console.log('could not delete order item', errorOrderItemRemove);
+        }
+      }
       const { error } = await supabase.from('orders').delete().eq('id', id);
 
       if (error) {
@@ -406,7 +450,7 @@ export default function OrderPage() {
         setIsError(true);
       } else {
         const { error: errorLeadLog } = await supabase.from('logs').insert({
-          user: user.user_metadata.name,
+          user_fullname: user.user_metadata.name,
           action: 'delete',
           entity: 'order',
           number: phone,

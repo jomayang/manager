@@ -152,7 +152,7 @@ export const DeliverySlip = () => {
                   </Text>
                 </View>
                 <View>
-                  <Text style={{ fontSize: 9, fontFamily: 'Helvetica' }}>Service client: 0660994741</Text>
+                  <Text style={{ fontSize: 8, fontFamily: 'Helvetica' }}>Service client: 0660994741</Text>
                 </View>
               </View>
             </View>
