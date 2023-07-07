@@ -232,6 +232,8 @@ export default function LeadPage() {
         let product;
         if (filterProduct === 'oil') {
           product = ['زيت اللحية'];
+        } else if (filterProduct === 'tampon-sourcils') {
+          product = ['طابع الحواجب'];
         } else if (filterProduct === 'shoes') {
           product = ['chaussure_1', 'chaussure_2', 'chaussure_3'];
         } else if (filterProduct === 'outfit') {
@@ -574,6 +576,7 @@ export default function LeadPage() {
                     <MenuItem value={'oil'}>Oil</MenuItem>
                     <MenuItem value={'shoes'}>Shoes</MenuItem>
                     <MenuItem value={'ensemble'}>Ensemble</MenuItem>
+                    <MenuItem value={'tampon-sourcils'}>Tampon sourcils</MenuItem>
                   </Select>
                 </FormControl>
               </div>
