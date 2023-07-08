@@ -623,7 +623,7 @@ function EditLeadForm({
   const handleProductChange = (e, index) => {
     const { name, value } = e.target;
     const pList = [...productList];
-    pList[index][name] = value.toLowerCase().replace(' ', '');
+    pList[index][name] = value.toLowerCase();
     setProductList(pList);
   };
 
