@@ -71,6 +71,12 @@ export const agencies = {
       label: 'Agence de Tlemcen',
     },
   ],
+  Chetouane: [
+    {
+      value: '135001',
+      label: 'Agence Chetouane',
+    },
+  ],
   Hennaya: [
     {
       value: '132601',
@@ -148,15 +154,15 @@ export const agencies = {
       value: '223601',
       label: 'Agence de Sidi Bel Abbes',
     },
+    {
+      value: '223602',
+      label: 'Benhamouda',
+    },
   ],
   Tiaret: [
     {
       value: '143901',
       label: 'Agence de Tiaret',
-    },
-    {
-      value: '143902',
-      label: 'Près la cité universitaire',
     },
   ],
   Frenda: [
@@ -168,7 +174,7 @@ export const agencies = {
   Guelma: [
     {
       value: '241901',
-      label: 'Agence de Guelma',
+      label: 'Nouvelle Agence Guelma',
     },
   ],
   'Oued Zenati': [
@@ -180,13 +186,17 @@ export const agencies = {
   Mostaganem: [
     {
       value: '271801',
-      label: 'Agence de Mostaganem',
+      label: 'Salamandre',
+    },
+    {
+      value: '271802',
+      label: 'Kharouba',
     },
   ],
   Skikda: [
     {
-      value: '213501',
-      label: 'Agence de Skikda',
+      value: '213502',
+      label: 'Nouvelle Agence Skikda',
     },
   ],
   'El Harrouch': [
@@ -240,7 +250,11 @@ export const agencies = {
   'Tizi Ouzou': [
     {
       value: '150101',
-      label: 'Agence de Tizi Ouzou',
+      label: 'Agence de Bekkar',
+    },
+    {
+      value: '150102',
+      label: 'Agence de nouvelle ville',
     },
   ],
   'Tizi Gheniff': [
@@ -412,7 +426,7 @@ export const agencies = {
       label: 'Agence de Metlili',
     },
   ],
-  'Alger Centre': [{ value: '160101', label: 'Agence de Alger Centre' }],
+  'Alger Centre': [{ value: '160101', label: 'Sacré-Cœur' }],
   'Hussein Dey': [{ value: '161701', label: 'Hussein Dey' }],
   Birtouta: [{ value: '163401', label: 'Agence de Birtouta' }],
   Birkhadem: [{ value: '161201', label: 'Agence de Birkhadem' }],
@@ -420,8 +434,9 @@ export const agencies = {
   Reghaïa: [{ value: '164301', label: 'Agence de Reghaïa' }],
   'Aïn Benian': [{ value: '164401', label: 'Agence de Aïn Benian' }],
   Zeralda: [{ value: '164601', label: 'Agence de Zeralda' }],
-  Cheraga: [{ value: '165001', label: 'Agence de Cheraga' }],
+  Cheraga: [{ value: '165001', label: 'Dar Diaf' }],
   Draria: [{ value: '165301', label: 'Agence de Draria' }],
+  'Bordj El Bahri': [{ value: '163901', label: 'Agence Bordj El Bahri' }],
   Tamanrasset: [
     {
       value: '110101',
@@ -485,6 +500,10 @@ export const agencies = {
       value: '250601',
       label: 'Agence de El Khroub',
     },
+    {
+      value: '250602',
+      label: 'Agence Ali Mendjeli',
+    },
   ],
   Tindouf: [
     {
@@ -495,7 +514,11 @@ export const agencies = {
   Médéa: [
     {
       value: '263301',
-      label: 'Agence de Médéa',
+      label: 'Agence de Médéa [El Koutab]',
+    },
+    {
+      value: '263302',
+      label: 'Agence de Médéa [Pole Urbain]',
     },
   ],
   'El Bayadh': [
@@ -507,19 +530,21 @@ export const agencies = {
   Oran: [
     {
       value: '310101',
-      label: 'Agence de Oran',
+      label: 'Saint Hubert',
+    },
+    {
+      value: '310102',
+      label: 'Cité Djamel',
     },
   ],
   'Bir El Djir': [
     {
       value: '310301',
-      label: 'Agence de Bir El Djir',
+      label: 'Agence El Morchid',
     },
-  ],
-  'Es Senia': [
     {
-      value: '310501',
-      label: 'Agence de Es Senia',
+      value: '310302',
+      label: 'Fernand Ville',
     },
   ],
   Arzew: [

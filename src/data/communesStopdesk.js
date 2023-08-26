@@ -132,6 +132,7 @@ export const communesStopdesk = {
     { value: 'Draria', label: 'Draria - الدرارية' },
     { value: 'Birtouta', label: 'Bir Touta - بئر توتة' },
     { value: 'Hussein Dey', label: 'Hussein Dey - حسين داي' },
+    { value: 'Bordj El Bahri', label: 'Bordj El Bahri - برج البحري' },
   ],
   Tamanrasset: [
     { value: 'Tamanrasset', label: 'Tamanrasset - تامنغست' },
@@ -157,7 +158,6 @@ export const communesStopdesk = {
   Oran: [
     { value: 'Oran', label: 'Oran - وهران' },
     { value: 'Bir El Djir', label: 'Bir El Djir - بئر الجير' },
-    { value: 'Es Senia', label: 'Es Senia - السانية' },
     { value: 'Arzew', label: 'Arzew - أرزيو' },
   ],
   'Souk Ahras': [{ value: 'Souk Ahras', label: 'Souk Ahras - سوق أهراس' }],
