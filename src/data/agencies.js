@@ -505,6 +505,12 @@ export const agencies = {
       label: 'Agence Ali Mendjeli',
     },
   ],
+  'Didouche Mourad': [
+    {
+      value: '250501',
+      label: 'Agence de Didouche Mourad',
+    },
+  ],
   Tindouf: [
     {
       value: '370201',

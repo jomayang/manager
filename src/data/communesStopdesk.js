@@ -151,6 +151,7 @@ export const communesStopdesk = {
   Constantine: [
     { value: 'Constantine', label: 'Constantine - قسنطينة' },
     { value: 'El Khroub', label: 'El Khroub - الخروب' },
+    { value: 'Didouche Mourad', label: 'Didouche Mourad - ديدوش مراد' },
   ],
   Tindouf: [{ value: 'Tindouf', label: 'Tindouf - تندوف' }],
   Médéa: [{ value: 'Médéa', label: 'Medea - المدية' }],
