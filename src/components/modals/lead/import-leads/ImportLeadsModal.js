@@ -94,7 +94,7 @@ function ImportLeadsModal() {
           if (agentsCount !== 0) {
             agentId = agents[Math.floor(Math.random() * agentsCount)].id;
           } else {
-            agentId = null;
+            agentId = 17;
           }
           const phone = item.phone_number ? item.phone_number.replace('p:', '') : '';
           console.log('the phone is ', phone);
@@ -108,7 +108,7 @@ function ImportLeadsModal() {
             last_name: '',
             wilaya,
             commune: '',
-            product: 'زيت اللحية',
+            product: 'ensemble_',
             address,
             phone,
             created_at: new Date(createdTime),
