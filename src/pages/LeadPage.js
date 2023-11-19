@@ -464,18 +464,19 @@ export default function LeadPage() {
 
   const handleDeleteLead = async (id) => {
     try {
-      window.confirm('are you sure about deleting the lead?');
-      const { error } = await supabase.from('leads').delete().eq('id', id);
+      if (window.confirm('are you sure about deleting the lead?')) {
+        const { error } = await supabase.from('leads').delete().eq('id', id);
 
-      if (error) {
-        setFeedback('a Problem accured when removing the lead');
-        setIsError(true);
-      } else {
-        setFeedback('Lead removed successfully!');
-        setIsError(false);
-        setTriggerFetch(Math.random());
+        if (error) {
+          setFeedback('a Problem accured when removing the lead');
+          setIsError(true);
+        } else {
+          setFeedback('Lead removed successfully!');
+          setIsError(false);
+          setTriggerFetch(Math.random());
+        }
+        setOpen(true);
       }
-      setOpen(true);
     } catch (error) {
       console.log(error);
       setFeedback('a Problem accured!');
