@@ -35,6 +35,8 @@ function CreateLeadForm({ handleTriggerFetch }) {
   const [address, setAddress] = useState('');
   const [phone, setPhone] = useState('');
   const [product, setProduct] = useState('');
+  const [color, setColor] = useState('');
+  const [size, setSize] = useState('');
   const [agents, setAgents] = useState([]);
   const [agentsCount, setAgentsCount] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
@@ -93,7 +95,7 @@ function CreateLeadForm({ handleTriggerFetch }) {
           agentId = agents[Math.floor(Math.random() * agentsCount)].id;
         }
       } else {
-        agentId = null;
+        agentId = 17;
       }
       const { data, error } = await supabase
         .from('leads')
@@ -105,6 +107,8 @@ function CreateLeadForm({ handleTriggerFetch }) {
           wilaya,
           commune,
           product,
+          color,
+          size,
           agent_id: agentId,
         })
         .select();
@@ -179,6 +183,12 @@ function CreateLeadForm({ handleTriggerFetch }) {
         <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
           <FormControl fullWidth>
             <TextField name="product" label="Product" value={product} onChange={(e) => setProduct(e.target.value)} />
+          </FormControl>
+          <FormControl fullWidth>
+            <TextField name="color" label="Color" value={color} onChange={(e) => setColor(e.target.value)} />
+          </FormControl>
+          <FormControl fullWidth>
+            <TextField name="size" label="Size" value={size} onChange={(e) => setSize(e.target.value)} />
           </FormControl>
         </Stack>
         <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
