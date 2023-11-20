@@ -314,15 +314,15 @@ function EditLeadForm({
       if (status === 'confirmed') {
         const itemsList = productList.map((productItem) => {
           if (productItem.color && productItem.size) {
-            return `${productItem.product}_${productItem.color}_${productItem.size}x${productItem.qty}`;
+            return `${productItem.product}_${productItem.color}_${productItem.size}_Qty=${productItem.qty}`;
           }
           if (productItem.color && !productItem.size) {
-            return `${productItem.product}_${productItem.color}x${productItem.qty}`;
+            return `${productItem.product}_${productItem.color}_Qty=${productItem.qty}`;
           }
           if (!productItem.color && productItem.size) {
-            return `${productItem.product}_${productItem.size}x${productItem.qty}`;
+            return `${productItem.product}_${productItem.size}_Qty=${productItem.qty}`;
           }
-          return `${productItem.product}x${productItem.qty}`;
+          return `${productItem.product}_Qty=${productItem.qty}`;
         });
 
         const prodList = itemsList.join(',');
