@@ -53,6 +53,7 @@ export default function StatPage() {
   const [deliveryRatesBy, setDeliveryRatesBy] = useState('agent');
   const [confirmationRatesByX, setConfirmationRatesByX] = useState([]);
   const [confirmationRatesBy, setConfirmationRatesBy] = useState('agent');
+  const [objective, setObjective] = useState('conversion');
   const [users, setUsers] = useState([]);
 
   const [deliveryRateFromDate, setDeliveryRateFromDate] = useState();
@@ -431,10 +432,12 @@ export default function StatPage() {
 
       if (confirmationRatesBy === 'agent' && confirmationRateFromDate && confirmationRateToDate) {
         const { data: dataO, error: errorO } = await supabase.rpc('get_leads_by_agent_with_date_range', {
+          objective_in: objective,
           date1: formatedFromDate,
           date2: formatedToDate,
         });
         const { data: dataD, error: errorD } = await supabase.rpc('get_confirmed_count_by_agent_with_date_range', {
+          objective_in: objective,
           date1: formatedFromDate,
           date2: formatedToDate,
         });
@@ -445,8 +448,10 @@ export default function StatPage() {
           console.log(dataO);
         }
       } else if (confirmationRatesBy === 'agent' && !(confirmationRateFromDate && confirmationRateToDate)) {
-        const { data: dataO, error: errorO } = await supabase.rpc('get_leads_by_agent');
-        const { data: dataD, error: errorD } = await supabase.rpc('get_confirmed_count_by_agent');
+        const { data: dataO, error: errorO } = await supabase.rpc('get_leads_by_agent', { objective_in: objective });
+        const { data: dataD, error: errorD } = await supabase.rpc('get_confirmed_count_by_agent', {
+          objective_in: objective,
+        });
         if (dataD && dataO) {
           console.log('result x2');
           dataOrders = dataO;
@@ -454,10 +459,12 @@ export default function StatPage() {
         }
       } else if (confirmationRatesBy === 'product' && confirmationRateFromDate && confirmationRateToDate) {
         const { data: dataO, error: errorO } = await supabase.rpc('get_leads_by_product_with_date_range', {
+          objective_in: objective,
           date1: formatedFromDate,
           date2: formatedToDate,
         });
         const { data: dataD, error: errorD } = await supabase.rpc('get_confirmed_count_by_product_with_date_range', {
+          objective_in: objective,
           date1: formatedFromDate,
           date2: formatedToDate,
         });
@@ -467,8 +474,10 @@ export default function StatPage() {
           dataConfirmed = dataD;
         }
       } else if (confirmationRatesBy === 'product' && !(confirmationRateFromDate && confirmationRateToDate)) {
-        const { data: dataO, error: errorO } = await supabase.rpc('get_leads_by_product');
-        const { data: dataD, error: errorD } = await supabase.rpc('get_confirmed_count_by_product');
+        const { data: dataO, error: errorO } = await supabase.rpc('get_leads_by_product', { objective_in: objective });
+        const { data: dataD, error: errorD } = await supabase.rpc('get_confirmed_count_by_product', {
+          objective_in: objective,
+        });
         if (dataD && dataO) {
           console.log('result 2 ===> ', dataD, dataO);
           dataOrders = dataO;
@@ -558,7 +567,17 @@ export default function StatPage() {
                   renderInput={(params) => <TextField sx={{ marginBottom: [2, 0] }} fullWidth {...params} />}
                 />
               </LocalizationProvider>
-
+              <Select
+                value={objective}
+                fullWidth
+                sx={{ marginBottom: [2, 0] }}
+                label="objective"
+                onChange={(e) => setObjective(e.target.value)}
+              >
+                <MenuItem value="conversion">Conversion</MenuItem>
+                <MenuItem value="leadgen">Lead Generation</MenuItem>
+                <MenuItem value="message">Message</MenuItem>
+              </Select>
               <LoadingButton
                 sx={{ marginBottom: 2 }}
                 loading={isConfirmationRateLoading}
