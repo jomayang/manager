@@ -111,7 +111,7 @@ function ImportLeadsModal() {
             commune: '',
             product: 'ensemble_',
             objective: 'leadgen',
-            address,
+            address: address || '',
             phone,
             color,
             size,
