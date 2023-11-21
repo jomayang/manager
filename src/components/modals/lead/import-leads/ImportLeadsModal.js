@@ -102,7 +102,8 @@ function ImportLeadsModal() {
           const fullName = item.full_name;
           const wilaya = item.state;
           const address = item.street_address;
-
+          const color = item.color ? item.color : null;
+          const size = item.size ? item.size : null;
           return {
             first_name: fullName,
             last_name: '',
@@ -112,6 +113,8 @@ function ImportLeadsModal() {
             objective: 'leadgen',
             address,
             phone,
+            color,
+            size,
             created_at: new Date(createdTime),
             agent_id: agentId,
           };

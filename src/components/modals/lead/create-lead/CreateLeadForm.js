@@ -205,11 +205,13 @@ function CreateLeadForm({ handleTriggerFetch }) {
             </Select>
           </FormControl>
           <FormControl fullWidth>
-            <InputLabel>Objective</InputLabel>
-            <Select value={objective} label="Commune" onChange={(e) => setObjective(e.target.value)}>
-              <MenuItem value="conversion">Conversion</MenuItem>
-              <MenuItem value="leadgen">Lead Generation</MenuItem>
-              <MenuItem value="message">Message</MenuItem>
+            <InputLabel>Commune</InputLabel>
+            <Select value={commune} label="Commune" onChange={(e) => setCommune(e.target.value)}>
+              {communes.map((com, i) => (
+                <MenuItem key={i} value={com.value} disabled={!com.isDeliverable}>
+                  {com.label} {!com.isDeliverable && '(Undeliverable)'}
+                </MenuItem>
+              ))}
             </Select>
           </FormControl>
         </Stack>
@@ -220,13 +222,11 @@ function CreateLeadForm({ handleTriggerFetch }) {
         </Stack>
         <Stack>
           <FormControl fullWidth>
-            <InputLabel>Commune</InputLabel>
-            <Select value={commune} label="Commune" onChange={(e) => setCommune(e.target.value)}>
-              {communes.map((com, i) => (
-                <MenuItem key={i} value={com.value} disabled={!com.isDeliverable}>
-                  {com.label} {!com.isDeliverable && '(Undeliverable)'}
-                </MenuItem>
-              ))}
+            <InputLabel>Objective</InputLabel>
+            <Select value={objective} label="Commune" onChange={(e) => setObjective(e.target.value)}>
+              <MenuItem value="conversion">Conversion</MenuItem>
+              <MenuItem value="leadgen">Lead Generation</MenuItem>
+              <MenuItem value="message">Message</MenuItem>
             </Select>
           </FormControl>
         </Stack>
