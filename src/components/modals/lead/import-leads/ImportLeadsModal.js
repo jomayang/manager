@@ -109,6 +109,7 @@ function ImportLeadsModal() {
             wilaya,
             commune: '',
             product: 'ensemble_',
+            objective: 'leadgen',
             address,
             phone,
             created_at: new Date(createdTime),

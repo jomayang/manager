@@ -38,6 +38,7 @@ function CreateLeadForm({ handleTriggerFetch }) {
   const [color, setColor] = useState('');
   const [size, setSize] = useState('');
   const [agents, setAgents] = useState([]);
+  const [objective, setObjective] = useState('conversion');
   const [agentsCount, setAgentsCount] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [currentAgentId, setCurrentAgentId] = useState('');
@@ -108,6 +109,7 @@ function CreateLeadForm({ handleTriggerFetch }) {
           commune,
           product,
           color,
+          objective,
           size,
           agent_id: agentId,
         })
@@ -203,6 +205,21 @@ function CreateLeadForm({ handleTriggerFetch }) {
             </Select>
           </FormControl>
           <FormControl fullWidth>
+            <InputLabel>Objective</InputLabel>
+            <Select value={objective} label="Commune" onChange={(e) => setObjective(e.target.value)}>
+              <MenuItem value="conversion">Conversion</MenuItem>
+              <MenuItem value="leadgen">Lead Generation</MenuItem>
+              <MenuItem value="message">Message</MenuItem>
+            </Select>
+          </FormControl>
+        </Stack>
+        <Stack>
+          <FormControl fullWidth>
+            <TextField name="address" label="Address" value={address} onChange={(e) => setAddress(e.target.value)} />
+          </FormControl>
+        </Stack>
+        <Stack>
+          <FormControl fullWidth>
             <InputLabel>Commune</InputLabel>
             <Select value={commune} label="Commune" onChange={(e) => setCommune(e.target.value)}>
               {communes.map((com, i) => (
@@ -211,11 +228,6 @@ function CreateLeadForm({ handleTriggerFetch }) {
                 </MenuItem>
               ))}
             </Select>
-          </FormControl>
-        </Stack>
-        <Stack>
-          <FormControl fullWidth>
-            <TextField name="address" label="Address" value={address} onChange={(e) => setAddress(e.target.value)} />
           </FormControl>
         </Stack>
         <Stack>
