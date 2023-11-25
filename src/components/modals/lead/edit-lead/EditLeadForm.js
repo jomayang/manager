@@ -342,7 +342,7 @@ function EditLeadForm({
         let errorInsert;
         if (isYalidine) {
           const response = await axios({
-            url: `http://localhost:3000/create/`,
+            url: `https://ecom-api-5wlr.onrender.com/create/`,
             method: 'post',
             headers: { 'Content-Type': 'application/json' },
             data: {
@@ -517,7 +517,7 @@ function EditLeadForm({
       setOpen(true);
       handleTriggerFetch(Math.random());
     } catch (error) {
-      console.log('something went wrong: ', error.message);
+      console.log('something went wrong: ', error);
       setFeedback('a Problem accured!');
       setIsError(true);
       setUpdateLoading(false);
