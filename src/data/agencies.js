@@ -231,8 +231,8 @@ export const agencies = {
   ],
   "M'Sila": [
     {
-      value: '282801',
-      label: "Agence de M'Sila",
+      value: '282802',
+      label: 'Agence Salem Shopping Mall',
     },
   ],
   'Bou Saâda': [
