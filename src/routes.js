@@ -23,6 +23,7 @@ import TrackingPageNew from './pages/TrackingPageNew';
 import ParcelPage from './pages/ParcelPage';
 import AuditPage from './pages/AuditPage';
 import InventoryPage from './pages/InventoryPage';
+import FinancePage from './pages/FinancePage';
 
 // ----------------------------------------------------------------------
 
@@ -35,6 +36,7 @@ const ADMIN_ROUTES = [
       { path: 'app', element: <DashboardAppPage /> },
       { path: 'leads', element: <LeadPage /> },
       { path: 'orders', element: <OrderPage /> },
+      { path: 'finance', element: <FinancePage /> },
       { path: 'tracking', element: <TrackingPageNew /> },
       { path: 'parcels', element: <ParcelPage /> },
       // { path: 'tracking', element: <TrackingPage /> },

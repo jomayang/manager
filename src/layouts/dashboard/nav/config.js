@@ -71,6 +71,11 @@ export const navAdminConfig = [
     icon: icon('ic_invoice'),
   },
   {
+    title: 'Finance',
+    path: '/dashboard/finance',
+    icon: icon('ic_banking'),
+  },
+  {
     title: 'Audit',
     path: '/dashboard/audit',
     icon: icon('ic_lock'),

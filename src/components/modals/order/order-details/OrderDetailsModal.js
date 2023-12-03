@@ -78,6 +78,7 @@ function OrderDetailsModal({
   productPriceAttr,
   shippingPriceAttr,
   phoneAttr,
+  trackingAttr,
   createdAtAttr,
 }) {
   const [open, setOpen] = useState(false);
@@ -147,6 +148,11 @@ function OrderDetailsModal({
           <Typography id="modal-modal-title" variant="p" component="p">
             <b>Delivery Type:</b> {isStopDeskAttr ? 'Stopdesk' : 'Home delivery'}
           </Typography>
+          {trackingAttr && (
+            <Typography id="modal-modal-title" variant="p" component="p">
+              <b>Tracking:</b> {trackingAttr}
+            </Typography>
+          )}
 
           <hr style={{ border: '1px solid #eee', marginTop: 10, marginBottom: 20 }} />
 

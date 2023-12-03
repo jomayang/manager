@@ -305,6 +305,7 @@ export default function OrderPage() {
             stopdesk: order.stopdesk,
             isStopdesk: order.is_stopdesk,
             createdAt: order.created_at,
+
             isAutoDelivered: order.is_auto_delivered,
           }));
           setRowsCount(count);
@@ -762,6 +763,7 @@ export default function OrderPage() {
                                   statusAttr={status}
                                   isStopDeskAttr={isStopdesk}
                                   stopdeskAttr={stopdesk}
+                                  trackingAttr={trackingId}
                                   productAttr={product}
                                   shippingPriceAttr={shippingPrice}
                                   productPriceAttr={productPrice}
