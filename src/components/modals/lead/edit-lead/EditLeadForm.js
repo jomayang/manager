@@ -358,6 +358,8 @@ function EditLeadForm({
               stopdesk: agency,
               orderId: trackerId,
               price: productPrice + shippingPrice,
+              hasExchange: false,
+              productToCollect: null,
             },
           });
           console.log('added to yal ', response.data);
@@ -749,7 +751,7 @@ function EditLeadForm({
                   />
                 </FormControl>
               </Stack>
-              <Stack>
+              {/* <Stack>
                 <FormGroup>
                   <FormControlLabel
                     control={
@@ -762,7 +764,7 @@ function EditLeadForm({
                     label="Yalidine"
                   />
                 </FormGroup>
-              </Stack>
+              </Stack> */}
 
               {/* {productList.map((productItem, i) => (
 

@@ -119,6 +119,8 @@ function CreateOrderForm({ handleTriggerFetch }) {
           stopdesk: agency,
           orderId: trackerId,
           price: productPrice + shippingPrice,
+          hasExchange: false,
+          productToCollect: null,
         },
       });
       const { data: dataTracker, error: errorTracker } = await supabase.from('followups').insert({

@@ -50,6 +50,7 @@ import EditOrderStatus from '../components/modals/order/edit-order/EditOrderStat
 import { UserContext } from '../context/UserContext';
 import ParcelHistoryCustomModal from '../components/modals/parcel/parcel-history-custom/ParcelHistoryCustomModal';
 import { DeliverySlip } from '../components/pdf/delivery-slip';
+import CreateExchangeStatus from '../components/modals/order/create-exchange/CreateExchangeStatus';
 
 // ----------------------------------------------------------------------
 const Alert = forwardRef((props, ref) => <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />);
@@ -238,6 +239,8 @@ export default function OrderPage() {
             stopdesk: order.stopdesk,
             isStopdesk: order.is_stopdesk,
             createdAt: order.created_at,
+            isExchange: order.is_exchange,
+            hasExchange: order.has_exchange,
             isAutoDelivered: order.is_auto_delivered,
           }));
           setRowsCount(count);
@@ -305,7 +308,8 @@ export default function OrderPage() {
             stopdesk: order.stopdesk,
             isStopdesk: order.is_stopdesk,
             createdAt: order.created_at,
-
+            isExchange: order.is_exchange,
+            hasExchange: order.has_exchange,
             isAutoDelivered: order.is_auto_delivered,
           }));
           setRowsCount(count);
@@ -677,6 +681,8 @@ export default function OrderPage() {
                         const {
                           id,
                           fullName,
+                          firstName,
+                          lastName,
                           phone,
                           wilaya,
                           commune,
@@ -688,12 +694,21 @@ export default function OrderPage() {
                           stopdesk,
                           isStopdesk,
                           isAutoDelivered,
+                          isExchange,
+                          hasExchange,
                           createdAt,
                         } = row;
                         const selectedOrder = selected.indexOf(id) !== -1;
 
                         return (
-                          <TableRow hover key={id} tabIndex={-1} role="checkbox" selected={selectedOrder}>
+                          <TableRow
+                            style={isExchange ? { background: '#e4fcdc' } : {}}
+                            hover
+                            key={id}
+                            tabIndex={-1}
+                            role="checkbox"
+                            selected={selectedOrder}
+                          >
                             <TableCell padding="checkbox">
                               <Checkbox checked={selectedOrder} onChange={(event) => handleClick(event, id)} />
                             </TableCell>
@@ -728,6 +743,21 @@ export default function OrderPage() {
                             </TableCell>
                             <TableCell align="right">
                               <Stack direction="row" justifyContent="right">
+                                {status === 'delivered' && !hasExchange && !isExchange && (
+                                  <CreateExchangeStatus
+                                    id={id}
+                                    communeAttr={commune}
+                                    wilayaAttr={wilaya}
+                                    addressAttr={commune}
+                                    productAttr={product}
+                                    firstNameAttr={firstName}
+                                    lastNameAttr={lastName}
+                                    phoneAttr={phone}
+                                    trackingAttr={trackingId}
+                                    createdAtAttr={createdAt}
+                                    handleTriggerFetch={(val) => setTriggerFetch(val)}
+                                  />
+                                )}
                                 {status === 'initial' && (
                                   <>
                                     {isAutoDelivered ? (
