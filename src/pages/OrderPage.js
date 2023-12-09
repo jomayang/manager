@@ -325,83 +325,87 @@ export default function OrderPage() {
 
   const handleDeleteOrder = async (trackingId, phone) => {
     try {
-      alert('are you sure about deleting the order?');
-      console.log('tracking is', trackingId);
-      const response = await axios({
-        url: `https://ecom-api-5wlr.onrender.com/delete/`,
-        method: 'post',
-        headers: { 'Content-Type': 'application/json' },
-        data: { tracking: trackingId },
-      });
-      console.log('done');
-      const { error: errorFollowup } = await supabase.from('followups').delete().eq('tracking', trackingId);
-      // 1 - Get order_item (item_id, qty) on order_id
-      // 2 - For each order_item
-      // --> Increase inventory with qty on item_id
-      // --> Remove order_item
-      // 3 - Remove order
-      const { data: dataOrder, error: errorOrder } = await supabase
-        .from('orders')
-        .select('id')
-        .eq('tracking_id', trackingId)
-        .single();
-
-      if (dataOrder) {
-        const { data: dataOrderItem, error: errorOrderItem } = await supabase
-          .from('order_item')
-          .select()
-          .eq('order_id', dataOrder.id);
-
-        if (dataOrderItem) {
-          dataOrderItem.forEach(async (orderItem) => {
-            console.log('order item', orderItem);
-            const { item_id: itemId, qty } = orderItem;
-            console.log('item id ', itemId, 'quantity', qty);
-            const { data: dataInventory, error: errorInventory } = await supabase.rpc('increment_inventory', {
-              qty_in: qty,
-              item_id_in: itemId,
-            });
-
-            if (dataInventory) {
-              console.log('stock added');
-            }
-            if (errorInventory) {
-              console.log('stock did not increase', errorInventory);
-            }
-          });
-        }
-        if (errorOrderItem) {
-          console.log('something went wrong', errorOrderItem);
-        }
-        const { error: errorOrderItemRemove } = await supabase.from('order_item').delete().eq('order_id', dataOrder.id);
-
-        if (errorOrderItemRemove) {
-          console.log('could not delete order item', errorOrderItemRemove);
-        }
-      }
-
-      const { error } = await supabase.from('orders').delete().eq('tracking_id', trackingId);
-
-      if (error || errorFollowup) {
-        setFeedback('a Problem accured when removing the lead');
-        setIsError(true);
-      } else {
-        const { error: errorLeadLog } = await supabase.from('logs').insert({
-          user_fullname: user.user_metadata.name,
-          action: 'delete',
-          entity: 'order',
-          number: phone,
+      if (window.confirm('are you sure about deleting the order?')) {
+        console.log('tracking is', trackingId);
+        const response = await axios({
+          url: `https://ecom-api-5wlr.onrender.com/delete/`,
+          method: 'post',
+          headers: { 'Content-Type': 'application/json' },
+          data: { tracking: trackingId },
         });
-        if (errorLeadLog) {
-          console.log('oops log: ', errorLeadLog);
-          setFeedback('a Problem accured when adding the new LOG!');
-          setIsError(true);
+        console.log('done');
+        const { error: errorFollowup } = await supabase.from('followups').delete().eq('tracking', trackingId);
+        // 1 - Get order_item (item_id, qty) on order_id
+        // 2 - For each order_item
+        // --> Increase inventory with qty on item_id
+        // --> Remove order_item
+        // 3 - Remove order
+        const { data: dataOrder, error: errorOrder } = await supabase
+          .from('orders')
+          .select('id')
+          .eq('tracking_id', trackingId)
+          .single();
+
+        if (dataOrder) {
+          const { data: dataOrderItem, error: errorOrderItem } = await supabase
+            .from('order_item')
+            .select()
+            .eq('order_id', dataOrder.id);
+
+          if (dataOrderItem) {
+            dataOrderItem.forEach(async (orderItem) => {
+              console.log('order item', orderItem);
+              const { item_id: itemId, qty } = orderItem;
+              console.log('item id ', itemId, 'quantity', qty);
+              const { data: dataInventory, error: errorInventory } = await supabase.rpc('increment_inventory', {
+                qty_in: qty,
+                item_id_in: itemId,
+              });
+
+              if (dataInventory) {
+                console.log('stock added');
+              }
+              if (errorInventory) {
+                console.log('stock did not increase', errorInventory);
+              }
+            });
+          }
+          if (errorOrderItem) {
+            console.log('something went wrong', errorOrderItem);
+          }
+          const { error: errorOrderItemRemove } = await supabase
+            .from('order_item')
+            .delete()
+            .eq('order_id', dataOrder.id);
+
+          if (errorOrderItemRemove) {
+            console.log('could not delete order item', errorOrderItemRemove);
+          }
         }
-        setFeedback('Lead removed successfully!');
-        setIsError(false);
-        setTriggerFetch(Math.random());
+
+        const { error } = await supabase.from('orders').delete().eq('tracking_id', trackingId);
+
+        if (error || errorFollowup) {
+          setFeedback('a Problem accured when removing the lead');
+          setIsError(true);
+        } else {
+          const { error: errorLeadLog } = await supabase.from('logs').insert({
+            user_fullname: user.user_metadata.name,
+            action: 'delete',
+            entity: 'order',
+            number: phone,
+          });
+          if (errorLeadLog) {
+            console.log('oops log: ', errorLeadLog);
+            setFeedback('a Problem accured when adding the new LOG!');
+            setIsError(true);
+          }
+          setFeedback('Lead removed successfully!');
+          setIsError(false);
+          setTriggerFetch(Math.random());
+        }
+        setOpen(true);
       }
-      setOpen(true);
     } catch (error) {
       console.log(error);
       setFeedback('a Problem accured!');
@@ -412,64 +416,68 @@ export default function OrderPage() {
 
   const handleDeleteOrderAuto = async (id, phone) => {
     try {
-      alert('are you sure about deleting the order?');
-      const { data: dataOrder, error: errorOrder } = await supabase.from('orders').select('id').eq('id', id).single();
+      if (window.confirm('are you sure about deleting the order?')) {
+        const { data: dataOrder, error: errorOrder } = await supabase.from('orders').select('id').eq('id', id).single();
 
-      if (dataOrder) {
-        const { data: dataOrderItem, error: errorOrderItem } = await supabase
-          .from('order_item')
-          .select()
-          .eq('order_id', dataOrder.id);
+        if (dataOrder) {
+          const { data: dataOrderItem, error: errorOrderItem } = await supabase
+            .from('order_item')
+            .select()
+            .eq('order_id', dataOrder.id);
 
-        if (dataOrderItem) {
-          dataOrderItem.forEach(async (orderItem) => {
-            console.log('order item', orderItem);
-            const { item_id: itemId, qty } = orderItem;
-            console.log('item id ', itemId, 'quantity', qty);
-            const { data: dataInventory, error: errorInventory } = await supabase.rpc('increment_inventory', {
-              qty_in: qty,
-              item_id_in: itemId,
+          if (dataOrderItem) {
+            dataOrderItem.forEach(async (orderItem) => {
+              console.log('order item', orderItem);
+              const { item_id: itemId, qty } = orderItem;
+              console.log('item id ', itemId, 'quantity', qty);
+              const { data: dataInventory, error: errorInventory } = await supabase.rpc('increment_inventory', {
+                qty_in: qty,
+                item_id_in: itemId,
+              });
+
+              if (dataInventory) {
+                console.log('stock added');
+              }
+              if (errorInventory) {
+                console.log('stock did not increase', errorInventory);
+              }
             });
+          }
+          if (errorOrderItem) {
+            console.log('something went wrong', errorOrderItem);
+          }
+          const { error: errorOrderItemRemove } = await supabase
+            .from('order_item')
+            .delete()
+            .eq('order_id', dataOrder.id);
 
-            if (dataInventory) {
-              console.log('stock added');
-            }
-            if (errorInventory) {
-              console.log('stock did not increase', errorInventory);
-            }
-          });
+          if (errorOrderItemRemove) {
+            console.log('could not delete order item', errorOrderItemRemove);
+          }
         }
-        if (errorOrderItem) {
-          console.log('something went wrong', errorOrderItem);
-        }
-        const { error: errorOrderItemRemove } = await supabase.from('order_item').delete().eq('order_id', dataOrder.id);
+        const { error } = await supabase.from('orders').delete().eq('id', id);
 
-        if (errorOrderItemRemove) {
-          console.log('could not delete order item', errorOrderItemRemove);
-        }
-      }
-      const { error } = await supabase.from('orders').delete().eq('id', id);
-
-      if (error) {
-        setFeedback('a Problem accured when removing the lead');
-        setIsError(true);
-      } else {
-        const { error: errorLeadLog } = await supabase.from('logs').insert({
-          user_fullname: user.user_metadata.name,
-          action: 'delete',
-          entity: 'order',
-          number: phone,
-        });
-        if (errorLeadLog) {
-          console.log('oops log: ', errorLeadLog);
-          setFeedback('a Problem accured when adding the new LOG!');
+        if (error) {
+          setFeedback('a Problem accured when removing the lead');
           setIsError(true);
+        } else {
+          const { error: errorLeadLog } = await supabase.from('logs').insert({
+            user_fullname: user.user_metadata.name,
+            action: 'delete',
+            entity: 'order',
+            number: phone,
+          });
+          if (errorLeadLog) {
+            console.log('oops log: ', errorLeadLog);
+            setFeedback('a Problem accured when adding the new LOG!');
+            setIsError(true);
+          }
+          setFeedback('Lead removed successfully!');
+          setIsError(false);
+          setTriggerFetch(Math.random());
         }
-        setFeedback('Lead removed successfully!');
-        setIsError(false);
-        setTriggerFetch(Math.random());
+        setOpen(true);
       }
-      setOpen(true);
     } catch (error) {
       console.log(error);
       setFeedback('a Problem accured!');
