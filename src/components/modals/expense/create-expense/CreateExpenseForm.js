@@ -101,8 +101,15 @@ function CreateExpenseForm({ handleTriggerFetch }) {
               <MenuItem value="food">Food</MenuItem>
               <MenuItem value="utilities">Utilities</MenuItem>
               <MenuItem value="rent">Rent</MenuItem>
-              <MenuItem value="paycheck">Paycheck</MenuItem>
+              <MenuItem value="paycheck">Payroll</MenuItem>
               <MenuItem value="transport">Transport</MenuItem>
+              <MenuItem value="raw-materials">Raw materials</MenuItem>
+              <MenuItem value="packaging">Packaging</MenuItem>
+              <MenuItem value="goods">Goods</MenuItem>
+              <MenuItem value="gifts">Gifts</MenuItem>
+              <MenuItem value="personal-charges">Personal charges</MenuItem>
+              <MenuItem value="refund">Refund</MenuItem>
+              <MenuItem value="investment">Investment</MenuItem>
               <MenuItem value="other">Other</MenuItem>
             </Select>
           </FormControl>
