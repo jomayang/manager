@@ -153,7 +153,7 @@ export default function InventoryPage() {
   const [filterStatus, setFilterStatus] = useState('');
   const [filterProduct, setFilterProduct] = useState('');
   const [userSession, setUserSession] = useState(null);
-
+  const [products, setProducts] = useState([]);
   const [currentUserRole, setCurrentUserRole] = useState('');
   useEffect(() => {
     console.log(selected);
@@ -233,7 +233,32 @@ export default function InventoryPage() {
           console.log('error user: ', errorUser);
         }
 
-        const { count, data, error } = await supabase.rpc('get_items_inventory').select('*', { count: 'exact' });
+        let count;
+        let data;
+        let error;
+        if (filterProduct === '') {
+          const {
+            count: countFilter,
+            data: dataFilter,
+            error: errorFilter,
+          } = await supabase.rpc('get_items_inventory').select('*', { count: 'exact' });
+          count = countFilter;
+          data = dataFilter;
+          error = errorFilter;
+        } else {
+          const {
+            count: countFilter,
+            data: dataFilter,
+            error: errorFilter,
+          } = await supabase
+            .rpc('get_items_inventory_with_product_filter', {
+              product_in: filterProduct,
+            })
+            .select('*', { count: 'exact' });
+          count = countFilter;
+          data = dataFilter;
+          error = errorFilter;
+        }
         // .range(page * rowsPerPage, page * rowsPerPage + rowsPerPage - 1);
         console.log('couuuunt:', count);
         if (data) {
@@ -297,48 +322,17 @@ export default function InventoryPage() {
     getSession();
   }, []);
 
-  const handleSearchInDb = async (e) => {
-    if (e.key === 'Enter') {
+  useEffect(() => {
+    const getItems = async () => {
       try {
-        setIsLoading(true);
-        const { count, data, error } = await supabase
-          .from('leads')
-          .select('*', { count: 'exact' })
-          .like('phone', `%${searchInput}%`)
-          .order('created_at', { ascending: false })
-          .range(page * rowsPerPage, page * rowsPerPage + rowsPerPage - 1);
-
-        if (data) {
-          const fetchedLeads = data.map((lead) => ({
-            id: lead.id,
-            fullName: `${lead.first_name} ${lead.last_name}`,
-            firstName: lead.first_name,
-            lastName: lead.last_name,
-            phone: lead.phone,
-            commune: lead.commune,
-            product: lead.product,
-            address: lead.address,
-            comment: lead.comment,
-            status: lead.status,
-            wilaya: lead.wilaya,
-            createdAt: lead.created_at,
-            color: lead.color,
-            size: lead.size,
-          }));
-
-          setRowsCount(count);
-          setLeads(fetchedLeads);
-        }
-        if (error) {
-          console.log(error);
-        }
-        setIsLoading(false);
+        const { data, error } = await supabase.rpc('get_available_products').select('*', { count: 'exact' });
+        setProducts(data);
       } catch (error) {
-        console.log('something went wrong', error);
-        setIsLoading(false);
+        console.log('something went wrong xx', error);
       }
-    }
-  };
+    };
+    getItems();
+  }, []);
 
   const handleDeleteItem = async (id) => {
     try {
@@ -394,17 +388,24 @@ export default function InventoryPage() {
             ) : (
               // <form onSubmit={handleSearchInDb}>
               <div>
-                <StyledSearch
-                  value={searchInput}
-                  onChange={(e) => setSearchInput(e.target.value)}
-                  onKeyDown={handleSearchInDb}
-                  placeholder="Search product..."
-                  startAdornment={
-                    <InputAdornment position="start">
-                      <Iconify icon="eva:search-fill" sx={{ color: 'text.disabled', width: 20, height: 20 }} />
-                    </InputAdornment>
-                  }
-                />
+                <FormControl fullWidth style={{ width: 240, marginLeft: 10, marginTop: 10, marginBottom: 10 }}>
+                  <InputLabel>Filter Product</InputLabel>
+                  <Select
+                    value={filterProduct}
+                    label="filter-product"
+                    onChange={(e) => {
+                      setFilterProduct(e.target.value);
+                      setPage(0);
+                    }}
+                  >
+                    <MenuItem value={''}>All</MenuItem>
+                    {products.map((item) => (
+                      <MenuItem key={item.key} value={item.key}>
+                        {item.key}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
                 {/* <FormControl fullWidth style={{ width: 240, marginLeft: 10, marginTop: 10 }}>
                   <InputLabel>Filter Status</InputLabel>
                   <Select
