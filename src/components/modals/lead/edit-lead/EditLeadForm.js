@@ -580,12 +580,12 @@ function EditLeadForm({
   }, []);
 
   useEffect(() => {
-    if ((productPrice === 0 || shippingPrice === 0) && status === 'confirmed') {
+    if ((productPrice === 0 || shippingPrice === 0 || +remaining <= 0) && status === 'confirmed') {
       setIsDisabled(true);
     } else {
       setIsDisabled(false);
     }
-  }, [productPrice, shippingPrice, status]);
+  }, [productPrice, shippingPrice, status, remaining]);
 
   // useEffect(() => {
   //   const getQty = async () => {
@@ -663,6 +663,13 @@ function EditLeadForm({
         .single();
 
       setRemaining(`${dataInventory.quantity}`);
+
+      if (dataInventory.quantity <= 0) {
+        setIsDisabled(true);
+      } else {
+        setIsDisabled(false);
+      }
+
       setSelectedItem(`${product} ${color} ${size}`);
 
       if (dataInventory.quantity === 0) {
