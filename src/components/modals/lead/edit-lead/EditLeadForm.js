@@ -226,22 +226,22 @@ function EditLeadForm({
           let homeDeliverFee;
           if (zone0.includes(wilaya)) {
             homeDeliverFee = fees[wilaya].homeFee;
-            reduction = 250;
+            reduction = 150;
           } else if (zone1.includes(wilaya)) {
             homeDeliverFee = fees[wilaya].homeFee + 100;
-            reduction = 150;
+            reduction = 50;
           } else if (zone2.includes(wilaya)) {
             homeDeliverFee = fees[wilaya].homeFee + 100;
-            reduction = 350;
+            reduction = 150;
           } else if (zone3.includes(wilaya)) {
             homeDeliverFee = fees[wilaya].homeFee + 100;
-            reduction = 350;
+            reduction = 200;
           } else if (zone4.includes(wilaya)) {
             homeDeliverFee = fees[wilaya].homeFee + 100;
-            reduction = 300;
+            reduction = 250;
           } else if (zone5.includes(wilaya)) {
             homeDeliverFee = fees[wilaya].homeFee + 100;
-            reduction = 400;
+            reduction = 100;
           } else if (zone6.includes(wilaya)) {
             homeDeliverFee = fees[wilaya].homeFee;
             reduction = 100;
