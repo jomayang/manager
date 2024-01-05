@@ -37,6 +37,8 @@ function CreateExpenseForm({ handleTriggerFetch }) {
   const [category, setCategory] = useState('utilities');
   const [type, setType] = useState('fixed');
   const [department, setDepartment] = useState('ecommerce');
+  const [correspondingQty, setCorrespondingQty] = useState(0);
+  const [correspondingProduct, setCorrespondingProduct] = useState('');
   const [amount, setAmount] = useState(0);
   const [comment, setComment] = useState('');
 
@@ -62,6 +64,8 @@ function CreateExpenseForm({ handleTriggerFetch }) {
           comment,
           type,
           category,
+          correspondingQty,
+          correspondingProduct,
           department,
         })
         .select();
@@ -149,6 +153,38 @@ function CreateExpenseForm({ handleTriggerFetch }) {
               <MenuItem value="fixed">Fixed</MenuItem>
               <MenuItem value="variable">Variable</MenuItem>
             </Select>
+          </FormControl>
+        </Stack>
+        <Stack>
+          <FormControl fullWidth>
+            <InputLabel>Department</InputLabel>
+            <Select value={department} label="Department" onChange={(e) => setDepartment(e.target.value)}>
+              <MenuItem value="garment-factory">Garment Factory</MenuItem>
+              <MenuItem value="ecommerce">Ecommerce</MenuItem>
+            </Select>
+          </FormControl>
+        </Stack>
+        <Stack>
+          <FormControl fullWidth>
+            <InputLabel>Corresponding Quantity</InputLabel>
+            <TextField
+              name="corresponding-qty"
+              label="Corresponding Quantity"
+              inputProps={{ type: 'number' }}
+              value={correspondingQty}
+              onChange={(e) => setCorrespondingQty(+e.target.value)}
+            />
+          </FormControl>
+        </Stack>
+        <Stack>
+          <FormControl fullWidth>
+            <InputLabel>Corresponding Product</InputLabel>
+            <TextField
+              name="corresponding-product"
+              label="Corresponding Product"
+              value={correspondingProduct}
+              onChange={(e) => setCorrespondingProduct(e.target.value)}
+            />
           </FormControl>
         </Stack>
         <Stack>
