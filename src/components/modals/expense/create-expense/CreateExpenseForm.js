@@ -64,8 +64,8 @@ function CreateExpenseForm({ handleTriggerFetch }) {
           comment,
           type,
           category,
-          correspondingQty,
-          correspondingProduct,
+          corresponding_qty: correspondingQty,
+          corresponding_product: correspondingProduct,
           department,
         })
         .select();
