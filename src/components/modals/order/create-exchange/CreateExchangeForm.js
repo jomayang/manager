@@ -90,7 +90,7 @@ function CreateExchangeForm({
   const [availableProducts, setAvailableProducts] = useState([]);
   const [availableColors, setAvailableColors] = useState([]);
   const [availableSizes, setAvailableSizes] = useState([]);
-
+  const [exchangePrice, setExchangePrice] = useState(0);
   const [productList, setProductList] = useState([{ product: productAttr, color: '', size: '', qty: 1 }]);
 
   const { user } = useContext(UserContext);
@@ -298,7 +298,7 @@ function CreateExchangeForm({
           isFreeShipping: true,
           stopdesk: agency,
           orderId: trackerId,
-          price: 0,
+          price: exchangePrice,
           hasExchange: true,
           productToCollect: trackingAttr,
         },
@@ -344,8 +344,8 @@ function CreateExchangeForm({
           is_stopdesk: isStopDesk,
           is_free_shipping: true,
           stopdesk: agency,
-          product_price: productPrice,
-          shipping_price: shippingPrice,
+          product_price: 0,
+          shipping_price: exchangePrice,
           tracking_id: response.data[`order_${trackerId}`].tracking,
           delivery_fees: accurateDeliveryFee,
           tracker_id: trackerId,
@@ -504,6 +504,14 @@ function CreateExchangeForm({
     setProductList(pList);
   };
 
+  useEffect(() => {
+    if (+remaining <= 0) {
+      setIsDisabled(true);
+    } else {
+      setIsDisabled(false);
+    }
+  }, [remaining]);
+
   const handleInventoryCheck = async (index) => {
     const { product, color, size } = productList[index];
 
@@ -526,6 +534,13 @@ function CreateExchangeForm({
         .single();
 
       setRemaining(`${dataInventory.quantity}`);
+
+      if (dataInventory.quantity <= 0) {
+        setIsDisabled(true);
+      } else {
+        setIsDisabled(false);
+      }
+
       setSelectedItem(`${product} ${color} ${size}`);
 
       if (dataInventory.quantity === 0) {
@@ -826,7 +841,22 @@ function CreateExchangeForm({
                 />
               </FormControl>
             </Stack>
-
+            <Stack>
+              <FormControl fullWidth>
+                <TextField
+                  name="exchange-price"
+                  label="exchange price"
+                  inputProps={{ type: 'number' }}
+                  InputProps={{
+                    endAdornment: <InputAdornment position="end">DA</InputAdornment>,
+                  }}
+                  value={exchangePrice}
+                  onChange={(e) => {
+                    setExchangePrice(+e.target.value);
+                  }}
+                />
+              </FormControl>
+            </Stack>
             <Stack>
               <Typography variant="p" component="p" style={{ fontSize: '13px', marginBottom: 8, color: '#666' }}>
                 {productQty && (
@@ -850,7 +880,7 @@ function CreateExchangeForm({
                 )}
               </Typography>
               <Typography variant="p" component="p" style={{ fontSize: '13px' }}>
-                Total: 0 DA
+                Total: {exchangePrice} DA
               </Typography>
             </Stack>
           </Stack>
@@ -858,7 +888,7 @@ function CreateExchangeForm({
         <Stack>
           <LoadingButton
             loading={updateLoading}
-            // disabled={isDisabled}
+            disabled={isDisabled}
             type="submit"
             fullWidth
             size="large"
