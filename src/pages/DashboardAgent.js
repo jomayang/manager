@@ -54,7 +54,7 @@ export default function DashboardAgent() {
 
   const [monthlyBalance, setMonthlyBalance] = useState(0);
 
-  const [agentId, setAgentId] = useState(23);
+  const [agentId, setAgentId] = useState(17);
 
   const [leadsByStatus, setLeadsByStatus] = useState([]);
   const theme = useTheme();
@@ -175,9 +175,9 @@ export default function DashboardAgent() {
         if (data) {
           if (confirmRate > 65) {
             variableReward = count * 50;
-          } else if (confirmRate >= 60) {
+          } else if (confirmRate >= 55) {
             variableReward = count * 40;
-          } else if (confirmRate > 47) {
+          } else if (confirmRate > 42) {
             variableReward = count * 30;
           } else {
             variableReward = 0;
@@ -263,9 +263,9 @@ export default function DashboardAgent() {
         const confirmRateTemp = ((dataDAgent[0].value / dataOAgent[0].value) * 100).toFixed(0);
 
         setConfirmRate(confirmRateTemp);
-        if (confirmRateTemp < 47) {
+        if (confirmRateTemp < 42) {
           setConfirmRateStatus('error');
-        } else if (confirmRateTemp >= 47 && confirmRateTemp < 60) {
+        } else if (confirmRateTemp >= 42 && confirmRateTemp < 55) {
           setConfirmRateStatus('warning');
         } else {
           setConfirmRateStatus('success');

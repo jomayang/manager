@@ -101,7 +101,6 @@ export default function DashboardAppAgent() {
       try {
         const today = new Date();
 
-        // today.setDate(today.getDate() - 1);
         const formattedToday = `${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, '0')}-${today
           .getDate()
           .toString()
@@ -145,9 +144,9 @@ export default function DashboardAppAgent() {
         if (data) {
           if (confirmRate > 65) {
             variableReward = count * 50;
-          } else if (confirmRate >= 60) {
+          } else if (confirmRate >= 55) {
             variableReward = count * 40;
-          } else if (confirmRate > 47) {
+          } else if (confirmRate > 42) {
             variableReward = count * 30;
           } else {
             variableReward = 0;
@@ -201,9 +200,9 @@ export default function DashboardAppAgent() {
             const dailyConfirmRateTemp = ((dataDAgent[0].value / dataOAgent[0].value) * 100).toFixed(0);
 
             setDailyConfirmRate(dailyConfirmRateTemp);
-            if (dailyConfirmRateTemp < 47) {
+            if (dailyConfirmRateTemp < 42) {
               setDailyConfirmRateStatus('error');
-            } else if (dailyConfirmRateTemp >= 47 && dailyConfirmRateTemp < 52) {
+            } else if (dailyConfirmRateTemp >= 42 && dailyConfirmRateTemp < 55) {
               setDailyConfirmRateStatus('warning');
             } else {
               setDailyConfirmRateStatus('success');
@@ -233,9 +232,9 @@ export default function DashboardAppAgent() {
         const confirmRateTemp = ((dataDAgent[0].value / dataOAgent[0].value) * 100).toFixed(0);
 
         setConfirmRate(confirmRateTemp);
-        if (confirmRateTemp < 47) {
+        if (confirmRateTemp < 42) {
           setConfirmRateStatus('error');
-        } else if (confirmRateTemp >= 47 && confirmRateTemp < 52) {
+        } else if (confirmRateTemp >= 42 && confirmRateTemp < 55) {
           setConfirmRateStatus('warning');
         } else {
           setConfirmRateStatus('success');
