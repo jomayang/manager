@@ -155,19 +155,17 @@ export default function StatPage() {
       let formatedFromDate = '';
       let formatedToDate = '';
       if (salesFromDate && salesToDate) {
-        console.log(salesFromDate);
-        const fromDateDay = salesFromDate.month();
-        const fromDateMonth = salesFromDate.date();
-        const fromDateYear = salesFromDate.year();
+        const fromDate = new Date(salesFromDate);
+        const toDate = new Date(salesToDate);
 
-        const toDateDay = salesToDate.day();
-        const toDateMonth = salesToDate.month();
-        const toDateYear = salesToDate.year();
+        formatedFromDate = `${fromDate.getFullYear()}-${(fromDate.getMonth() + 1)
+          .toString()
+          .padStart(2, '0')}-${fromDate.getDate().toString().padStart(2, '0')}`;
 
-        formatedFromDate = salesFromDate.toISOString().split('T')[0];
-        formatedToDate = salesToDate.toISOString().split('T')[0];
-        console.log('from:', formatedFromDate);
-        console.log('to:', formatedToDate);
+        formatedToDate = `${toDate.getFullYear()}-${(toDate.getMonth() + 1).toString().padStart(2, '0')}-${toDate
+          .getDate()
+          .toString()
+          .padStart(2, '0')}`;
       }
       if (salesBy === 'wilaya') {
         if (salesFromDate && salesToDate) {
@@ -239,19 +237,19 @@ export default function StatPage() {
       let formatedFromDate = '';
       let formatedToDate = '';
       if (deliveryRateFromDate && deliveryRateToDate) {
-        console.log(deliveryRateFromDate);
-        const fromDateDay = deliveryRateFromDate.month();
-        const fromDateMonth = deliveryRateFromDate.date();
-        const fromDateYear = deliveryRateFromDate.year();
+        const fromDate = new Date(deliveryRateFromDate);
+        const toDate = new Date(deliveryRateToDate);
 
-        const toDateDay = deliveryRateToDate.day();
-        const toDateMonth = deliveryRateToDate.month();
-        const toDateYear = deliveryRateToDate.year();
+        formatedFromDate = `${fromDate.getFullYear()}-${(fromDate.getMonth() + 1)
+          .toString()
+          .padStart(2, '0')}-${fromDate.getDate().toString().padStart(2, '0')}`;
 
-        formatedFromDate = deliveryRateFromDate.toISOString().split('T')[0];
-        formatedToDate = deliveryRateToDate.toISOString().split('T')[0];
-        console.log('from:', formatedFromDate);
-        console.log('to:', formatedToDate);
+        formatedToDate = `${toDate.getFullYear()}-${(toDate.getMonth() + 1).toString().padStart(2, '0')}-${toDate
+          .getDate()
+          .toString()
+          .padStart(2, '0')}`;
+
+        console.log('from', formatedFromDate, 'to', formatedToDate);
       }
       let dataOrders;
       let dataDelivered;
@@ -412,19 +410,17 @@ export default function StatPage() {
       let formatedFromDate = '';
       let formatedToDate = '';
       if (confirmationRateFromDate && confirmationRateToDate) {
-        console.log(confirmationRateFromDate);
-        const fromDateDay = confirmationRateFromDate.month();
-        const fromDateMonth = confirmationRateFromDate.date();
-        const fromDateYear = confirmationRateFromDate.year();
+        const fromDate = new Date(confirmationRateFromDate);
+        const toDate = new Date(confirmationRateToDate);
 
-        const toDateDay = confirmationRateToDate.day();
-        const toDateMonth = confirmationRateToDate.month();
-        const toDateYear = confirmationRateToDate.year();
+        formatedFromDate = `${fromDate.getFullYear()}-${(fromDate.getMonth() + 1)
+          .toString()
+          .padStart(2, '0')}-${fromDate.getDate().toString().padStart(2, '0')}`;
 
-        formatedFromDate = confirmationRateFromDate.toISOString().split('T')[0];
-        formatedToDate = confirmationRateToDate.toISOString().split('T')[0];
-        console.log('from:', formatedFromDate);
-        console.log('to:', formatedToDate);
+        formatedToDate = `${toDate.getFullYear()}-${(toDate.getMonth() + 1).toString().padStart(2, '0')}-${toDate
+          .getDate()
+          .toString()
+          .padStart(2, '0')}`;
       }
 
       let dataOrders;

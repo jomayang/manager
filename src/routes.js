@@ -24,6 +24,10 @@ import ParcelPage from './pages/ParcelPage';
 import AuditPage from './pages/AuditPage';
 import InventoryPage from './pages/InventoryPage';
 import FinancePage from './pages/FinancePage';
+import DashboardAgent from './pages/DashboardAgent';
+import DashboardTracker from './pages/DashboardTracker';
+import DashboardAppAgent from './pages/DashboardAppAgent';
+import DashboardAppTracker from './pages/DashboardAppTracker';
 
 // ----------------------------------------------------------------------
 
@@ -34,6 +38,8 @@ const ADMIN_ROUTES = [
     children: [
       { element: <Navigate to="/dashboard/app" />, index: true },
       { path: 'app', element: <DashboardAppPage /> },
+      { path: 'rewards', element: <DashboardAgent /> },
+      { path: 'tracker', element: <DashboardTracker /> },
       { path: 'leads', element: <LeadPage /> },
       { path: 'orders', element: <OrderPage /> },
       { path: 'finance', element: <FinancePage /> },
@@ -77,7 +83,7 @@ const AGENT_ROUTES = [
     element: <DashboardLayout />,
     children: [
       { element: <Navigate to="/dashboard/app" />, index: true },
-      { path: 'app', element: <DashboardAppPage /> },
+      { path: 'app', element: <DashboardAppAgent /> },
       { path: 'leads', element: <LeadPage /> },
       { path: 'orders', element: <OrderPage /> },
     ],
@@ -106,7 +112,7 @@ const TRACKER_ROUTES = [
     element: <DashboardLayout />,
     children: [
       { element: <Navigate to="/dashboard/app" />, index: true },
-      { path: 'app', element: <DashboardAppPage /> },
+      { path: 'app', element: <DashboardAppTracker /> },
       { path: 'orders', element: <OrderPage /> },
       { path: 'tracking', element: <TrackingPageNew /> },
       // { path: 'tracking', element: <TrackingPage /> },
@@ -199,7 +205,7 @@ export default function Router() {
     const getSession = async () => {
       try {
         const { data, error } = await supabase.auth.getSession();
-        console.log('geooooooo', data.session);
+        console.log(data.session);
         if (data && data.session) {
           setUserSession(data.session);
 
@@ -213,7 +219,7 @@ export default function Router() {
           if (dataFetch && dataFetch[0]) role = dataFetch[0].role;
           if (role === 'admin') {
             setRouteState(ADMIN_ROUTES);
-            console.log('the role is admin');
+            console.log('the user is admin');
           } else if (role === 'dm') {
             setRouteState(DM_ROUTES);
           } else if (role === 'agent' || role === 'agent-associate') setRouteState(AGENT_ROUTES);

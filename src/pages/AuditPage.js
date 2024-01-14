@@ -107,6 +107,8 @@ export default function AuditPage() {
           'Shakira Lozi': 'Boutheina Nezzar',
           'Rahm Bnf19': 'Rahma benfedda',
           'Jemy Gift': 'Lina Gherzouli',
+          'boutheina nezzar': 'Boutheina Nezzar',
+          'Aymene Benniou': 'Aymene Benniou',
         };
         const { data, error } = await supabase
           .from('logs')

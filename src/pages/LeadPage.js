@@ -150,6 +150,7 @@ export default function LeadPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [filterStatus, setFilterStatus] = useState('');
   const [filterProduct, setFilterProduct] = useState('');
+  const [filterAgent, setFilterAgent] = useState('');
   const [userSession, setUserSession] = useState(null);
   const [currentUserRole, setCurrentUserRole] = useState('');
   useEffect(() => {
@@ -239,6 +240,14 @@ export default function LeadPage() {
         } else if (filterProduct === 'outfit') {
           product = ['outfit', 'ensemble'];
         }
+
+        let agent;
+        if (filterAgent === 'lina-gherzouli') {
+          agent = 17;
+        } else if (filterAgent === 'rahma-benfedda') {
+          agent = 23;
+        }
+
         let query = supabase
           .from('leads')
           .select('*', { count: 'exact' })
@@ -254,6 +263,10 @@ export default function LeadPage() {
         } else if (filterProduct !== '' && filterStatus === '') {
           query = query.in('product', product);
         }
+
+        // if (filterAgent !== '') {
+        //   query = query.eq('agent_id', agent)
+        // }
 
         if (dataUser.role === 'agent' || dataUser.role === 'agent-associate') {
           query = query.eq('agent_id', dataUser.id);

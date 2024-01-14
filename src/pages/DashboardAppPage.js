@@ -117,18 +117,23 @@ export default function DashboardAppPage() {
 
       if (data) {
         console.log('number of delivered: ', count);
-        const netPayments = data.map((order) => order.product_price + order.shipping_price - order.delivery_fees);
-        const totalRev = netPayments.reduce((partialSum, a) => partialSum + a, 0);
-        console.log('total revenue = ', totalRev);
+
         // setTotalRevenue(totalRev - returnedCount * 350);
-        setTotalRevenue(totalRev);
         setDeliveredCount(count);
-        console.log('orders', data, totalRev);
       }
     };
     fetchDelivered();
   }, [returnedCount]);
 
+  useEffect(() => {
+    const fetchRevenue = async () => {
+      const { data, error } = await supabase.rpc('retrieve_total_revenue');
+      if (data) {
+        setTotalRevenue(data[0].value);
+      }
+    };
+    fetchRevenue();
+  }, []);
   useEffect(() => {
     const fetchOrders = async () => {
       const { count, data, error } = await supabase

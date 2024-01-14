@@ -2,6 +2,7 @@
 import PropTypes from 'prop-types';
 import { alpha, styled } from '@mui/material/styles';
 import { Card, Typography } from '@mui/material';
+import { Image } from '@mui/icons-material';
 // utils
 import { fShortenNumber } from '../../../utils/formatNumber';
 // components
@@ -27,10 +28,23 @@ AppWidgetSummary.propTypes = {
   icon: PropTypes.string,
   title: PropTypes.string.isRequired,
   total: PropTypes.number.isRequired,
+  isPercentage: PropTypes.bool,
+  isShortned: PropTypes.bool,
+  star: PropTypes.bool,
   sx: PropTypes.object,
 };
 
-export default function AppWidgetSummary({ title, total, icon, color = 'primary', sx, ...other }) {
+export default function AppWidgetSummary({
+  title,
+  total,
+  icon,
+  isPercentage,
+  isShortned,
+  star,
+  color = 'primary',
+  sx,
+  ...other
+}) {
   return (
     <Card
       sx={{
@@ -53,10 +67,12 @@ export default function AppWidgetSummary({ title, total, icon, color = 'primary'
             )} 100%)`,
         }}
       >
-        <Iconify icon={icon} width={24} height={24} />
+        {star ? <img src="/trophy.png" alt="" /> : <Iconify icon={icon} width={24} height={24} />}
       </StyledIcon>
 
-      <Typography variant="h3">{fShortenNumber(total)}</Typography>
+      <Typography variant="h3">
+        {isPercentage ? `${total}%` : isShortned ? fShortenNumber(total) : `${total} DA`}
+      </Typography>
 
       <Typography variant="subtitle2" sx={{ opacity: 0.72 }}>
         {title}

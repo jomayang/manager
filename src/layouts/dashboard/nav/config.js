@@ -30,6 +30,16 @@ export const navAdminConfig = [
     icon: icon('ic_dashboard'),
   },
   {
+    title: 'rewards',
+    path: '/dashboard/rewards',
+    icon: icon('ic_label'),
+  },
+  {
+    title: 'tracker',
+    path: '/dashboard/tracker',
+    icon: icon('ic_label'),
+  },
+  {
     title: 'lead',
     path: '/dashboard/leads',
     icon: icon('ic_file'),
