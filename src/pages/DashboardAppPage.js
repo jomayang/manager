@@ -35,7 +35,7 @@ export default function DashboardAppPage() {
   const [netRevenue, setNetRevenue] = useState(0);
   const [totalDeliveryFees, setTotalDeliveryFees] = useState(0);
   const [deliveryRate, setDeliveryRate] = useState(0);
-
+  const [numberOfLeads, setNumberOfLeads] = useState(0);
   const [weekDates, setWeekDates] = useState();
   const [ordersByDay, setOrdersByDate] = useState();
   const [leadsByDay, setLeadsByDay] = useState();
@@ -145,6 +145,17 @@ export default function DashboardAppPage() {
       }
     };
     fetchOrders();
+  }, []);
+
+  useEffect(() => {
+    const fetchLeads = async () => {
+      const { count, data, error } = await supabase.from('leads').select('*', { count: 'exact' });
+
+      if (count) {
+        setNumberOfLeads(count);
+      }
+    };
+    fetchLeads();
   }, []);
 
   useEffect(() => {
@@ -279,6 +290,8 @@ export default function DashboardAppPage() {
                   <AppWidgetSummary
                     title="Total Revenue (DA)"
                     total={totalRevenue}
+                    // isCurrency
+                    isShortned
                     icon={'ant-design:dollar-circle-filled'}
                   />
                 </Grid>
@@ -296,13 +309,20 @@ export default function DashboardAppPage() {
                   <AppWidgetSummary
                     title="Confirmed Leads"
                     total={totalOrders}
+                    isShor
                     color="success"
+                    // isShortned
                     icon={'ant-design:funnel-plot-filled'}
                   />
                 </Grid>
 
                 <Grid item xs={12} sm={6} md={3}>
-                  <AppWidgetSummary title="Bug Reports" total={234} color="error" icon={'ant-design:bug-filled'} />
+                  <AppWidgetSummary
+                    title="Potential Customers"
+                    total={numberOfLeads}
+                    color="error"
+                    icon={'ant-design:customer-service-filled'}
+                  />
                 </Grid>
 
                 <Grid item xs={12} md={8} lg={8}>

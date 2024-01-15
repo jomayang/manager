@@ -21,6 +21,7 @@ import {
 } from '../sections/@dashboard/app';
 import supabase from '../config/SupabaseClient';
 import { UserContext } from '../context/UserContext';
+import { fNumber } from '../utils/formatNumber';
 
 // ----------------------------------------------------------------------
 
@@ -418,7 +419,7 @@ export default function DashboardTracker() {
             Monthly Balance:
             <br />
             <Typography variant="p" style={{ float: 'right', color: '#08660D', fontWeight: 'bold' }} color={'success'}>
-              {monthlyBalance} DA
+              {fNumber(monthlyBalance)} DA
             </Typography>
           </Typography>
         </Stack>
@@ -451,6 +452,7 @@ export default function DashboardTracker() {
                   <AppWidgetSummary
                     title="Daily Balance"
                     total={dailyBalance}
+                    isCurrency
                     color="info"
                     icon={'ant-design:dollar-circle-filled'}
                   />

@@ -4,7 +4,7 @@ import { alpha, styled } from '@mui/material/styles';
 import { Card, Typography } from '@mui/material';
 import { Image } from '@mui/icons-material';
 // utils
-import { fShortenNumber } from '../../../utils/formatNumber';
+import { fNumber, fShortenNumber } from '../../../utils/formatNumber';
 // components
 import Iconify from '../../../components/iconify';
 
@@ -30,6 +30,8 @@ AppWidgetSummary.propTypes = {
   total: PropTypes.number.isRequired,
   isPercentage: PropTypes.bool,
   isShortned: PropTypes.bool,
+
+  isCurrency: PropTypes.bool,
   star: PropTypes.bool,
   sx: PropTypes.object,
 };
@@ -40,6 +42,7 @@ export default function AppWidgetSummary({
   icon,
   isPercentage,
   isShortned,
+  isCurrency,
   star,
   color = 'primary',
   sx,
@@ -71,7 +74,8 @@ export default function AppWidgetSummary({
       </StyledIcon>
 
       <Typography variant="h3">
-        {isPercentage ? `${total}%` : isShortned ? fShortenNumber(total) : `${total} DA`}
+        {isShortned ? fShortenNumber(total) : fNumber(total)}
+        {isPercentage && '%'} {isCurrency && 'DA'}
       </Typography>
 
       <Typography variant="subtitle2" sx={{ opacity: 0.72 }}>
