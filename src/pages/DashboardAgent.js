@@ -394,7 +394,7 @@ export default function DashboardAgent() {
   useEffect(() => {
     const fetchMonthlyBalance = async () => {
       try {
-        const lastPayrollDay = 13;
+        const lastPayrollDay = 14;
 
         const lastPayrollDate = getLastDateForDayOfMonth(lastPayrollDay);
         const formattedLastPayrollDate = `${lastPayrollDate.getFullYear()}-${(lastPayrollDate.getMonth() + 1)
