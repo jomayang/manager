@@ -4,7 +4,7 @@ import { faker } from '@faker-js/faker';
 import { useTheme } from '@mui/material/styles';
 import { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Grid, Container, Typography, Stack } from '@mui/material';
+import { Grid, Container, Typography, Stack, Select, MenuItem } from '@mui/material';
 // components
 import Iconify from '../components/iconify';
 // sections
@@ -29,21 +29,11 @@ export default function DashboardAgent() {
   const { user: userAuth } = useContext(UserContext);
   const navigate = useNavigate();
   const [userRole, setUserRole] = useState('');
-  const [deliveredCount, setDeliveredCount] = useState(0);
-  const [returnedCount, setReturnedCount] = useState(0);
-  const [totalRevenue, setTotalRevenue] = useState(0);
-  const [totalOrders, setTotalOrders] = useState(0);
-  const [netRevenue, setNetRevenue] = useState(0);
-  const [totalDeliveryFees, setTotalDeliveryFees] = useState(0);
   const [deliveryRate, setDeliveryRate] = useState(0);
   const [deliveryRateStatus, setDeliveryRateStatus] = useState('info');
 
   const [weekDates, setWeekDates] = useState();
   const [weekValues, setWeekValues] = useState();
-
-  const [ordersByDay, setOrdersByDate] = useState();
-  const [leadsByDay, setLeadsByDay] = useState();
-  const [confirmRateByDay, setConfirmRateByDay] = useState();
 
   const [dailyConfirmRate, setDailyConfirmRate] = useState(0);
   const [dailyConfirmRateStatus, setDailyConfirmRateStatus] = useState('info');
@@ -55,7 +45,7 @@ export default function DashboardAgent() {
 
   const [monthlyBalance, setMonthlyBalance] = useState(0);
 
-  const [agentId, setAgentId] = useState(17);
+  const [agentId, setAgentId] = useState(23);
 
   const [leadsByStatus, setLeadsByStatus] = useState([]);
   const theme = useTheme();
@@ -168,11 +158,12 @@ export default function DashboardAgent() {
           .gt('created_at', formattedToday);
 
         if (dataCalls) {
-          if (countCalls <= 150) {
-            fixedReward = countCalls * 5.33;
-          } else {
-            fixedReward = 800;
-          }
+          // console.log('data calls: ', dataCalls);
+          fixedReward = countCalls * 5.33;
+          // if (countCalls <= 150) {
+          // } else {
+          //   fixedReward = 800;
+          // }
         }
 
         let variableReward = 0;
@@ -188,7 +179,8 @@ export default function DashboardAgent() {
             variableReward = 0;
           }
         }
-
+        console.log('fixed reward: ', fixedReward);
+        console.log('variable reward: ', variableReward);
         const dailyBalanceTemp = fixedReward + variableReward;
 
         setDailyBalance(dailyBalanceTemp);
@@ -545,7 +537,16 @@ export default function DashboardAgent() {
                     ]}
                   />
                 </Grid>
-
+                <Select
+                  value={agentId}
+                  fullWidth
+                  sx={{ marginBottom: [2, 0], marginTop: 10 }}
+                  label="confirmation rate by"
+                  onChange={(e) => setAgentId(e.target.value)}
+                >
+                  <MenuItem value={23}>Rahma</MenuItem>
+                  <MenuItem value={17}>Lina</MenuItem>
+                </Select>
                 {/* <Grid item xs={12} md={6} lg={4}>
                   <AppCurrentSubject
                     title="Current Subject"

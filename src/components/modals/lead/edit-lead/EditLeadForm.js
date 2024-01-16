@@ -720,6 +720,7 @@ function EditLeadForm({
                 <MenuItem value={'canceled'}>Canceled</MenuItem>
                 <MenuItem value={'busy'}>Busy</MenuItem>
                 <MenuItem value={'reported'}>Reported</MenuItem>
+                <MenuItem value={'out-of-stock'}>Out of Stock</MenuItem>
                 <MenuItem value={'other'}>other</MenuItem>
               </Select>
             </FormControl>
