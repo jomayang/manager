@@ -2,7 +2,7 @@ import { Helmet } from 'react-helmet-async';
 // @mui
 import { useTheme } from '@mui/material/styles';
 import { useContext, useEffect, useState } from 'react';
-import { Grid, Container, Typography, Stack } from '@mui/material';
+import { Grid, Container, Typography, Stack, Box, LinearProgress } from '@mui/material';
 // sections
 import { AppCurrentVisits, AppWebsiteVisits, AppWidgetSummary } from '../sections/@dashboard/app';
 import supabase from '../config/SupabaseClient';
@@ -31,6 +31,9 @@ export default function DashboardAppAgent() {
   const [monthlyBalance, setMonthlyBalance] = useState(0);
 
   const [agentId, setAgentId] = useState(17);
+  const [numberOfCalls, setNumberOfCalls] = useState(0);
+  const [activityProgress, setActivityProgress] = useState(0);
+  const [activityStatus, setActivityStatus] = useState('info');
 
   const [leadsByStatus, setLeadsByStatus] = useState([]);
   const theme = useTheme();
@@ -138,6 +141,17 @@ export default function DashboardAppAgent() {
 
         if (dataCalls) {
           fixedReward = countCalls * 5.33;
+          setNumberOfCalls(countCalls);
+          const activityProgressTemp = (countCalls / 200) * 100;
+          setActivityProgress(activityProgressTemp);
+
+          if (countCalls >= 150) {
+            setActivityStatus('success');
+          } else if (countCalls > 75) {
+            setActivityStatus('warning');
+          } else {
+            setActivityStatus('error');
+          }
         }
         let variableReward = 0;
 
@@ -437,6 +451,9 @@ export default function DashboardAppAgent() {
         </Stack>
 
         <Grid container spacing={3}>
+          <Box sx={{ width: '100%', marginLeft: '24px' }}>
+            <LinearProgress color={activityStatus} variant="determinate" value={activityProgress} />
+          </Box>
           <Grid item xs={12} sm={6} md={3}>
             <AppWidgetSummary
               title="Daily Confirmation Rate"

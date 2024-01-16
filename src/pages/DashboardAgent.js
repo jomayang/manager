@@ -4,7 +4,7 @@ import { faker } from '@faker-js/faker';
 import { useTheme } from '@mui/material/styles';
 import { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Grid, Container, Typography, Stack, Select, MenuItem } from '@mui/material';
+import { Grid, Container, Typography, Stack, Select, MenuItem, LinearProgress, Box } from '@mui/material';
 // components
 import Iconify from '../components/iconify';
 // sections
@@ -44,7 +44,9 @@ export default function DashboardAgent() {
   const [dailyBalance, setDailyBalance] = useState(0);
 
   const [monthlyBalance, setMonthlyBalance] = useState(0);
-
+  const [numberOfCalls, setNumberOfCalls] = useState(0);
+  const [activityProgress, setActivityProgress] = useState(0);
+  const [activityStatus, setActivityStatus] = useState('info');
   const [agentId, setAgentId] = useState(23);
 
   const [leadsByStatus, setLeadsByStatus] = useState([]);
@@ -154,16 +156,23 @@ export default function DashboardAgent() {
           .select('*', { count: 'exact' })
           .eq('entity', 'lead')
           .eq('user_fullname', agentName)
-          .not('last_status', 'in', '(other,initial)')
+          .not('last_status', 'in', '(other,initial,out-of-stock)')
           .gt('created_at', formattedToday);
 
         if (dataCalls) {
           // console.log('data calls: ', dataCalls);
           fixedReward = countCalls * 5.33;
-          // if (countCalls <= 150) {
-          // } else {
-          //   fixedReward = 800;
-          // }
+          setNumberOfCalls(countCalls);
+          const activityProgressTemp = (countCalls / 200) * 100;
+          setActivityProgress(activityProgressTemp);
+
+          if (countCalls >= 150) {
+            setActivityStatus('success');
+          } else if (countCalls > 75) {
+            setActivityStatus('warning');
+          } else {
+            setActivityStatus('error');
+          }
         }
 
         let variableReward = 0;
@@ -461,6 +470,9 @@ export default function DashboardAgent() {
           <>
             {userRole === 'admin' && (
               <Grid container spacing={3}>
+                <Box sx={{ width: '100%', marginLeft: '24px' }}>
+                  <LinearProgress color={activityStatus} variant="determinate" value={activityProgress} />
+                </Box>
                 <Grid item xs={12} sm={6} md={3}>
                   <AppWidgetSummary
                     title="Daily Confirmation Rate"
@@ -537,10 +549,13 @@ export default function DashboardAgent() {
                     ]}
                   />
                 </Grid>
+                <Grid item xs={12} md={4} lg={4}>
+                  <Typography variant={'h6'}>Number of calls: {numberOfCalls}</Typography>
+                </Grid>
                 <Select
                   value={agentId}
                   fullWidth
-                  sx={{ marginBottom: [2, 0], marginTop: 10 }}
+                  sx={{ marginBottom: [2, 0], marginTop: 2 }}
                   label="confirmation rate by"
                   onChange={(e) => setAgentId(e.target.value)}
                 >
