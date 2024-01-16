@@ -115,30 +115,29 @@ export default function DashboardAppAgent() {
           .eq('agent_id', agentId)
           .eq('is_exchange', false);
 
-        // Get the current date and time
-        const now = new Date();
-
-        // Set the time to midnight for the current day
-        const start = new Date(now);
-        start.setHours(10, 0, 0, 0);
-
-        // Calculate the difference in milliseconds
-        const timeDifference = now - start;
-
-        // Convert milliseconds to hours
-        const hoursPassed = timeDifference / (1000 * 60 * 20);
-
         let fixedReward = 0;
 
-        const currentHour = now.getHours();
-        const currentMinute = now.getMinutes();
+        const agentsDict = {
+          a23: 'Rahm Bnf19',
+          a17: 'Jemy Gift',
+        };
 
-        if (currentHour >= 20 && currentHour <= 23 && currentMinute <= 59) {
-          fixedReward = 800;
-        } else if (currentHour < 10) {
-          fixedReward = 0;
-        } else {
-          fixedReward = hoursPassed.toFixed(0) * 26;
+        const agentName = agentsDict[`a${agentId}`];
+
+        const {
+          count: countCalls,
+          data: dataCalls,
+          error: errorCalls,
+        } = await supabase
+          .from('logs')
+          .select('*', { count: 'exact' })
+          .eq('entity', 'lead')
+          .eq('user_fullname', agentName)
+          .not('last_status', 'in', '(other,initial)')
+          .gt('created_at', formattedToday);
+
+        if (dataCalls) {
+          fixedReward = countCalls * 5.33;
         }
         let variableReward = 0;
 

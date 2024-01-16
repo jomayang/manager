@@ -1213,12 +1213,12 @@ export const communesList = {
     { fee: 200, isDeliverable: true, value: 'Zaouiet Kounta', label: 'Zaouiet Kounta - زاوية كنتة' },
   ],
   Illizi: [
-    { fee: null, isDeliverable: false, value: 'Bordj El Haouas', label: 'Bordj El Haouasse - برج الحواس' },
+    { fee: null, isDeliverable: true, value: 'Bordj El Haouas', label: 'Bordj El Haouasse - برج الحواس' },
     { fee: null, isDeliverable: false, value: 'Bordj Omar Driss', label: 'Bordj Omar Driss - برج عمر إدريس' },
     { fee: null, isDeliverable: false, value: 'Debdeb', label: 'Debdeb - دبداب' },
-    { fee: null, isDeliverable: false, value: 'Djanet', label: 'Djanet - جانت' },
+    { fee: null, isDeliverable: true, value: 'Djanet', label: 'Djanet - جانت' },
     { fee: 0, isDeliverable: true, value: 'Illizi', label: 'Illizi - إيليزي' },
-    { fee: null, isDeliverable: false, value: 'In Amenas', label: 'In Amenas - إن أميناس' },
+    { fee: null, isDeliverable: true, value: 'In Amenas', label: 'In Amenas - إن أميناس' },
   ],
   Biskra: [
     { fee: 200, isDeliverable: true, value: 'Aïn Naga', label: 'Ain Naga - عين الناقة' },
