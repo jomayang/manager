@@ -140,7 +140,7 @@ export default function DashboardTracker() {
 
         // Set the time to midnight for the current day
         const start = new Date(now);
-        start.setHours(10, 0, 0, 0);
+        start.setHours(8, 0, 0, 0);
 
         // Calculate the difference in milliseconds
         const timeDifference = now - start;
@@ -153,9 +153,9 @@ export default function DashboardTracker() {
         const currentHour = now.getHours();
         const currentMinute = now.getMinutes();
 
-        if (currentHour >= 20 && currentHour <= 23 && currentMinute <= 59) {
+        if (currentHour >= 18 && currentHour <= 23 && currentMinute <= 59) {
           fixedReward = 800;
-        } else if (currentHour < 10) {
+        } else if (currentHour < 8) {
           fixedReward = 0;
         } else {
           fixedReward = hoursPassed.toFixed(0) * 26;
@@ -274,7 +274,7 @@ export default function DashboardTracker() {
           .order('date', { ascending: false });
         if (dataOrder) {
           const weekDatesTemp = dataOrder.map((item) => item.date);
-          const weekValuesTemp = dataOrder.map((item) => item.amount + 800);
+          const weekValuesTemp = dataOrder.map((item) => item.amount);
 
           setWeekDates(weekDatesTemp);
           setWeekValues(weekValuesTemp);
@@ -376,7 +376,7 @@ export default function DashboardTracker() {
         if (data) {
           accumulatedVariableRewards = data.reduce((sum, item) => sum + item.amount, 0);
 
-          accumulatedFixedRewards = count * 800;
+          accumulatedFixedRewards = 0;
         }
 
         const monthlyBalanceTemp = accumulatedVariableRewards + accumulatedFixedRewards;

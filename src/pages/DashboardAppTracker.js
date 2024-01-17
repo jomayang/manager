@@ -247,7 +247,7 @@ export default function DashboardAppTracker() {
           .order('date', { ascending: false });
         if (dataOrder) {
           const weekDatesTemp = dataOrder.map((item) => item.date);
-          const weekValuesTemp = dataOrder.map((item) => item.amount + 800);
+          const weekValuesTemp = dataOrder.map((item) => item.amount);
 
           setWeekDates(weekDatesTemp);
           setWeekValues(weekValuesTemp);
@@ -351,7 +351,7 @@ export default function DashboardAppTracker() {
         if (data) {
           accumulatedVariableRewards = data.reduce((sum, item) => sum + item.amount, 0);
 
-          accumulatedFixedRewards = count * 800;
+          accumulatedFixedRewards = 0;
         }
 
         const monthlyBalanceTemp = accumulatedVariableRewards + accumulatedFixedRewards;

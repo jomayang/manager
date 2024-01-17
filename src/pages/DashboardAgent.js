@@ -4,7 +4,18 @@ import { faker } from '@faker-js/faker';
 import { useTheme } from '@mui/material/styles';
 import { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Grid, Container, Typography, Stack, Select, MenuItem, LinearProgress, Box } from '@mui/material';
+import styled from '@emotion/styled';
+import {
+  Grid,
+  Container,
+  Typography,
+  Stack,
+  Select,
+  MenuItem,
+  LinearProgress,
+  Box,
+  linearProgressClasses,
+} from '@mui/material';
 // components
 import Iconify from '../components/iconify';
 // sections
@@ -24,7 +35,17 @@ import { UserContext } from '../context/UserContext';
 import { fNumber } from '../utils/formatNumber';
 
 // ----------------------------------------------------------------------
-
+const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
+  height: 4,
+  borderRadius: 5,
+  [`&.${linearProgressClasses.colorPrimary}`]: {
+    backgroundColor: theme.palette.grey[theme.palette.mode === 'light' ? 200 : 800],
+  },
+  [`& .${linearProgressClasses.bar}`]: {
+    borderRadius: 5,
+    // backgroundColor: theme.palette.mode === 'light' ? '#1a90ff' : '#308fe8',
+  },
+}));
 export default function DashboardAgent() {
   const { user: userAuth } = useContext(UserContext);
   const navigate = useNavigate();
@@ -327,7 +348,7 @@ export default function DashboardAgent() {
           .order('date', { ascending: false });
         if (dataOrder) {
           const weekDatesTemp = dataOrder.map((item) => item.date);
-          const weekValuesTemp = dataOrder.map((item) => item.amount + 800);
+          const weekValuesTemp = dataOrder.map((item) => item.amount);
 
           setWeekDates(weekDatesTemp);
           setWeekValues(weekValuesTemp);
@@ -418,7 +439,7 @@ export default function DashboardAgent() {
         if (data) {
           accumulatedVariableRewards = data.reduce((sum, item) => sum + item.amount, 0);
 
-          accumulatedFixedRewards = count * 800;
+          accumulatedFixedRewards = 0;
         }
 
         const monthlyBalanceTemp = accumulatedVariableRewards + accumulatedFixedRewards;
@@ -471,7 +492,7 @@ export default function DashboardAgent() {
             {userRole === 'admin' && (
               <Grid container spacing={3}>
                 <Box sx={{ width: '100%', marginLeft: '24px' }}>
-                  <LinearProgress color={activityStatus} variant="determinate" value={activityProgress} />
+                  <BorderLinearProgress color={activityStatus} variant="determinate" value={activityProgress} />
                 </Box>
                 <Grid item xs={12} sm={6} md={3}>
                   <AppWidgetSummary

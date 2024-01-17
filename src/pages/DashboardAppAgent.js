@@ -136,7 +136,7 @@ export default function DashboardAppAgent() {
           .select('*', { count: 'exact' })
           .eq('entity', 'lead')
           .eq('user_fullname', agentName)
-          .not('last_status', 'in', '(other,initial)')
+          .not('last_status', 'in', '(other,initial,out-of-stock)')
           .gt('created_at', formattedToday);
 
         if (dataCalls) {
@@ -304,7 +304,7 @@ export default function DashboardAppAgent() {
           .order('date', { ascending: false });
         if (dataOrder) {
           const weekDatesTemp = dataOrder.map((item) => item.date);
-          const weekValuesTemp = dataOrder.map((item) => item.amount + 800);
+          const weekValuesTemp = dataOrder.map((item) => item.amount);
 
           setWeekDates(weekDatesTemp);
           setWeekValues(weekValuesTemp);
@@ -402,7 +402,7 @@ export default function DashboardAppAgent() {
         if (data) {
           accumulatedVariableRewards = data.reduce((sum, item) => sum + item.amount, 0);
 
-          accumulatedFixedRewards = count * 800;
+          accumulatedFixedRewards = 0;
         }
 
         const monthlyBalanceTemp = accumulatedVariableRewards + accumulatedFixedRewards;
