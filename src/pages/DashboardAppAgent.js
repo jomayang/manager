@@ -35,6 +35,7 @@ export default function DashboardAppAgent() {
   const [activityProgress, setActivityProgress] = useState(0);
   const [activityStatus, setActivityStatus] = useState('info');
 
+  const [level, setLevel] = useState();
   const [leadsByStatus, setLeadsByStatus] = useState([]);
   const theme = useTheme();
   useEffect(() => {
@@ -156,17 +157,23 @@ export default function DashboardAppAgent() {
         let variableReward = 0;
 
         if (data) {
-          if (confirmRate >= 60) {
+          if (confirmRate >= 65) {
+            variableReward = count * 60;
+            setLevel('level3');
+          } else if (confirmRate >= 60) {
             variableReward = count * 50;
+            setLevel('level2');
           } else if (confirmRate >= 55) {
             variableReward = count * 40;
+            setLevel('level1');
           } else if (confirmRate > 42) {
             variableReward = count * 30;
           } else {
             variableReward = 0;
           }
         }
-
+        console.log('variable reward: ', variableReward);
+        console.log('fixed reward: ', fixedReward);
         const dailyBalanceTemp = fixedReward + variableReward;
 
         setDailyBalance(dailyBalanceTemp);
@@ -175,7 +182,7 @@ export default function DashboardAppAgent() {
       }
     };
     fetchDailyBalance();
-  }, [agentId]);
+  }, [agentId, confirmRate]);
 
   useEffect(() => {
     const fetchDailyConfirmRate = async () => {
@@ -490,6 +497,7 @@ export default function DashboardAppAgent() {
               title="Daily Balance"
               total={dailyBalance}
               isCurrency
+              level={level}
               color="info"
               icon={'ant-design:dollar-circle-filled'}
             />
@@ -530,7 +538,9 @@ export default function DashboardAppAgent() {
               ]}
             />
           </Grid>
-
+          <Grid item xs={12} md={4} lg={4}>
+            <Typography variant={'h6'}>Number of calls: {numberOfCalls}</Typography>
+          </Grid>
           {/* <Grid item xs={12} md={6} lg={4}>
                   <AppCurrentSubject
                     title="Current Subject"

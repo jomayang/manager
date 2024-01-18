@@ -68,6 +68,7 @@ export default function DashboardAgent() {
   const [numberOfCalls, setNumberOfCalls] = useState(0);
   const [activityProgress, setActivityProgress] = useState(0);
   const [activityStatus, setActivityStatus] = useState('info');
+  const [level, setLevel] = useState();
   const [agentId, setAgentId] = useState(23);
 
   const [leadsByStatus, setLeadsByStatus] = useState([]);
@@ -197,12 +198,17 @@ export default function DashboardAgent() {
         }
 
         let variableReward = 0;
-
+        // const confrate = 67;
         if (data) {
-          if (confirmRate >= 60) {
+          if (confirmRate >= 65) {
+            variableReward = count * 60;
+            setLevel('level3');
+          } else if (confirmRate >= 60) {
             variableReward = count * 50;
+            setLevel('level2');
           } else if (confirmRate >= 55) {
             variableReward = count * 40;
+            setLevel('level1');
           } else if (confirmRate > 42) {
             variableReward = count * 30;
           } else {
@@ -537,6 +543,7 @@ export default function DashboardAgent() {
                     title="Daily Balance"
                     total={dailyBalance}
                     isCurrency
+                    level={level}
                     color="info"
                     icon={'ant-design:dollar-circle-filled'}
                   />

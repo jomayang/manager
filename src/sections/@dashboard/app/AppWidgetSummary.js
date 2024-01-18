@@ -44,6 +44,7 @@ export default function AppWidgetSummary({
   isShortned,
   isCurrency,
   star,
+  level,
   color = 'primary',
   sx,
   ...other
@@ -70,7 +71,13 @@ export default function AppWidgetSummary({
             )} 100%)`,
         }}
       >
-        {star ? <img src="/trophy.png" alt="" /> : <Iconify icon={icon} width={24} height={24} />}
+        {star ? (
+          <img src="/trophy.png" alt="" />
+        ) : level ? (
+          <img src={`/assets/badges/${level}.png`} alt="" />
+        ) : (
+          <Iconify icon={icon} width={24} height={24} />
+        )}
       </StyledIcon>
 
       <Typography variant="h3">
