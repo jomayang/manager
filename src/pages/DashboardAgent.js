@@ -199,7 +199,7 @@ export default function DashboardAgent() {
         let variableReward = 0;
 
         if (data) {
-          if (confirmRate > 65) {
+          if (confirmRate >= 60) {
             variableReward = count * 50;
           } else if (confirmRate >= 55) {
             variableReward = count * 40;
@@ -421,8 +421,15 @@ export default function DashboardAgent() {
   useEffect(() => {
     const fetchMonthlyBalance = async () => {
       try {
-        const lastPayrollDay = 14;
-
+        // const lastPayrollDay = 14;
+        let lastPayrollDay;
+        if (agentId === 17) {
+          lastPayrollDay = 14;
+        } else if (agentId === 23) {
+          lastPayrollDay = 13;
+        } else {
+          lastPayrollDay = 1;
+        }
         const lastPayrollDate = getLastDateForDayOfMonth(lastPayrollDay);
         const formattedLastPayrollDate = `${lastPayrollDate.getFullYear()}-${(lastPayrollDate.getMonth() + 1)
           .toString()

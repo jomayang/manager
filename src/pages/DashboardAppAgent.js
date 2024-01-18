@@ -156,7 +156,7 @@ export default function DashboardAppAgent() {
         let variableReward = 0;
 
         if (data) {
-          if (confirmRate > 65) {
+          if (confirmRate >= 60) {
             variableReward = count * 50;
           } else if (confirmRate >= 55) {
             variableReward = count * 40;
