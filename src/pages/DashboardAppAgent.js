@@ -167,13 +167,14 @@ export default function DashboardAppAgent() {
             variableReward = count * 40;
             setLevel('level1');
           } else if (confirmRate > 42) {
+            setLevel(null);
             variableReward = count * 30;
           } else {
             variableReward = 0;
           }
         }
-        console.log('variable reward: ', variableReward);
-        console.log('fixed reward: ', fixedReward);
+        // console.log('variable reward: ', variableReward);
+        // console.log('fixed reward: ', fixedReward);
         const dailyBalanceTemp = fixedReward + variableReward;
 
         setDailyBalance(dailyBalanceTemp);
