@@ -399,73 +399,70 @@ export default function DashboardAppTracker() {
           </Typography>
         </Stack>
 
-        {userRole && (
-          <>
-            {userRole === 'admin' && (
-              <Grid container spacing={3}>
-                <Grid item xs={12} sm={6} md={4}>
-                  <AppWidgetSummary
-                    title="Weekly Delivery Rate"
-                    total={weeklyDeliveryRate}
-                    isPercentage
-                    color={weeklyDeliveryRateStatus}
-                    icon={'ant-design:funnel-plot-outlined'}
-                  />
-                </Grid>
+        <Grid container spacing={3}>
+          <Grid item xs={12} sm={6} md={4}>
+            <AppWidgetSummary
+              title="Weekly Delivery Rate"
+              total={weeklyDeliveryRate}
+              isPercentage
+              color={weeklyDeliveryRateStatus}
+              icon={'ant-design:funnel-plot-outlined'}
+            />
+          </Grid>
 
-                <Grid item xs={12} sm={6} md={4}>
-                  <AppWidgetSummary
-                    title="Delivery Rate"
-                    isPercentage
-                    total={deliveryRate}
-                    color={deliveryRateStatus}
-                    icon={'ant-design:transaction-outlined'}
-                  />
-                </Grid>
+          <Grid item xs={12} sm={6} md={4}>
+            <AppWidgetSummary
+              title="Delivery Rate"
+              isPercentage
+              total={deliveryRate}
+              color={deliveryRateStatus}
+              icon={'ant-design:transaction-outlined'}
+            />
+          </Grid>
 
-                <Grid item xs={12} sm={6} md={4}>
-                  <AppWidgetSummary
-                    title="Daily Balance"
-                    total={dailyBalance}
-                    isCurrency
-                    color="info"
-                    icon={'ant-design:dollar-circle-filled'}
-                  />
-                </Grid>
+          <Grid item xs={12} sm={6} md={4}>
+            <AppWidgetSummary
+              title="Daily Balance"
+              total={dailyBalance}
+              isCurrency
+              color="info"
+              icon={'ant-design:dollar-circle-filled'}
+            />
+          </Grid>
 
-                <Grid item xs={12} md={8} lg={8}>
-                  <AppWebsiteVisits
-                    title="Weekly Stats"
-                    subheader="Recent lead generation performance stats"
-                    chartLabels={weekDates}
-                    isPercent
-                    chartData={[
-                      {
-                        name: 'Daily balance (DA)',
-                        type: 'column',
-                        fill: 'solid',
-                        data: weekValues,
-                        color: theme.palette.success.dark,
-                      },
-                    ]}
-                    // chartColors={[theme.palette.success.main]}
-                  />
-                </Grid>
+          <Grid item xs={12} md={8} lg={8}>
+            <AppWebsiteVisits
+              title="Weekly Stats"
+              subheader="Recent lead generation performance stats"
+              chartLabels={weekDates}
+              isPercent
+              chartData={[
+                {
+                  name: 'Daily balance (DA)',
+                  type: 'column',
+                  fill: 'solid',
+                  data: weekValues,
+                  color: theme.palette.success.dark,
+                },
+              ]}
+              // chartColors={[theme.palette.success.main]}
+            />
+          </Grid>
 
-                <Grid item xs={12} md={4} lg={4}>
-                  <AppCurrentVisits
-                    title="Recent Order Situation"
-                    chartData={leadsByStatus}
-                    chartColors={[
-                      theme.palette.success.main,
-                      theme.palette.warning.main,
-                      theme.palette.error.main,
-                      theme.palette.info.main,
-                    ]}
-                  />
-                </Grid>
+          <Grid item xs={12} md={4} lg={4}>
+            <AppCurrentVisits
+              title="Recent Order Situation"
+              chartData={leadsByStatus}
+              chartColors={[
+                theme.palette.success.main,
+                theme.palette.warning.main,
+                theme.palette.error.main,
+                theme.palette.info.main,
+              ]}
+            />
+          </Grid>
 
-                {/* <Grid item xs={12} md={6} lg={4}>
+          {/* <Grid item xs={12} md={6} lg={4}>
                   <AppCurrentSubject
                     title="Current Subject"
                     chartLabels={['Consistency', 'Availability', 'Confirm Rate', 'Delivery Rate', 'Volume']}
@@ -477,10 +474,7 @@ export default function DashboardAppTracker() {
                     chartColors={[...Array(6)].map(() => theme.palette.text.secondary)}
                   />
                 </Grid> */}
-              </Grid>
-            )}
-          </>
-        )}
+        </Grid>
       </Container>
     </>
   );

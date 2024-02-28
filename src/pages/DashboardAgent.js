@@ -202,7 +202,7 @@ export default function DashboardAgent() {
         if (data) {
           if (confirmRate >= 65) {
             variableReward = count * 60;
-            setLevel('level3');
+            setLevel('level4');
           } else if (confirmRate >= 60) {
             variableReward = count * 50;
             setLevel('level2');
@@ -545,7 +545,7 @@ export default function DashboardAgent() {
                     total={dailyBalance}
                     isCurrency
                     level={level}
-                    color="info"
+                    color="success"
                     icon={'ant-design:dollar-circle-filled'}
                   />
                 </Grid>

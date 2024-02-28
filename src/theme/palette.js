@@ -52,6 +52,15 @@ const SUCCESS = {
   contrastText: GREY[800],
 };
 
+const SPECIAL = {
+  lighter: '#E9FCD4',
+  light: '#AAF27F',
+  main: '#54D62C',
+  dark: '#229A16',
+  darker: '#08660D',
+  contrastText: GREY[800],
+};
+
 const WARNING = {
   lighter: '#FFF7CD',
   light: '#FFE16A',
