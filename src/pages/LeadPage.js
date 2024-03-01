@@ -238,7 +238,9 @@ export default function LeadPage() {
         } else if (filterProduct === 'shoes') {
           product = ['chaussure_1', 'chaussure_2', 'chaussure_3'];
         } else if (filterProduct === 'outfit') {
-          product = ['outfit', 'ensemble'];
+          product = ['outfit', 'ensemble', 'ensemble_n2_'];
+        } else if (filterProduct === 'ensemble-daim') {
+          product = ['ensemble_n4_'];
         }
 
         let agent;
@@ -591,6 +593,7 @@ export default function LeadPage() {
                     <MenuItem value={'oil'}>Oil</MenuItem>
                     <MenuItem value={'shoes'}>Shoes</MenuItem>
                     <MenuItem value={'ensemble'}>Ensemble</MenuItem>
+                    <MenuItem value={'ensemble-daim'}>Ensemble en Daim</MenuItem>
                     <MenuItem value={'tampon-sourcils'}>Tampon sourcils</MenuItem>
                   </Select>
                 </FormControl>
