@@ -459,10 +459,16 @@ export const agencies = {
       label: 'El Hidhab',
     },
   ],
+  Bougaa: [
+    {
+      value: '192601',
+      label: 'Agence de Bougaa',
+    },
+  ],
   'El Eulma': [
     {
-      value: '193201',
-      label: 'Agence de El Eulma',
+      value: '193202',
+      label: 'Desk El Eulma',
     },
   ],
   'Aïn Oulmene': [
