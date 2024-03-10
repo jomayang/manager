@@ -163,7 +163,7 @@ export const communesStopdesk = {
   ],
   'Souk Ahras': [{ value: 'Souk Ahras', label: 'Souk Ahras - سوق أهراس' }],
   Naâma: [
-    { value: 'Naâma', label: 'Naama - النعامة' },
+    // { value: 'Naâma', label: 'Naama - النعامة' },
     { value: 'Mecheria', label: 'Mecheria - مشرية' },
   ],
   Boumerdès: [

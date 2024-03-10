@@ -571,12 +571,7 @@ export const agencies = {
       label: 'Agence de Souk Ahras',
     },
   ],
-  Naâma: [
-    {
-      value: '450101',
-      label: 'Agence de Naâma',
-    },
-  ],
+
   Mecheria: [
     {
       value: '450201',
