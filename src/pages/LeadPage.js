@@ -443,13 +443,18 @@ export default function LeadPage() {
     if (e.key === 'Enter') {
       try {
         setIsLoading(true);
-        const { count, data, error } = await supabase
+        let query = supabase
           .from('leads')
           .select('*', { count: 'exact' })
           .like('phone', `%${searchInput}%`)
-          .eq('agent_id', currentUserRole !== 'admin' && currentUser.id)
           .order('created_at', { ascending: false })
           .range(page * rowsPerPage, page * rowsPerPage + rowsPerPage - 1);
+
+        if (currentUserRole !== 'admin') {
+          query = query.eq('agent_id', currentUser.id);
+        }
+
+        const { count, data, error } = await query;
 
         if (data) {
           const fetchedLeads = data.map((lead) => ({
@@ -474,7 +479,7 @@ export default function LeadPage() {
           setLeads(fetchedLeads);
         }
         if (error) {
-          console.log(error);
+          console.log('something went very wrong', error);
         }
         setIsLoading(false);
       } catch (error) {
