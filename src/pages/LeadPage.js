@@ -153,6 +153,8 @@ export default function LeadPage() {
   const [filterAgent, setFilterAgent] = useState('');
   const [userSession, setUserSession] = useState(null);
   const [currentUserRole, setCurrentUserRole] = useState('');
+  const [currentUser, setCurrentUser] = useState({});
+  const [listOfProducts, setListOfProducts] = useState([]);
   useEffect(() => {
     console.log(selected);
   }, [selected]);
@@ -216,6 +218,16 @@ export default function LeadPage() {
   const isNotFound = !filteredLeads.length && !!filterName;
 
   useEffect(() => {
+    const fetchProducts = async () => {
+      const { data } = await supabase.rpc('get_all_products');
+      if (data) {
+        setListOfProducts(data);
+      }
+    };
+    fetchProducts();
+  }, []);
+
+  useEffect(() => {
     const fetchLeads = async () => {
       try {
         setIsLoading(true);
@@ -225,23 +237,13 @@ export default function LeadPage() {
 
         if (dataUser) {
           console.log('data user: ', dataUser);
+          setCurrentUser(dataUser);
         }
 
         if (errorUser) {
           console.log('error user: ', errorUser);
         }
-        let product;
-        if (filterProduct === 'oil') {
-          product = ['زيت اللحية'];
-        } else if (filterProduct === 'tampon-sourcils') {
-          product = ['طابع الحواجب'];
-        } else if (filterProduct === 'shoes') {
-          product = ['chaussure_1', 'chaussure_2', 'chaussure_3'];
-        } else if (filterProduct === 'outfit') {
-          product = ['outfit', 'ensemble', 'ensemble_n2_'];
-        } else if (filterProduct === 'ensemble-daim') {
-          product = ['ensemble_n4_'];
-        }
+        const product = filterProduct;
 
         let agent;
         if (filterAgent === 'lina-gherzouli') {
@@ -257,13 +259,17 @@ export default function LeadPage() {
           // .eq('agent_id', dataUser.id)
           .order('created_at', { ascending: false })
           .range(page * rowsPerPage, page * rowsPerPage + rowsPerPage - 1);
-        if (filterStatus !== '' && filterProduct !== '') {
-          query = query.eq('status', filterStatus).in('product', product);
-        } else if (filterStatus !== '' && filterProduct === '') {
-          console.log('filter is ', filterStatus);
+
+        if (filterStatus !== '') {
           query = query.eq('status', filterStatus);
-        } else if (filterProduct !== '' && filterStatus === '') {
-          query = query.in('product', product);
+        }
+
+        if (filterProduct !== '') {
+          query = query.eq('product', filterProduct);
+        }
+
+        if (filterAgent !== '') {
+          query = query.eq('agent_id', agent);
         }
 
         // if (filterAgent !== '') {
@@ -273,7 +279,7 @@ export default function LeadPage() {
         if (dataUser.role === 'agent' || dataUser.role === 'agent-associate') {
           query = query.eq('agent_id', dataUser.id);
         }
-        console.log('query  =', query);
+
         const { count, data, error } = await query;
 
         // if (dataAuth) {
@@ -318,7 +324,7 @@ export default function LeadPage() {
       }
     };
     fetchLeads();
-  }, [rowsPerPage, page, triggerFetch, filterStatus, filterProduct]);
+  }, [rowsPerPage, page, triggerFetch, filterStatus, filterProduct, filterAgent]);
   useEffect(() => {
     const getSession = async () => {
       try {
@@ -441,6 +447,7 @@ export default function LeadPage() {
           .from('leads')
           .select('*', { count: 'exact' })
           .like('phone', `%${searchInput}%`)
+          .eq('agent_id', currentUserRole !== 'admin' && currentUser.id)
           .order('created_at', { ascending: false })
           .range(page * rowsPerPage, page * rowsPerPage + rowsPerPage - 1);
 
@@ -590,13 +597,28 @@ export default function LeadPage() {
                     }}
                   >
                     <MenuItem value={''}>All</MenuItem>
-                    <MenuItem value={'oil'}>Oil</MenuItem>
-                    <MenuItem value={'shoes'}>Shoes</MenuItem>
-                    <MenuItem value={'ensemble'}>Ensemble</MenuItem>
-                    <MenuItem value={'ensemble-daim'}>Ensemble en Daim</MenuItem>
-                    <MenuItem value={'tampon-sourcils'}>Tampon sourcils</MenuItem>
+                    {listOfProducts.map((item) => (
+                      <MenuItem value={item.val}>{item.val}</MenuItem>
+                    ))}
                   </Select>
                 </FormControl>
+                {currentUserRole === 'admin' && (
+                  <FormControl fullWidth style={{ width: 240, marginLeft: 10, marginTop: 10, marginBottom: 10 }}>
+                    <InputLabel>Filter Agent</InputLabel>
+                    <Select
+                      value={filterAgent}
+                      label="filter-agent"
+                      onChange={(e) => {
+                        setFilterAgent(e.target.value);
+                        setPage(0);
+                      }}
+                    >
+                      <MenuItem value={''}>All</MenuItem>
+                      <MenuItem value={'lina-gherzouli'}>Gherzouli lina</MenuItem>
+                      <MenuItem value={'rahma-benfedda'}>Benfedda rahma</MenuItem>
+                    </Select>
+                  </FormControl>
+                )}
               </div>
               // <button
               // </form>
